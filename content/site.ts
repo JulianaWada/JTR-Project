@@ -141,3 +141,17 @@ export const budgetBrackets: Record<(typeof budgetRanges)[number], [number, numb
 };
 
 export const currencies = ["USD", "EUR", "GBP", "NGN", "AED", "CAD", "ZAR"] as const;
+
+/**
+ * Rough USD exchange rates, used only to show budget ranges in the visitor's chosen currency.
+ * TODO: review these occasionally; they are display hints, not quotes.
+ */
+export const approxUsdRates: Record<(typeof currencies)[number], number> = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.78,
+  NGN: 1500,
+  AED: 3.67,
+  CAD: 1.37,
+  ZAR: 18,
+};

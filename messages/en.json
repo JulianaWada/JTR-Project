@@ -126,7 +126,7 @@
       "what": "What we do",
       "who": "Who it's for",
       "deliverables": "Example deliverables",
-      "cta": "Discuss a {service} project"
+      "cta": "Talk to us about {service}"
     }
   },
   "regions": {
@@ -436,7 +436,7 @@
       "message": "Tell us about your project",
       "messageHint": "Goals, timeline, links, anything that helps.",
       "optional": "optional",
-      "consent": "I agree that JTR may use these details to reply to my enquiry, as described in the privacy policy.",
+      "consent": "I agree that JTR may use these details to reply to my enquiry, as described in the <link>privacy policy</link>.",
       "submit": "Send enquiry",
       "sending": "Sending…",
       "successTitle": "Thank you, your message is on its way.",

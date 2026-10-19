@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.9.2",
     "clsx": "^2.1.1",
     "gray-matter": "^4.0.3",
+    "libphonenumber-js": "^1.13.15",
     "motion": "^14.3.0",
     "next": "16.4.2",
     "next-intl": "^4.14.9",
@@ -21,8 +22,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-hook-form": "^7.90.0",
-    "react-phone-number-input": "^3.4.18",
     "resend": "^6.34.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7"
   },
