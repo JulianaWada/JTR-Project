@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Palette A "Steel & Electric Blue", taken from the JTR emblem. */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-2: #eef2f7;
+  --ink: #0a1a33;
+  --muted: #4b5a6e;
+  --primary: #1563d6;
+  --primary-ink: #ffffff;
+  --primary-soft: #e3eefc;
+  --silver: #c5ccd6;
+  --border: #dde3eb;
+  --navy: #0a1a33;
+  --ring: #1563d6;
+  --success: #0f7b4a;
+  --danger: #b42318;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #07111f;
+  --surface: #0d1b2e;
+  --surface-2: #12243b;
+  --ink: #e6ebf2;
+  --muted: #9aa8ba;
+  --primary: #3b9bff;
+  --primary-ink: #07111f;
+  --primary-soft: #0f2a4a;
+  --silver: #8f9bab;
+  --border: #1a2a42;
+  --navy: #07111f;
+  --ring: #6bb4ff;
+  --success: #3ccf8e;
+  --danger: #ff7a6e;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-silver: var(--silver);
+  --color-line: var(--border);
+  --color-navy: var(--navy);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-body), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  --radius-card: 1.25rem;
+  --container-site: 76rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+/* Arabic reads better without letter-spacing and with a touch more line height. */
+:lang(ar) {
+  letter-spacing: 0 !important;
+  line-height: 1.75;
+}
+:lang(ar) h1,
+:lang(ar) h2,
+:lang(ar) h3 {
+  line-height: 1.35;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Brushed-silver hairline used under headings and on cards. */
+.hairline {
+  background: linear-gradient(90deg, transparent, var(--silver), transparent);
+  height: 1px;
+}
+
+/* Angular cut echoing the diagonal of the "R" in the emblem. */
+.cut-corner {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), calc(100% - 1.5rem) 100%, 0 100%);
+}
+[dir="rtl"] .cut-corner {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 1.5rem 100%, 0 calc(100% - 1.5rem));
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.prose-jtr {
+  line-height: 1.75;
+}
+.prose-jtr h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+.prose-jtr h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.prose-jtr p,
+.prose-jtr ul,
+.prose-jtr ol {
+  margin-bottom: 1.1rem;
+  color: var(--ink);
+}
+.prose-jtr ul {
+  list-style: disc;
+  padding-inline-start: 1.25rem;
+}
+.prose-jtr ol {
+  list-style: decimal;
+  padding-inline-start: 1.25rem;
+}
+.prose-jtr a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-jtr blockquote {
+  border-inline-start: 3px solid var(--primary);
+  padding-inline-start: 1rem;
+  color: var(--muted);
+  margin: 1.5rem 0;
+}
+.prose-jtr code {
+  background: var(--surface-2);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  font-size: 0.9em;
+}

@@ -1,0 +1,143 @@
+/**
+ * Structured site content. Words that visitors read live in /messages/*.json;
+ * this file holds facts, links, IDs and placeholder data shared by every language.
+ *
+ * Every value marked TODO is a placeholder to replace before launch
+ * (they are all listed in the README under "Placeholders").
+ */
+
+export const siteConfig = {
+  name: "Jules TechRight",
+  shortName: "JTR",
+  legalName: "Jules TechRight (JTR) Ltd",
+  // TODO: replace with the production domain once it is registered.
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.julestechright.com",
+  foundingCountry: "NG",
+  headquarters: {
+    // TODO: replace with the real office address.
+    street: "TODO: Street address",
+    city: "Lagos",
+    region: "Lagos State",
+    postalCode: "TODO",
+    country: "Nigeria",
+    countryCode: "NG",
+  },
+  contact: {
+    // TODO: replace with the real contact email.
+    email: "hello@julestechright.com",
+    // TODO: replace with the real phone number (E.164 format).
+    phone: "+234 000 000 0000",
+    phoneHref: "tel:+2340000000000",
+    // TODO: replace with the real WhatsApp number (digits only, with country code).
+    whatsapp: "2340000000000",
+    // TODO: replace with the real careers inbox.
+    careersEmail: "careers@julestechright.com",
+  },
+  // TODO: replace with the real Cal.com booking link. Cal.com shows times in the visitor's time zone automatically.
+  bookingUrl: "https://cal.com/julestechright/intro-call",
+  // TODO: replace with a real Google Maps embed URL for the Lagos office.
+  mapEmbedUrl: "",
+  social: [
+    // TODO: replace with real profile URLs (or delete the ones you don't use).
+    { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/company/julestechright" },
+    { id: "x", label: "X", href: "https://x.com/julestechright" },
+    { id: "github", label: "GitHub", href: "https://github.com/julestechright" },
+    { id: "instagram", label: "Instagram", href: "https://www.instagram.com/julestechright" },
+  ],
+} as const;
+
+export const serviceIds = [
+  "websites",
+  "mobile",
+  "agentic-ai",
+  "edtech",
+  "digital-transformation",
+] as const;
+export type ServiceId = (typeof serviceIds)[number];
+
+export const regionIds = [
+  "africa",
+  "europe",
+  "north-america",
+  "middle-east",
+  "global",
+] as const;
+export type RegionId = (typeof regionIds)[number];
+
+/**
+ * Global reach figures shown on Home and About.
+ * TODO: replace every value with real figures before launch.
+ */
+export const reachFigures = [
+  { id: "countries", value: 12, suffix: "+" },
+  { id: "projects", value: 40, suffix: "+" },
+  { id: "timezones", value: 9, suffix: "" },
+  { id: "response", value: 24, suffix: "h" },
+] as const;
+
+/** Time zones the team covers, shown in the Global reach section. */
+export const timeZoneCoverage = [
+  { city: "lagos", tz: "Africa/Lagos" },
+  { city: "london", tz: "Europe/London" },
+  { city: "dubai", tz: "Asia/Dubai" },
+  { city: "newYork", tz: "America/New_York" },
+] as const;
+
+/**
+ * Portfolio entries. Titles and summaries are in messages under "projects.items.<id>".
+ * TODO: replace these placeholder projects with real case studies.
+ */
+export const projects: {
+  id: string;
+  service: ServiceId;
+  region: RegionId;
+  year: number;
+  featured?: boolean;
+}[] = [
+  { id: "learning-platform", service: "edtech", region: "africa", year: 2026, featured: true },
+  { id: "support-agent", service: "agentic-ai", region: "europe", year: 2026, featured: true },
+  { id: "logistics-app", service: "mobile", region: "middle-east", year: 2025, featured: true },
+  { id: "fintech-site", service: "websites", region: "north-america", year: 2025 },
+  { id: "records-migration", service: "digital-transformation", region: "africa", year: 2025 },
+  { id: "ops-copilot", service: "agentic-ai", region: "global", year: 2026 },
+];
+
+/**
+ * Team profiles. Names, roles and bios are in messages under "about.team.members.<id>".
+ * TODO: replace with real team members and add photos to /public/team/<id>.jpg.
+ */
+export const team = [
+  { id: "founder", initials: "JT" },
+  { id: "engineering", initials: "EL" },
+  { id: "ai", initials: "AI" },
+  { id: "design", initials: "DL" },
+] as const;
+
+export const valueIds = [
+  "innovation",
+  "accessibility",
+  "impact",
+  "integrity",
+  "excellence",
+] as const;
+
+export const budgetRanges = [
+  "under-10k",
+  "10k-25k",
+  "25k-50k",
+  "50k-100k",
+  "over-100k",
+  "not-sure",
+] as const;
+
+/** Budget brackets in USD; other currencies are converted roughly for display only. */
+export const budgetBrackets: Record<(typeof budgetRanges)[number], [number, number] | null> = {
+  "under-10k": [0, 10000],
+  "10k-25k": [10000, 25000],
+  "25k-50k": [25000, 50000],
+  "50k-100k": [50000, 100000],
+  "over-100k": [100000, Infinity],
+  "not-sure": null,
+};
+
+export const currencies = ["USD", "EUR", "GBP", "NGN", "AED", "CAD", "ZAR"] as const;

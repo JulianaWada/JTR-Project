@@ -1,0 +1,521 @@
+{
+  "meta": {
+    "siteName": "Jules TechRight",
+    "defaultTitle": "Jules TechRight (JTR) | Websites, apps and agentic AI, built for the world",
+    "titleTemplate": "%s | Jules TechRight",
+    "description": "Jules TechRight (JTR) is a global technology company with African roots. We build websites, mobile apps, agentic AI, educational technology and digital transformation programmes for clients worldwide."
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "mainNav": "Main navigation",
+    "footerNav": "Footer navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleTheme": "Switch between light and dark mode",
+    "themeLight": "Light mode",
+    "themeDark": "Dark mode",
+    "changeLanguage": "Change language",
+    "currentLanguage": "Current language: {language}",
+    "logoAlt": "JTR emblem",
+    "home": "Jules TechRight home",
+    "opensInNewTab": "(opens in a new tab)",
+    "breadcrumb": "Breadcrumb"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "projects": "Projects",
+    "insights": "Insights",
+    "careers": "Careers",
+    "contact": "Contact",
+    "assistant": "AI Assistant",
+    "startProject": "Start a project",
+    "bookCall": "Book a call"
+  },
+  "localeSuggestion": {
+    "message": "This site is also available in {language}.",
+    "switch": "Switch to {language}",
+    "dismiss": "No, thanks"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "viewAll": "View all",
+    "startProject": "Start a project",
+    "talkToAssistant": "Talk to our AI assistant",
+    "bookCall": "Book a call",
+    "contactUs": "Contact us",
+    "builtInAfrica": "Built in Africa, for the world",
+    "placeholder": "Placeholder",
+    "comingSoon": "Coming soon",
+    "backToTop": "Back to top"
+  },
+  "services": {
+    "websites": {
+      "name": "Websites & Web Platforms",
+      "short": "High-performing websites, web apps, portals and e-commerce that load fast on any connection and convert visitors into customers.",
+      "what": "We design and build marketing websites, web applications, customer portals, dashboards and online stores. Every build is fast, accessible, search-friendly and easy for your team to update.",
+      "who": "Start-ups launching a product, growing businesses that have outgrown their site, and organisations that need secure, scalable web platforms.",
+      "deliverables": [
+        "Corporate and marketing websites",
+        "Web applications and SaaS products",
+        "Customer and partner portals",
+        "E-commerce and payments integration",
+        "Multilingual and right-to-left sites",
+        "Performance, SEO and accessibility audits"
+      ]
+    },
+    "mobile": {
+      "name": "Mobile Applications",
+      "short": "iOS, Android and cross-platform apps that feel native, work offline and scale with your users.",
+      "what": "We take mobile products from idea to app store: product discovery, UX design, cross-platform or native development, testing, release and ongoing improvement.",
+      "who": "Businesses taking a service mobile, founders building a new product, and teams replacing an ageing app.",
+      "deliverables": [
+        "iOS and Android apps",
+        "Cross-platform apps (React Native, Flutter)",
+        "Offline-first and low-bandwidth design",
+        "In-app payments and notifications",
+        "App store launch and analytics",
+        "Maintenance and feature roadmaps"
+      ]
+    },
+    "agentic-ai": {
+      "name": "Agentic AI",
+      "short": "AI agents and assistants that understand your business, take action in your tools and free your team for higher-value work.",
+      "what": "We design, build and deploy AI agents that answer questions, complete multi-step tasks and work inside your existing systems, with the guardrails, monitoring and human oversight that responsible AI needs.",
+      "who": "Teams drowning in repetitive work, customer-facing businesses that want instant, accurate support, and leaders exploring where AI creates real value.",
+      "deliverables": [
+        "Customer support and sales assistants",
+        "Workflow and back-office automation agents",
+        "Knowledge assistants over your documents",
+        "LLM integrations into existing products",
+        "AI readiness and use-case workshops",
+        "Evaluation, guardrails and monitoring"
+      ]
+    },
+    "edtech": {
+      "name": "Educational Technology",
+      "short": "Learning platforms and tools that make education more engaging, accessible and measurable.",
+      "what": "We build learning management systems, interactive courses, assessment tools and AI tutors designed for real classrooms, remote learners and low-bandwidth environments.",
+      "who": "Schools, universities, training providers, NGOs and companies running learning and development programmes.",
+      "deliverables": [
+        "Learning platforms and LMS integrations",
+        "Interactive course and content tools",
+        "Assessment and progress tracking",
+        "AI tutors and study assistants",
+        "Mobile and offline learning",
+        "Accessibility for diverse learners"
+      ]
+    },
+    "digital-transformation": {
+      "name": "Digital Transformation",
+      "short": "Strategy and delivery that modernise how your organisation works, from paper processes to connected digital systems.",
+      "what": "We help organisations map their processes, choose the right technology and roll it out, from cloud migration and system integration to data, automation and team training.",
+      "who": "Established businesses, public-sector bodies and non-profits ready to replace manual processes and legacy systems.",
+      "deliverables": [
+        "Digital strategy and roadmaps",
+        "Process mapping and automation",
+        "Cloud migration and integration",
+        "Data and reporting dashboards",
+        "Change management and training",
+        "Ongoing technology partnership"
+      ]
+    },
+    "labels": {
+      "what": "What we do",
+      "who": "Who it's for",
+      "deliverables": "Example deliverables",
+      "cta": "Discuss a {service} project"
+    }
+  },
+  "regions": {
+    "africa": "Africa",
+    "europe": "Europe",
+    "north-america": "North America",
+    "middle-east": "Middle East",
+    "global": "Global"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Websites · Apps · Agentic AI",
+      "title": "Transforming ideas into innovative digital experiences",
+      "subtitle": "Jules TechRight builds websites, mobile apps and agentic AI that make a real difference for businesses, learners and communities, wherever they are.",
+      "tagline": "Built in Africa, for the world"
+    },
+    "services": {
+      "eyebrow": "What we do",
+      "title": "Five ways we turn ideas into impact",
+      "subtitle": "From your first website to AI agents running inside your operations, one team covers the full journey."
+    },
+    "why": {
+      "eyebrow": "Why JTR",
+      "title": "Why clients around the world choose JTR",
+      "items": {
+        "insight": {
+          "title": "African insight, global standards",
+          "body": "We understand fast-growing, mobile-first markets and build to the quality bar of the world's leading technology firms."
+        },
+        "accessibility": {
+          "title": "Accessible by design",
+          "body": "Everything we ship works on modest devices and slow connections, and meets WCAG accessibility guidelines."
+        },
+        "impact": {
+          "title": "Impact you can measure",
+          "body": "We agree on outcomes up front and design every product to simplify real challenges and create new opportunities."
+        },
+        "remote": {
+          "title": "Remote delivery across time zones",
+          "body": "Distributed by default, we overlap with your working hours in Africa, Europe, the Middle East and the Americas."
+        }
+      }
+    },
+    "reach": {
+      "eyebrow": "Global reach",
+      "title": "One team, working wherever you are",
+      "subtitle": "We partner with clients across continents, delivering remotely with clear communication and dependable overlap with your working day.",
+      "figures": {
+        "countries": "Countries served",
+        "projects": "Projects delivered",
+        "timezones": "Time zones covered",
+        "response": "Typical response time"
+      },
+      "markets": "Markets we serve",
+      "model": {
+        "title": "How remote delivery works",
+        "steps": [
+          "Kick-off call at a time that suits you",
+          "Weekly demos and a shared project board",
+          "A dedicated lead in your time zone overlap",
+          "Async updates so nothing waits on a meeting"
+        ]
+      },
+      "clocks": "Our working day, around the world",
+      "cities": {
+        "lagos": "Lagos",
+        "london": "London",
+        "dubai": "Dubai",
+        "newYork": "New York"
+      },
+      "figuresNote": "Figures are placeholders and will be updated."
+    },
+    "missionVision": {
+      "missionLabel": "Our mission",
+      "mission": "To empower individuals, businesses, and communities through technology that simplifies everyday challenges, enhances learning, improves productivity, and creates new opportunities.",
+      "visionLabel": "Our vision",
+      "vision": "To become a leading technology company in Africa, delivering innovative solutions with global impact."
+    },
+    "projects": {
+      "eyebrow": "Selected work",
+      "title": "Featured projects",
+      "subtitle": "A look at the kind of work we do. Full case studies are on the way."
+    },
+    "cta": {
+      "title": "Have an idea? Let's build it together.",
+      "subtitle": "Tell us what you're working on. We'll reply within one business day, wherever you are in the world.",
+      "whatsapp": "Chat on WhatsApp"
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "About us",
+      "description": "Learn about Jules TechRight (JTR): our story, mission, vision, values and the team building websites, apps and agentic AI for clients worldwide."
+    },
+    "hero": {
+      "eyebrow": "About JTR",
+      "title": "A global technology company with African roots",
+      "subtitle": "We believe in transforming ideas into innovative digital experiences that make a difference."
+    },
+    "story": {
+      "title": "Our story",
+      "paragraphs": [
+        "Jules TechRight (JTR) Ltd is an innovative technology company dedicated to developing smart, accessible, and impactful digital solutions. We specialise in websites and web platforms, mobile applications, agentic AI, educational technology and digital transformation.",
+        "Founded in Africa and headquartered in Lagos, we were built around a simple idea: great technology should be accessible to everyone, and it should solve real problems. Working in fast-moving, mobile-first markets taught us to build products that are lean, resilient and genuinely useful.",
+        "Today we work with clients across Africa, Europe, North America, the Middle East and beyond, delivering remotely with the craft, communication and reliability you'd expect from a leading international partner."
+      ]
+    },
+    "values": {
+      "eyebrow": "Our values",
+      "title": "What guides our work",
+      "items": {
+        "innovation": {
+          "title": "Innovation",
+          "body": "We explore new ideas and technologies, then apply the ones that create real value."
+        },
+        "accessibility": {
+          "title": "Accessibility",
+          "body": "We build for every user, every device and every connection speed."
+        },
+        "impact": {
+          "title": "Impact",
+          "body": "We measure success by the difference our work makes for people and organisations."
+        },
+        "integrity": {
+          "title": "Integrity",
+          "body": "We are honest about what's possible, transparent in how we work and careful with your data."
+        },
+        "excellence": {
+          "title": "Excellence",
+          "body": "We hold ourselves to global standards in design, engineering and delivery."
+        }
+      }
+    },
+    "team": {
+      "eyebrow": "Our team",
+      "title": "The people behind JTR",
+      "subtitle": "A distributed team of engineers, designers and AI specialists.",
+      "members": {
+        "founder": {
+          "name": "Team member name",
+          "role": "Founder & CEO",
+          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+        },
+        "engineering": {
+          "name": "Team member name",
+          "role": "Head of Engineering",
+          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+        },
+        "ai": {
+          "name": "Team member name",
+          "role": "Lead, Agentic AI",
+          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+        },
+        "design": {
+          "name": "Team member name",
+          "role": "Design Lead",
+          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+        }
+      }
+    }
+  },
+  "servicesPage": {
+    "meta": {
+      "title": "Services",
+      "description": "Websites and web platforms, mobile apps, agentic AI, educational technology and digital transformation, delivered remotely for clients worldwide."
+    },
+    "hero": {
+      "eyebrow": "Services",
+      "title": "Everything you need to build, launch and grow digital products",
+      "subtitle": "Five connected service areas, one accountable team. Pick one, or let us bring them together."
+    },
+    "jumpTo": "Jump to a service"
+  },
+  "projects": {
+    "meta": {
+      "title": "Projects",
+      "description": "Selected projects from Jules TechRight across websites, mobile apps, agentic AI, educational technology and digital transformation."
+    },
+    "hero": {
+      "eyebrow": "Portfolio",
+      "title": "Work that makes a difference",
+      "subtitle": "Filter by service area or region. Full case studies are coming soon."
+    },
+    "filters": {
+      "service": "Service area",
+      "region": "Region",
+      "all": "All",
+      "results": "{count, plural, =0 {No projects match these filters} one {# project} other {# projects}}",
+      "reset": "Clear filters"
+    },
+    "items": {
+      "learning-platform": {
+        "title": "Adaptive learning platform",
+        "summary": "Placeholder case study: a mobile-first learning platform with offline lessons and progress tracking for thousands of students."
+      },
+      "support-agent": {
+        "title": "AI customer support agent",
+        "summary": "Placeholder case study: an agentic assistant that resolves common customer requests and hands complex cases to people."
+      },
+      "logistics-app": {
+        "title": "Field logistics app",
+        "summary": "Placeholder case study: a cross-platform app for drivers with offline maps, proof of delivery and live tracking."
+      },
+      "fintech-site": {
+        "title": "Fintech marketing site",
+        "summary": "Placeholder case study: a fast, multilingual marketing site and onboarding flow for a payments start-up."
+      },
+      "records-migration": {
+        "title": "Paper-to-digital records",
+        "summary": "Placeholder case study: replacing paper records with a secure cloud system, dashboards and staff training."
+      },
+      "ops-copilot": {
+        "title": "Operations copilot",
+        "summary": "Placeholder case study: an internal AI agent that drafts reports, updates systems and answers policy questions."
+      }
+    }
+  },
+  "insights": {
+    "meta": {
+      "title": "Insights",
+      "description": "Ideas and practical guides from Jules TechRight on websites, mobile apps, agentic AI, edtech and digital transformation."
+    },
+    "hero": {
+      "eyebrow": "Insights",
+      "title": "Ideas, guides and lessons from our work",
+      "subtitle": "Practical thinking on building technology that works for everyone."
+    },
+    "readingTime": "{minutes, plural, one {# min read} other {# min read}}",
+    "publishedOn": "Published {date}",
+    "by": "By {author}",
+    "back": "All insights",
+    "empty": "No articles yet. Check back soon.",
+    "notTranslated": "This article is currently available in English only."
+  },
+  "careers": {
+    "meta": {
+      "title": "Careers",
+      "description": "Work with Jules TechRight. We hire remotely and build technology that makes a difference."
+    },
+    "hero": {
+      "eyebrow": "Careers",
+      "title": "Build technology that matters, from anywhere",
+      "subtitle": "We're a remote-first team that cares about craft, learning and impact."
+    },
+    "culture": {
+      "title": "How we work",
+      "items": [
+        {
+          "title": "Remote-first",
+          "body": "We hire talented people wherever they live and work across time zones with clear, async communication."
+        },
+        {
+          "title": "Always learning",
+          "body": "Time and budget for courses, conferences and experimenting with new tools, including AI."
+        },
+        {
+          "title": "Ownership and impact",
+          "body": "Small teams, real responsibility and work that changes how people learn, work and live."
+        }
+      ]
+    },
+    "openings": {
+      "title": "Open roles",
+      "none": "There are no open roles right now.",
+      "sendCv": "We're always happy to hear from great people. Send your CV and a short note about what you'd like to work on, and we'll keep you in mind.",
+      "cta": "Send your CV"
+    }
+  },
+  "contact": {
+    "meta": {
+      "title": "Contact",
+      "description": "Start a project with Jules TechRight. Contact us by form, email, phone or WhatsApp, or book a call at a time that suits you."
+    },
+    "hero": {
+      "eyebrow": "Contact",
+      "title": "Let's talk about your project",
+      "subtitle": "Tell us a little about what you need. We work with clients worldwide and reply within one business day."
+    },
+    "channels": {
+      "title": "Other ways to reach us",
+      "email": "Email",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "book": "Book a call",
+      "bookNote": "Pick a slot in your own time zone.",
+      "hq": "Headquarters",
+      "mapTitle": "Map of our Lagos office",
+      "mapPlaceholder": "Map coming soon"
+    },
+    "form": {
+      "title": "Project enquiry",
+      "name": "Full name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "phoneHint": "Choose your country code, then enter your number.",
+      "company": "Company or organisation",
+      "country": "Country",
+      "countryPlaceholder": "Select your country",
+      "timezone": "Time zone",
+      "service": "Service of interest",
+      "servicePlaceholder": "Select a service",
+      "serviceOther": "Something else",
+      "budget": "Budget range",
+      "budgetPlaceholder": "Select a range",
+      "currency": "Currency",
+      "budgetNotSure": "Not sure yet",
+      "message": "Tell us about your project",
+      "messageHint": "Goals, timeline, links, anything that helps.",
+      "optional": "optional",
+      "consent": "I agree that JTR may use these details to reply to my enquiry, as described in the privacy policy.",
+      "submit": "Send enquiry",
+      "sending": "Sending…",
+      "successTitle": "Thank you, your message is on its way.",
+      "successBody": "We'll reply to {email} within one business day.",
+      "errorTitle": "Something went wrong.",
+      "errorBody": "Your message wasn't sent. Please try again, or email us at {email}.",
+      "errors": {
+        "required": "This field is required.",
+        "email": "Enter a valid email address.",
+        "phone": "Enter a valid phone number.",
+        "tooLong": "This is too long.",
+        "tooShort": "Please add a little more detail.",
+        "consent": "Please confirm you agree so we can reply."
+      }
+    }
+  },
+  "assistant": {
+    "name": "JTR Assistant",
+    "meta": {
+      "title": "AI Assistant",
+      "description": "Ask the JTR Assistant about our services, process and how we work with clients worldwide."
+    },
+    "intro": "Hi! I'm the JTR Assistant. Ask me about our services, how we work with clients worldwide, or tell me about your project.",
+    "open": "Chat with the JTR Assistant",
+    "close": "Close chat",
+    "expand": "Open full screen",
+    "placeholder": "Type your message…",
+    "send": "Send",
+    "stop": "Stop",
+    "thinking": "Thinking…",
+    "disclaimer": "AI-generated answers can be wrong. For quotes and commitments, our team will follow up.",
+    "fallback": "Sorry, I can't answer right now. Please try again in a moment, or contact us at {email}.",
+    "rateLimited": "You're sending messages quickly. Please wait a minute and try again.",
+    "tooLong": "That message is a bit long. Please keep it under {max} characters.",
+    "leadSaved": "Thanks, I've passed your details to the team.",
+    "suggestions": [
+      "What services do you offer?",
+      "Can you build an AI agent for my business?",
+      "How do you work with clients abroad?",
+      "I'd like to start a project"
+    ],
+    "pageTitle": "Talk to the JTR Assistant",
+    "pageSubtitle": "Get quick answers about our services and process, or share your project and we'll take it from there."
+  },
+  "consent": {
+    "title": "Cookies and privacy",
+    "body": "We use essential cookies to run this site. With your permission we'd also like to use analytics to understand how it's used and improve it.",
+    "accept": "Accept analytics",
+    "reject": "Essential only",
+    "policy": "Privacy policy",
+    "manage": "Cookie settings"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How Jules TechRight collects, uses and protects personal data under the GDPR, UK GDPR and Nigeria Data Protection Act."
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "description": "The terms that apply when you use the Jules TechRight website."
+    },
+    "draftNotice": "This is a placeholder draft for review by a qualified lawyer before launch. It is not legal advice.",
+    "lastUpdated": "Last updated {date}"
+  },
+  "footer": {
+    "tagline": "Transforming ideas into innovative digital experiences.",
+    "company": "Company",
+    "services": "Services",
+    "legal": "Legal",
+    "connect": "Connect",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "rights": "© {year} Jules TechRight (JTR) Ltd. All rights reserved.",
+    "hq": "Headquartered in Lagos, working worldwide"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "home": "Go to the home page",
+    "contact": "Contact us"
+  }
+}
