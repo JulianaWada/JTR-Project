@@ -2,7 +2,6 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { reachFigures, regionIds } from "@/content/site";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
 import { WorldClocks } from "./WorldClocks";
 
 export async function GlobalReach({ headingLevel = "h2" }: { headingLevel?: "h2" }) {
@@ -68,10 +67,6 @@ export async function GlobalReach({ headingLevel = "h2" }: { headingLevel?: "h2"
                 </li>
               ))}
             </ol>
-            <p className="mt-6 flex items-center gap-2 text-sm text-muted">
-              <Icon name="check" size={16} className="text-primary" />
-              {t("common.builtInAfrica")}
-            </p>
           </div>
         </div>
       </div>

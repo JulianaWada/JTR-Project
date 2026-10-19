@@ -47,7 +47,6 @@
     "talkToAssistant": "Fale com o nosso assistente de IA",
     "bookCall": "Agendar uma chamada",
     "contactUs": "Fale conosco",
-    "builtInAfrica": "Feito na África, para o mundo",
     "placeholder": "Conteúdo provisório",
     "comingSoon": "Em breve",
     "backToTop": "Voltar ao topo"
@@ -141,8 +140,7 @@
     "hero": {
       "eyebrow": "Sites · Aplicativos · IA agêntica",
       "title": "Transformamos ideias em experiências digitais inovadoras",
-      "subtitle": "A Jules TechRight cria sites, aplicativos móveis e IA agêntica que fazem uma diferença real para empresas, estudantes e comunidades, onde quer que estejam.",
-      "tagline": "Feito na África, para o mundo"
+      "subtitle": "A Jules TechRight cria sites, aplicativos móveis e IA agêntica que fazem uma diferença real para empresas, estudantes e comunidades, onde quer que estejam."
     },
     "services": {
       "eyebrow": "O que fazemos",

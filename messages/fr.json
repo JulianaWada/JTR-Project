@@ -47,7 +47,6 @@
     "talkToAssistant": "Parler à notre assistant IA",
     "bookCall": "Réserver un appel",
     "contactUs": "Nous contacter",
-    "builtInAfrica": "Conçu en Afrique, pour le monde",
     "placeholder": "Contenu provisoire",
     "comingSoon": "Bientôt disponible",
     "backToTop": "Retour en haut"
@@ -141,8 +140,7 @@
     "hero": {
       "eyebrow": "Sites web · Applications · IA agentique",
       "title": "Transformer les idées en expériences digitales innovantes",
-      "subtitle": "Jules TechRight conçoit des sites web, des applications mobiles et des solutions d’IA agentique qui changent vraiment la donne pour les entreprises, les apprenants et les communautés, où qu’ils se trouvent.",
-      "tagline": "Conçu en Afrique, pour le monde"
+      "subtitle": "Jules TechRight conçoit des sites web, des applications mobiles et des solutions d’IA agentique qui changent vraiment la donne pour les entreprises, les apprenants et les communautés, où qu’ils se trouvent."
     },
     "services": {
       "eyebrow": "Ce que nous faisons",

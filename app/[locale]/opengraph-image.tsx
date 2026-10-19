@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "Jules TechRight: websites, apps and agentic AI, built in Africa for the world";
+export const alt = "Jules TechRight: websites, mobile apps and agentic AI";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -29,7 +29,7 @@ export default async function OpenGraphImage() {
           <div style={{ display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1.1, marginTop: 24, maxWidth: 720 }}>
             Transforming ideas into innovative digital experiences
           </div>
-          <div style={{ display: "flex", marginTop: 36, fontSize: 30, color: "#9aa8ba" }}>Jules TechRight · Built in Africa, for the world</div>
+          <div style={{ display: "flex", marginTop: 36, fontSize: 30, color: "#9aa8ba" }}>Jules TechRight</div>
         </div>
         <img src={emblemSrc} width={300} height={300} alt="" />
       </div>

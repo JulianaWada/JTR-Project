@@ -46,7 +46,6 @@
     "talkToAssistant": "Talk to our AI assistant",
     "bookCall": "Book a call",
     "contactUs": "Contact us",
-    "builtInAfrica": "Built in Africa, for the world",
     "placeholder": "Placeholder",
     "comingSoon": "Coming soon",
     "backToTop": "Back to top"
@@ -140,8 +139,7 @@
     "hero": {
       "eyebrow": "Websites · Apps · Agentic AI",
       "title": "Transforming ideas into innovative digital experiences",
-      "subtitle": "Jules TechRight builds websites, mobile apps and agentic AI that make a real difference for businesses, learners and communities, wherever they are.",
-      "tagline": "Built in Africa, for the world"
+      "subtitle": "Jules TechRight builds websites, mobile apps and agentic AI that make a real difference for businesses, learners and communities, wherever they are."
     },
     "services": {
       "eyebrow": "What we do",

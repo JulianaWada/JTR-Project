@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
 import { GeoPattern } from "@/components/visual/GeoPattern";
 import { HeroVisual } from "@/components/visual/HeroVisual";
 
@@ -33,10 +32,6 @@ export async function Hero() {
               {t("common.talkToAssistant")}
             </ButtonLink>
           </div>
-          <p className="mt-8 flex items-center gap-2 text-sm font-medium text-muted">
-            <Icon name="globe" size={18} className="text-primary" />
-            {t("home.hero.tagline")}
-          </p>
         </div>
         <div className="relative mx-auto w-full max-w-[17rem] sm:max-w-sm lg:max-w-md">
           <HeroVisual className="h-auto w-full drop-shadow-2xl" />

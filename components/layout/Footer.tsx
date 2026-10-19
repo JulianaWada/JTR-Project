@@ -113,9 +113,8 @@ export async function Footer() {
         </div>
       </Container>
       <div className="border-t border-line">
-        <Container className="flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+        <Container className="py-6 text-sm text-muted">
           <p>{t("footer.rights", { year })}</p>
-          <p>{t("common.builtInAfrica")}</p>
         </Container>
       </div>
     </footer>
