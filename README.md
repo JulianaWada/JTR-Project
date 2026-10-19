@@ -43,7 +43,7 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Yes in production | The public address, e.g. `https://www.julestechright.com`. Used for canonical links, hreflang, the sitemap, Open Graph and JSON-LD. |
+| `NEXT_PUBLIC_SITE_URL` | Once the domain is live | The public address, e.g. `https://www.julestechright.com`. Used for canonical links, hreflang, the sitemap, Open Graph and JSON-LD. On Vercel it falls back to the project's production address (e.g. `jtr-project.vercel.app`) until you set it. |
 | `ANTHROPIC_API_KEY` | For the assistant | Claude API key from https://console.anthropic.com. Server-side only. |
 | `RESEND_API_KEY` | Yes in production | Resend API key from https://resend.com. Server-side only. |
 | `LEADS_TO_EMAIL` | Recommended | Inbox that receives enquiries. Defaults to `siteConfig.contact.email`. |

@@ -10,8 +10,14 @@ export const siteConfig = {
   name: "Jules TechRight",
   shortName: "JTR",
   legalName: "Jules TechRight (JTR) Ltd",
-  // TODO: replace with the production domain once it is registered.
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.julestechright.com",
+  // Canonical address for SEO. Set NEXT_PUBLIC_SITE_URL once the real domain is live; until then
+  // Vercel's production address (e.g. jtr-project.vercel.app) is used, so links never point at a dead domain.
+  // TODO: set NEXT_PUBLIC_SITE_URL to the production domain once it is registered.
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://www.julestechright.com"),
   foundingCountry: "NG",
   headquarters: {
     // TODO: replace with the real office address.
