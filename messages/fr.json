@@ -453,7 +453,7 @@
     }
   },
   "assistant": {
-    "name": "JTR Assistant",
+    "name": "Besoin d’aide ?",
     "meta": {
       "title": "Assistant IA",
       "description": "Interrogez l’assistant JTR sur nos services, notre méthode et notre façon de travailler avec des clients du monde entier."
