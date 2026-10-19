@@ -15,7 +15,7 @@ export async function GlobalReach({ headingLevel = "h2" }: { headingLevel?: "h2"
     <Section tone="navy" labelledBy="reach-title" className="overflow-hidden">
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 end-0 w-1/2 bg-[radial-gradient(circle_at_70%_30%,rgba(59,155,255,0.18),transparent_60%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(59,155,255,0.18),transparent_45%)] rtl:bg-[radial-gradient(circle_at_15%_20%,rgba(59,155,255,0.18),transparent_45%)]"
       />
       <div className="relative">
         <SectionHeading

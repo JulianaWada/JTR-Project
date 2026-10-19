@@ -85,8 +85,13 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
               </p>
               {/* TODO: real office address in content/site.ts (siteConfig.headquarters). */}
               <address className="mt-2 text-muted not-italic">
-                {headquarters.street}
-                <br />
+                {/* The street line stays hidden until a real address replaces the placeholder. */}
+                {!headquarters.street.startsWith("TODO") && (
+                  <>
+                    {headquarters.street}
+                    <br />
+                  </>
+                )}
                 {headquarters.city}, {headquarters.country}
               </address>
               <div className="mt-4 aspect-[4/3] overflow-hidden rounded-lg border border-line bg-surface-2">
