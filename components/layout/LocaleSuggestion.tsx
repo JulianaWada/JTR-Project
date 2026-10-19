@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { localeNames, locales, type Locale } from "@/i18n/routing";
-import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
 
 const STORAGE_KEY = "jtr-locale-choice";
@@ -42,8 +41,14 @@ export function LocaleSuggestion() {
   };
 
   return (
-    <div role="region" aria-label={localeNames[suggested]} lang={suggested} className="border-b border-line bg-primary-soft">
-      <Container className="flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm">
+    // Fixed overlay so it never pushes the page down after load (no layout shift).
+    <div
+      role="region"
+      aria-label={localeNames[suggested]}
+      lang={suggested}
+      className="fixed inset-x-3 top-20 z-[45] mx-auto max-w-xl rounded-card border border-line bg-surface shadow-xl shadow-black/10"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
         <p className="flex items-center gap-2 text-ink">
           <Icon name="globe" size={16} className="text-primary" />
           {t("message", { language: localeNames[suggested] })}
@@ -65,7 +70,7 @@ export function LocaleSuggestion() {
             {t("dismiss")}
           </button>
         </div>
-      </Container>
+      </div>
     </div>
   );
 }

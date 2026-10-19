@@ -17,7 +17,7 @@ export function PageHero({
   return (
     <section aria-labelledby="page-title" className="relative overflow-hidden border-b border-line">
       <GeoPattern className="text-silver/50 dark:text-silver/15" id="page-geo" />
-      <div aria-hidden="true" className="absolute -top-48 end-[-8rem] size-[30rem] rounded-full bg-primary/12 blur-3xl" />
+      <div aria-hidden="true" className="absolute -top-48 end-[-8rem] size-[30rem] glow [--glow:12%]" />
       <Container className="relative py-16 sm:py-24">
         <div className="max-w-3xl">
           <Eyebrow>{eyebrow}</Eyebrow>

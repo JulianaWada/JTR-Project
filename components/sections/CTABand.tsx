@@ -10,7 +10,7 @@ export async function CTABand() {
     <section aria-labelledby="cta-title" className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div className="dark relative mx-auto max-w-site overflow-hidden rounded-[2rem] bg-navy px-6 py-14 text-center sm:px-12 sm:py-20">
         <GeoPattern className="text-silver/20" id="cta-geo" />
-        <div aria-hidden="true" className="absolute -bottom-32 start-1/2 size-96 -translate-x-1/2 rounded-full bg-primary/30 blur-3xl" />
+        <div aria-hidden="true" className="absolute -bottom-32 start-1/2 size-96 -translate-x-1/2 glow [--glow:30%]" />
         <Container className="relative">
           <h2 id="cta-title" className="font-display text-balance mx-auto max-w-2xl text-3xl font-semibold text-ink sm:text-4xl">
             {t("home.cta.title")}

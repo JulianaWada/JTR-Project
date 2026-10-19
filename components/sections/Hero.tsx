@@ -13,7 +13,7 @@ export async function Hero() {
       <GeoPattern className="text-silver/50 dark:text-silver/20" id="hero-geo" />
       <div
         aria-hidden="true"
-        className="absolute -top-40 end-[-10rem] size-[36rem] rounded-full bg-primary/15 blur-3xl dark:bg-primary/20"
+        className="absolute -top-40 end-[-10rem] size-[36rem] glow"
       />
       <Container className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:py-28">
         <div>

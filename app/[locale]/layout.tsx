@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { Readex_Pro, IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { preload } from "react-dom";
+import { Readex_Pro, IBM_Plex_Sans } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isRtl, routing } from "@/i18n/routing";
@@ -14,29 +15,23 @@ import { CookieConsent } from "@/components/layout/CookieConsent";
 import { cn } from "@/lib/cn";
 import "../globals.css";
 
-// Readex Pro covers Latin, accented Latin and Arabic for headings.
+// Readex Pro for headings. Only the Latin file is preloaded here (French and Portuguese accents are in it);
+// the Arabic file is self-hosted in /public/fonts and preloaded on Arabic pages only.
 const heading = Readex_Pro({
-  subsets: ["latin", "latin-ext", "arabic"],
+  subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
 });
 
-// IBM Plex Sans for Latin body text; IBM Plex Sans Arabic for Arabic body text.
+// IBM Plex Sans for Latin body text. IBM Plex Sans Arabic is self-hosted in /public/fonts (see globals.css)
+// so Arabic pages can preload it without slowing down the other languages.
 const body = IBM_Plex_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
   display: "swap",
 });
 
-const arabic = IBM_Plex_Sans_Arabic({
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-arabic",
-  display: "swap",
-  // Only downloaded when Arabic glyphs are actually on the page.
-  preload: false,
-});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -65,16 +60,48 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  if (isRtl(locale)) {
+    // The fonts for Arabic headings and body text, so the first Arabic paint uses them.
+    for (const file of ["readex-pro-arabic", "ibm-plex-sans-arabic-400"]) {
+      preload(`/fonts/${file}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+    }
+  }
   const t = await getTranslations("a11y");
+  const meta = await getTranslations("meta");
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.legalName,
+    alternateName: [siteConfig.name, siteConfig.shortName],
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/brand/jtr-emblem.png`,
+    description: meta("description"),
+    email: siteConfig.contact.email,
+    telephone: siteConfig.contact.phone,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: siteConfig.headquarters.city,
+      addressRegion: siteConfig.headquarters.region,
+      addressCountry: siteConfig.headquarters.countryCode,
+    },
+    areaServed: "Worldwide",
+    knowsLanguage: routing.locales,
+    sameAs: siteConfig.social.map((s) => s.href),
+  };
 
   return (
     <html
       lang={locale}
       dir={isRtl(locale) ? "rtl" : "ltr"}
       suppressHydrationWarning
-      className={cn(heading.variable, body.variable, arabic.variable, "antialiased")}
+      className={cn(heading.variable, body.variable, "antialiased")}
     >
       <body className="flex min-h-screen flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c") }}
+        />
         <a
           href="#main"
           className="sr-only z-[60] rounded-full bg-primary px-4 py-2 font-semibold text-primary-ink focus:not-sr-only focus:fixed focus:start-4 focus:top-4"
