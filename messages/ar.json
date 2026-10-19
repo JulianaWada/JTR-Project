@@ -1,521 +1,522 @@
 {
+  "_review": "Machine-drafted Arabic translation. Needs review by a native speaker before launch.",
   "meta": {
     "siteName": "Jules TechRight",
-    "defaultTitle": "Jules TechRight (JTR) | Websites, apps and agentic AI, built for the world",
+    "defaultTitle": "Jules TechRight (JTR) | مواقع وتطبيقات وذكاء اصطناعي وكيلي، مصممة للعالم",
     "titleTemplate": "%s | Jules TechRight",
-    "description": "Jules TechRight (JTR) is a global technology company with African roots. We build websites, mobile apps, agentic AI, educational technology and digital transformation programmes for clients worldwide."
+    "description": "Jules TechRight (JTR) شركة تقنية عالمية ذات جذور أفريقية. نبني المواقع الإلكترونية وتطبيقات الهاتف المحمول وحلول الذكاء الاصطناعي الوكيلي وتقنيات التعليم وبرامج التحول الرقمي لعملاء حول العالم."
   },
   "a11y": {
-    "skipToContent": "Skip to main content",
-    "mainNav": "Main navigation",
-    "footerNav": "Footer navigation",
-    "openMenu": "Open menu",
-    "closeMenu": "Close menu",
-    "toggleTheme": "Switch between light and dark mode",
-    "themeLight": "Light mode",
-    "themeDark": "Dark mode",
-    "changeLanguage": "Change language",
-    "currentLanguage": "Current language: {language}",
-    "logoAlt": "JTR emblem",
-    "home": "Jules TechRight home",
-    "opensInNewTab": "(opens in a new tab)",
-    "breadcrumb": "Breadcrumb"
+    "skipToContent": "الانتقال إلى المحتوى الرئيسي",
+    "mainNav": "التنقل الرئيسي",
+    "footerNav": "روابط التذييل",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "toggleTheme": "التبديل بين الوضع الفاتح والداكن",
+    "themeLight": "الوضع الفاتح",
+    "themeDark": "الوضع الداكن",
+    "changeLanguage": "تغيير اللغة",
+    "currentLanguage": "اللغة الحالية: {language}",
+    "logoAlt": "شعار JTR",
+    "home": "الصفحة الرئيسية لـ Jules TechRight",
+    "opensInNewTab": "(يُفتح في علامة تبويب جديدة)",
+    "breadcrumb": "مسار التنقل"
   },
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "services": "Services",
-    "projects": "Projects",
-    "insights": "Insights",
-    "careers": "Careers",
-    "contact": "Contact",
-    "assistant": "AI Assistant",
-    "startProject": "Start a project",
-    "bookCall": "Book a call"
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "services": "الخدمات",
+    "projects": "المشاريع",
+    "insights": "رؤى",
+    "careers": "الوظائف",
+    "contact": "تواصل معنا",
+    "assistant": "المساعد الذكي",
+    "startProject": "ابدأ مشروعك",
+    "bookCall": "احجز مكالمة"
   },
   "localeSuggestion": {
-    "message": "This site is also available in {language}.",
-    "switch": "Switch to {language}",
-    "dismiss": "No, thanks"
+    "message": "هذا الموقع متاح أيضًا باللغة {language}.",
+    "switch": "التبديل إلى {language}",
+    "dismiss": "لا، شكرًا"
   },
   "common": {
-    "learnMore": "Learn more",
-    "readMore": "Read more",
-    "viewAll": "View all",
-    "startProject": "Start a project",
-    "talkToAssistant": "Talk to our AI assistant",
-    "bookCall": "Book a call",
-    "contactUs": "Contact us",
-    "builtInAfrica": "Built in Africa, for the world",
-    "placeholder": "Placeholder",
-    "comingSoon": "Coming soon",
-    "backToTop": "Back to top"
+    "learnMore": "اعرف المزيد",
+    "readMore": "اقرأ المزيد",
+    "viewAll": "عرض الكل",
+    "startProject": "ابدأ مشروعك",
+    "talkToAssistant": "تحدّث مع مساعدنا الذكي",
+    "bookCall": "احجز مكالمة",
+    "contactUs": "تواصل معنا",
+    "builtInAfrica": "صُنع في أفريقيا، للعالم",
+    "placeholder": "محتوى مؤقت",
+    "comingSoon": "قريبًا",
+    "backToTop": "العودة إلى الأعلى"
   },
   "services": {
     "websites": {
-      "name": "Websites & Web Platforms",
-      "short": "High-performing websites, web apps, portals and e-commerce that load fast on any connection and convert visitors into customers.",
-      "what": "We design and build marketing websites, web applications, customer portals, dashboards and online stores. Every build is fast, accessible, search-friendly and easy for your team to update.",
-      "who": "Start-ups launching a product, growing businesses that have outgrown their site, and organisations that need secure, scalable web platforms.",
+      "name": "المواقع والمنصات الإلكترونية",
+      "short": "مواقع وتطبيقات ويب وبوابات ومتاجر إلكترونية عالية الأداء، سريعة التحميل على أي اتصال، وتحوّل الزوار إلى عملاء.",
+      "what": "نصمم ونطوّر المواقع التسويقية وتطبيقات الويب وبوابات العملاء ولوحات المعلومات والمتاجر الإلكترونية. كل ما نبنيه سريع، وسهل الوصول، وملائم لمحركات البحث، ويسهل على فريقك تحديثه.",
+      "who": "الشركات الناشئة التي تُطلق منتجًا، والشركات النامية التي تجاوزت موقعها الحالي، والمؤسسات التي تحتاج إلى منصات ويب آمنة وقابلة للتوسع.",
       "deliverables": [
-        "Corporate and marketing websites",
-        "Web applications and SaaS products",
-        "Customer and partner portals",
-        "E-commerce and payments integration",
-        "Multilingual and right-to-left sites",
-        "Performance, SEO and accessibility audits"
+        "مواقع مؤسسية وتسويقية",
+        "تطبيقات ويب ومنتجات SaaS",
+        "بوابات للعملاء والشركاء",
+        "متاجر إلكترونية وتكامل أنظمة الدفع",
+        "مواقع متعددة اللغات وداعمة للكتابة من اليمين إلى اليسار",
+        "تدقيق الأداء وتحسين محركات البحث وسهولة الوصول"
       ]
     },
     "mobile": {
-      "name": "Mobile Applications",
-      "short": "iOS, Android and cross-platform apps that feel native, work offline and scale with your users.",
-      "what": "We take mobile products from idea to app store: product discovery, UX design, cross-platform or native development, testing, release and ongoing improvement.",
-      "who": "Businesses taking a service mobile, founders building a new product, and teams replacing an ageing app.",
+      "name": "تطبيقات الهاتف المحمول",
+      "short": "تطبيقات iOS وAndroid ومتعددة المنصات بتجربة أصلية، تعمل دون اتصال، وتنمو مع مستخدميك.",
+      "what": "ننقل منتجات الهاتف المحمول من الفكرة إلى متجر التطبيقات: استكشاف المنتج، وتصميم تجربة المستخدم، والتطوير الأصلي أو متعدد المنصات، والاختبار، والإطلاق، والتحسين المستمر.",
+      "who": "الشركات التي تنقل خدماتها إلى الهاتف المحمول، والمؤسسون الذين يبنون منتجًا جديدًا، والفرق التي تستبدل تطبيقًا قديمًا.",
       "deliverables": [
-        "iOS and Android apps",
-        "Cross-platform apps (React Native, Flutter)",
-        "Offline-first and low-bandwidth design",
-        "In-app payments and notifications",
-        "App store launch and analytics",
-        "Maintenance and feature roadmaps"
+        "تطبيقات iOS وAndroid",
+        "تطبيقات متعددة المنصات (React Native، Flutter)",
+        "تصميم يعمل دون اتصال ومع النطاق الترددي المنخفض",
+        "المدفوعات والإشعارات داخل التطبيق",
+        "الإطلاق في متاجر التطبيقات والتحليلات",
+        "الصيانة وخطط تطوير الميزات"
       ]
     },
     "agentic-ai": {
-      "name": "Agentic AI",
-      "short": "AI agents and assistants that understand your business, take action in your tools and free your team for higher-value work.",
-      "what": "We design, build and deploy AI agents that answer questions, complete multi-step tasks and work inside your existing systems, with the guardrails, monitoring and human oversight that responsible AI needs.",
-      "who": "Teams drowning in repetitive work, customer-facing businesses that want instant, accurate support, and leaders exploring where AI creates real value.",
+      "name": "الذكاء الاصطناعي الوكيلي",
+      "short": "وكلاء ومساعدون بالذكاء الاصطناعي يفهمون أعمالك، وينفّذون المهام داخل أدواتك، ويُتيحون لفريقك التفرغ للأعمال ذات القيمة الأعلى.",
+      "what": "نصمم ونبني ونطلق وكلاء ذكاء اصطناعي يجيبون عن الأسئلة، وينجزون مهام متعددة الخطوات، ويعملون داخل أنظمتك الحالية، مع الضوابط والمراقبة والإشراف البشري الذي يتطلبه الذكاء الاصطناعي المسؤول.",
+      "who": "الفرق المثقلة بالأعمال المتكررة، والشركات التي تتعامل مع العملاء وتريد دعمًا فوريًا ودقيقًا، والقادة الذين يستكشفون أين يحقق الذكاء الاصطناعي قيمة حقيقية.",
       "deliverables": [
-        "Customer support and sales assistants",
-        "Workflow and back-office automation agents",
-        "Knowledge assistants over your documents",
-        "LLM integrations into existing products",
-        "AI readiness and use-case workshops",
-        "Evaluation, guardrails and monitoring"
+        "مساعدون لدعم العملاء والمبيعات",
+        "وكلاء لأتمتة سير العمل والعمليات الإدارية",
+        "مساعدون معرفيون يعتمدون على مستنداتك",
+        "دمج النماذج اللغوية الكبيرة في المنتجات القائمة",
+        "ورش عمل للجاهزية للذكاء الاصطناعي وحالات الاستخدام",
+        "التقييم والضوابط والمراقبة"
       ]
     },
     "edtech": {
-      "name": "Educational Technology",
-      "short": "Learning platforms and tools that make education more engaging, accessible and measurable.",
-      "what": "We build learning management systems, interactive courses, assessment tools and AI tutors designed for real classrooms, remote learners and low-bandwidth environments.",
-      "who": "Schools, universities, training providers, NGOs and companies running learning and development programmes.",
+      "name": "تقنيات التعليم",
+      "short": "منصات وأدوات تعليمية تجعل التعليم أكثر تفاعلًا وإتاحةً وقابليةً للقياس.",
+      "what": "نبني أنظمة إدارة التعلم والدورات التفاعلية وأدوات التقييم والمعلمين الافتراضيين بالذكاء الاصطناعي، المصممة للفصول الدراسية الحقيقية والمتعلمين عن بُعد والبيئات ذات النطاق الترددي المنخفض.",
+      "who": "المدارس والجامعات ومزودو التدريب والمنظمات غير الحكومية والشركات التي تدير برامج التعلم والتطوير.",
       "deliverables": [
-        "Learning platforms and LMS integrations",
-        "Interactive course and content tools",
-        "Assessment and progress tracking",
-        "AI tutors and study assistants",
-        "Mobile and offline learning",
-        "Accessibility for diverse learners"
+        "منصات تعليمية وتكامل أنظمة إدارة التعلم",
+        "أدوات للدورات والمحتوى التفاعلي",
+        "التقييم وتتبع التقدم",
+        "معلمون ومساعدو دراسة بالذكاء الاصطناعي",
+        "التعلم عبر الهاتف المحمول ودون اتصال",
+        "سهولة الوصول لمتعلمين متنوعين"
       ]
     },
     "digital-transformation": {
-      "name": "Digital Transformation",
-      "short": "Strategy and delivery that modernise how your organisation works, from paper processes to connected digital systems.",
-      "what": "We help organisations map their processes, choose the right technology and roll it out, from cloud migration and system integration to data, automation and team training.",
-      "who": "Established businesses, public-sector bodies and non-profits ready to replace manual processes and legacy systems.",
+      "name": "التحول الرقمي",
+      "short": "استراتيجية وتنفيذ يحدّثان طريقة عمل مؤسستك، من الإجراءات الورقية إلى أنظمة رقمية مترابطة.",
+      "what": "نساعد المؤسسات على رسم عملياتها، واختيار التقنية المناسبة وتطبيقها، بدءًا من الترحيل إلى السحابة وتكامل الأنظمة وصولًا إلى البيانات والأتمتة وتدريب الفرق.",
+      "who": "الشركات الراسخة والجهات الحكومية والمنظمات غير الربحية المستعدة لاستبدال الإجراءات اليدوية والأنظمة القديمة.",
       "deliverables": [
-        "Digital strategy and roadmaps",
-        "Process mapping and automation",
-        "Cloud migration and integration",
-        "Data and reporting dashboards",
-        "Change management and training",
-        "Ongoing technology partnership"
+        "الاستراتيجية الرقمية وخرائط الطريق",
+        "رسم العمليات وأتمتتها",
+        "الترحيل إلى السحابة والتكامل",
+        "لوحات البيانات والتقارير",
+        "إدارة التغيير والتدريب",
+        "شراكة تقنية مستمرة"
       ]
     },
     "labels": {
-      "what": "What we do",
-      "who": "Who it's for",
-      "deliverables": "Example deliverables",
-      "cta": "Talk to us about {service}"
+      "what": "ما نقدمه",
+      "who": "لمن هذه الخدمة",
+      "deliverables": "أمثلة على المخرجات",
+      "cta": "تحدّث معنا عن {service}"
     }
   },
   "regions": {
-    "africa": "Africa",
-    "europe": "Europe",
-    "north-america": "North America",
-    "middle-east": "Middle East",
-    "global": "Global"
+    "africa": "أفريقيا",
+    "europe": "أوروبا",
+    "north-america": "أمريكا الشمالية",
+    "middle-east": "الشرق الأوسط",
+    "global": "عالمي"
   },
   "home": {
     "hero": {
-      "eyebrow": "Websites · Apps · Agentic AI",
-      "title": "Transforming ideas into innovative digital experiences",
-      "subtitle": "Jules TechRight builds websites, mobile apps and agentic AI that make a real difference for businesses, learners and communities, wherever they are.",
-      "tagline": "Built in Africa, for the world"
+      "eyebrow": "مواقع · تطبيقات · ذكاء اصطناعي وكيلي",
+      "title": "نحوّل الأفكار إلى تجارب رقمية مبتكرة",
+      "subtitle": "تبني Jules TechRight مواقع إلكترونية وتطبيقات للهاتف المحمول وحلول ذكاء اصطناعي وكيلي تُحدث فرقًا حقيقيًا للشركات والمتعلمين والمجتمعات، أينما كانوا.",
+      "tagline": "صُنع في أفريقيا، للعالم"
     },
     "services": {
-      "eyebrow": "What we do",
-      "title": "Five ways we turn ideas into impact",
-      "subtitle": "From your first website to AI agents running inside your operations, one team covers the full journey."
+      "eyebrow": "ما نقدمه",
+      "title": "خمس طرق نحوّل بها الأفكار إلى أثر",
+      "subtitle": "من موقعك الإلكتروني الأول إلى وكلاء ذكاء اصطناعي يعملون داخل عملياتك، فريق واحد يغطي الرحلة كاملة."
     },
     "why": {
-      "eyebrow": "Why JTR",
-      "title": "Why clients around the world choose JTR",
+      "eyebrow": "لماذا JTR",
+      "title": "لماذا يختار العملاء حول العالم JTR",
       "items": {
         "insight": {
-          "title": "African insight, global standards",
-          "body": "We understand fast-growing, mobile-first markets and build to the quality bar of the world's leading technology firms."
+          "title": "فهم أفريقي، ومعايير عالمية",
+          "body": "نفهم الأسواق سريعة النمو التي تعتمد على الهاتف المحمول أولًا، ونبني وفق معايير الجودة لدى كبرى شركات التقنية في العالم."
         },
         "accessibility": {
-          "title": "Accessible by design",
-          "body": "Everything we ship works on modest devices and slow connections, and meets WCAG accessibility guidelines."
+          "title": "سهولة الوصول منذ التصميم",
+          "body": "كل ما نُطلقه يعمل على الأجهزة المتواضعة والاتصالات البطيئة، ويستوفي إرشادات WCAG لسهولة الوصول."
         },
         "impact": {
-          "title": "Impact you can measure",
-          "body": "We agree on outcomes up front and design every product to simplify real challenges and create new opportunities."
+          "title": "أثر يمكنك قياسه",
+          "body": "نتفق على النتائج مسبقًا، ونصمم كل منتج لتبسيط التحديات الحقيقية وخلق فرص جديدة."
         },
         "remote": {
-          "title": "Remote delivery across time zones",
-          "body": "Distributed by default, we overlap with your working hours in Africa, Europe, the Middle East and the Americas."
+          "title": "تنفيذ عن بُعد عبر المناطق الزمنية",
+          "body": "نعمل بفريق موزّع أساسًا، ونتوافق مع ساعات عملك في أفريقيا وأوروبا والشرق الأوسط والأمريكتين."
         }
       }
     },
     "reach": {
-      "eyebrow": "Global reach",
-      "title": "One team, working wherever you are",
-      "subtitle": "We partner with clients across continents, delivering remotely with clear communication and dependable overlap with your working day.",
+      "eyebrow": "حضور عالمي",
+      "title": "فريق واحد، يعمل أينما كنت",
+      "subtitle": "نتشارك مع عملاء عبر القارات، وننفّذ عن بُعد بتواصل واضح وتوافق موثوق مع يوم عملك.",
       "figures": {
-        "countries": "Countries served",
-        "projects": "Projects delivered",
-        "timezones": "Time zones covered",
-        "response": "Typical response time"
+        "countries": "دولة نخدمها",
+        "projects": "مشروع منجز",
+        "timezones": "منطقة زمنية نغطيها",
+        "response": "متوسط وقت الاستجابة"
       },
-      "markets": "Markets we serve",
+      "markets": "الأسواق التي نخدمها",
       "model": {
-        "title": "How remote delivery works",
+        "title": "كيف يعمل التنفيذ عن بُعد",
         "steps": [
-          "Kick-off call at a time that suits you",
-          "Weekly demos and a shared project board",
-          "A dedicated lead in your time zone overlap",
-          "Async updates so nothing waits on a meeting"
+          "مكالمة انطلاق في الوقت الذي يناسبك",
+          "عروض أسبوعية ولوحة مشروع مشتركة",
+          "قائد مخصص يتوافق مع منطقتك الزمنية",
+          "تحديثات غير متزامنة حتى لا ينتظر شيء اجتماعًا"
         ]
       },
-      "clocks": "Our working day, around the world",
+      "clocks": "يوم عملنا حول العالم",
       "cities": {
-        "lagos": "Lagos",
-        "london": "London",
-        "dubai": "Dubai",
-        "newYork": "New York"
+        "lagos": "لاغوس",
+        "london": "لندن",
+        "dubai": "دبي",
+        "newYork": "نيويورك"
       },
-      "figuresNote": "Figures are placeholders and will be updated."
+      "figuresNote": "الأرقام مؤقتة وسيتم تحديثها."
     },
     "missionVision": {
-      "missionLabel": "Our mission",
-      "mission": "To empower individuals, businesses, and communities through technology that simplifies everyday challenges, enhances learning, improves productivity, and creates new opportunities.",
-      "visionLabel": "Our vision",
-      "vision": "To become a leading technology company in Africa, delivering innovative solutions with global impact."
+      "missionLabel": "رسالتنا",
+      "mission": "تمكين الأفراد والشركات والمجتمعات من خلال تقنية تبسّط التحديات اليومية، وتعزز التعلم، وترفع الإنتاجية، وتخلق فرصًا جديدة.",
+      "visionLabel": "رؤيتنا",
+      "vision": "أن نصبح شركة تقنية رائدة في أفريقيا، تقدم حلولًا مبتكرة ذات أثر عالمي."
     },
     "projects": {
-      "eyebrow": "Selected work",
-      "title": "Featured projects",
-      "subtitle": "A look at the kind of work we do. Full case studies are on the way."
+      "eyebrow": "أعمال مختارة",
+      "title": "مشاريع مميزة",
+      "subtitle": "لمحة عن طبيعة أعمالنا. دراسات الحالة الكاملة في الطريق."
     },
     "cta": {
-      "title": "Have an idea? Let's build it together.",
-      "subtitle": "Tell us what you're working on. We'll reply within one business day, wherever you are in the world.",
-      "whatsapp": "Chat on WhatsApp"
+      "title": "لديك فكرة؟ لنبنِها معًا.",
+      "subtitle": "أخبرنا بما تعمل عليه. سنرد خلال يوم عمل واحد، أينما كنت في العالم.",
+      "whatsapp": "تحدّث عبر WhatsApp"
     }
   },
   "about": {
     "meta": {
-      "title": "About us",
-      "description": "Learn about Jules TechRight (JTR): our story, mission, vision, values and the team building websites, apps and agentic AI for clients worldwide."
+      "title": "من نحن",
+      "description": "تعرّف على Jules TechRight (JTR): قصتنا ورسالتنا ورؤيتنا وقيمنا والفريق الذي يبني المواقع والتطبيقات وحلول الذكاء الاصطناعي الوكيلي لعملاء حول العالم."
     },
     "hero": {
-      "eyebrow": "About JTR",
-      "title": "A global technology company with African roots",
-      "subtitle": "We believe in transforming ideas into innovative digital experiences that make a difference."
+      "eyebrow": "عن JTR",
+      "title": "شركة تقنية عالمية ذات جذور أفريقية",
+      "subtitle": "نؤمن بتحويل الأفكار إلى تجارب رقمية مبتكرة تُحدث فرقًا."
     },
     "story": {
-      "title": "Our story",
+      "title": "قصتنا",
       "paragraphs": [
-        "Jules TechRight (JTR) Ltd is an innovative technology company dedicated to developing smart, accessible, and impactful digital solutions. We specialise in websites and web platforms, mobile applications, agentic AI, educational technology and digital transformation.",
-        "Founded in Africa and headquartered in Lagos, we were built around a simple idea: great technology should be accessible to everyone, and it should solve real problems. Working in fast-moving, mobile-first markets taught us to build products that are lean, resilient and genuinely useful.",
-        "Today we work with clients across Africa, Europe, North America, the Middle East and beyond, delivering remotely with the craft, communication and reliability you'd expect from a leading international partner."
+        "Jules TechRight (JTR) Ltd شركة تقنية مبتكرة تكرّس جهودها لتطوير حلول رقمية ذكية وسهلة الوصول وذات أثر. نتخصص في المواقع والمنصات الإلكترونية، وتطبيقات الهاتف المحمول، والذكاء الاصطناعي الوكيلي، وتقنيات التعليم، والتحول الرقمي.",
+        "تأسسنا في أفريقيا ويقع مقرنا الرئيسي في لاغوس، وقد قامت شركتنا على فكرة بسيطة: التقنية المتميزة يجب أن تكون في متناول الجميع، وأن تحل مشكلات حقيقية. علّمنا العمل في أسواق سريعة الحركة تعتمد على الهاتف المحمول أولًا أن نبني منتجات رشيقة ومرنة ومفيدة فعلًا.",
+        "نعمل اليوم مع عملاء في أفريقيا وأوروبا وأمريكا الشمالية والشرق الأوسط وخارجها، وننفّذ عن بُعد بالإتقان والتواصل والموثوقية التي تتوقعها من شريك دولي رائد."
       ]
     },
     "values": {
-      "eyebrow": "Our values",
-      "title": "What guides our work",
+      "eyebrow": "قيمنا",
+      "title": "ما يوجّه عملنا",
       "items": {
         "innovation": {
-          "title": "Innovation",
-          "body": "We explore new ideas and technologies, then apply the ones that create real value."
+          "title": "الابتكار",
+          "body": "نستكشف الأفكار والتقنيات الجديدة، ثم نطبّق منها ما يخلق قيمة حقيقية."
         },
         "accessibility": {
-          "title": "Accessibility",
-          "body": "We build for every user, every device and every connection speed."
+          "title": "سهولة الوصول",
+          "body": "نبني لكل مستخدم، ولكل جهاز، ولكل سرعة اتصال."
         },
         "impact": {
-          "title": "Impact",
-          "body": "We measure success by the difference our work makes for people and organisations."
+          "title": "الأثر",
+          "body": "نقيس النجاح بالفرق الذي يُحدثه عملنا للأفراد والمؤسسات."
         },
         "integrity": {
-          "title": "Integrity",
-          "body": "We are honest about what's possible, transparent in how we work and careful with your data."
+          "title": "النزاهة",
+          "body": "نتحلى بالصدق بشأن ما هو ممكن، والشفافية في طريقة عملنا، والحرص على بياناتك."
         },
         "excellence": {
-          "title": "Excellence",
-          "body": "We hold ourselves to global standards in design, engineering and delivery."
+          "title": "التميّز",
+          "body": "نلتزم بمعايير عالمية في التصميم والهندسة والتنفيذ."
         }
       }
     },
     "team": {
-      "eyebrow": "Our team",
-      "title": "The people behind JTR",
-      "subtitle": "A distributed team of engineers, designers and AI specialists.",
+      "eyebrow": "فريقنا",
+      "title": "الأشخاص وراء JTR",
+      "subtitle": "فريق موزّع من المهندسين والمصممين والمتخصصين في الذكاء الاصطناعي.",
       "members": {
         "founder": {
-          "name": "Team member name",
-          "role": "Founder & CEO",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+          "name": "اسم عضو الفريق",
+          "role": "المؤسس والرئيس التنفيذي",
+          "bio": "نبذة مؤقتة. أضف مقدمة قصيرة والخلفية ومجال التركيز."
         },
         "engineering": {
-          "name": "Team member name",
-          "role": "Head of Engineering",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+          "name": "اسم عضو الفريق",
+          "role": "رئيس الهندسة",
+          "bio": "نبذة مؤقتة. أضف مقدمة قصيرة والخلفية ومجال التركيز."
         },
         "ai": {
-          "name": "Team member name",
-          "role": "Lead, Agentic AI",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+          "name": "اسم عضو الفريق",
+          "role": "قائد الذكاء الاصطناعي الوكيلي",
+          "bio": "نبذة مؤقتة. أضف مقدمة قصيرة والخلفية ومجال التركيز."
         },
         "design": {
-          "name": "Team member name",
-          "role": "Design Lead",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
+          "name": "اسم عضو الفريق",
+          "role": "قائد التصميم",
+          "bio": "نبذة مؤقتة. أضف مقدمة قصيرة والخلفية ومجال التركيز."
         }
       }
     }
   },
   "servicesPage": {
     "meta": {
-      "title": "Services",
-      "description": "Websites and web platforms, mobile apps, agentic AI, educational technology and digital transformation, delivered remotely for clients worldwide."
+      "title": "الخدمات",
+      "description": "المواقع والمنصات الإلكترونية، وتطبيقات الهاتف المحمول، والذكاء الاصطناعي الوكيلي، وتقنيات التعليم، والتحول الرقمي، ننفّذها عن بُعد لعملاء حول العالم."
     },
     "hero": {
-      "eyebrow": "Services",
-      "title": "Everything you need to build, launch and grow digital products",
-      "subtitle": "Five connected service areas, one accountable team. Pick one, or let us bring them together."
+      "eyebrow": "الخدمات",
+      "title": "كل ما تحتاجه لبناء منتجاتك الرقمية وإطلاقها وتنميتها",
+      "subtitle": "خمسة مجالات خدمات مترابطة، وفريق واحد مسؤول. اختر واحدًا، أو دعنا نجمعها لك."
     },
-    "jumpTo": "Jump to a service"
+    "jumpTo": "انتقل إلى خدمة"
   },
   "projects": {
     "meta": {
-      "title": "Projects",
-      "description": "Selected projects from Jules TechRight across websites, mobile apps, agentic AI, educational technology and digital transformation."
+      "title": "المشاريع",
+      "description": "مشاريع مختارة من Jules TechRight في المواقع الإلكترونية وتطبيقات الهاتف المحمول والذكاء الاصطناعي الوكيلي وتقنيات التعليم والتحول الرقمي."
     },
     "hero": {
-      "eyebrow": "Portfolio",
-      "title": "Work that makes a difference",
-      "subtitle": "Filter by service area or region. Full case studies are coming soon."
+      "eyebrow": "أعمالنا",
+      "title": "أعمال تُحدث فرقًا",
+      "subtitle": "صنّف حسب مجال الخدمة أو المنطقة. دراسات الحالة الكاملة قريبًا."
     },
     "filters": {
-      "service": "Service area",
-      "region": "Region",
-      "all": "All",
-      "results": "{count, plural, =0 {No projects match these filters} one {# project} other {# projects}}",
-      "reset": "Clear filters"
+      "service": "مجال الخدمة",
+      "region": "المنطقة",
+      "all": "الكل",
+      "results": "{count, plural, =0 {لا توجد مشاريع تطابق عوامل التصفية هذه} one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}",
+      "reset": "مسح عوامل التصفية"
     },
     "items": {
       "learning-platform": {
-        "title": "Adaptive learning platform",
-        "summary": "Placeholder case study: a mobile-first learning platform with offline lessons and progress tracking for thousands of students."
+        "title": "منصة تعلّم تكيفية",
+        "summary": "دراسة حالة مؤقتة: منصة تعلّم تعتمد على الهاتف المحمول أولًا، مع دروس متاحة دون اتصال وتتبع للتقدم لآلاف الطلاب."
       },
       "support-agent": {
-        "title": "AI customer support agent",
-        "summary": "Placeholder case study: an agentic assistant that resolves common customer requests and hands complex cases to people."
+        "title": "وكيل ذكاء اصطناعي لدعم العملاء",
+        "summary": "دراسة حالة مؤقتة: مساعد وكيلي يعالج طلبات العملاء الشائعة ويحيل الحالات المعقدة إلى موظفين."
       },
       "logistics-app": {
-        "title": "Field logistics app",
-        "summary": "Placeholder case study: a cross-platform app for drivers with offline maps, proof of delivery and live tracking."
+        "title": "تطبيق للخدمات اللوجستية الميدانية",
+        "summary": "دراسة حالة مؤقتة: تطبيق متعدد المنصات للسائقين مع خرائط دون اتصال وإثبات التسليم والتتبع المباشر."
       },
       "fintech-site": {
-        "title": "Fintech marketing site",
-        "summary": "Placeholder case study: a fast, multilingual marketing site and onboarding flow for a payments start-up."
+        "title": "موقع تسويقي لشركة تقنية مالية",
+        "summary": "دراسة حالة مؤقتة: موقع تسويقي سريع ومتعدد اللغات ومسار تسجيل لشركة ناشئة في مجال المدفوعات."
       },
       "records-migration": {
-        "title": "Paper-to-digital records",
-        "summary": "Placeholder case study: replacing paper records with a secure cloud system, dashboards and staff training."
+        "title": "من السجلات الورقية إلى الرقمية",
+        "summary": "دراسة حالة مؤقتة: استبدال السجلات الورقية بنظام سحابي آمن ولوحات معلومات وتدريب الموظفين."
       },
       "ops-copilot": {
-        "title": "Operations copilot",
-        "summary": "Placeholder case study: an internal AI agent that drafts reports, updates systems and answers policy questions."
+        "title": "مساعد ذكي للعمليات",
+        "summary": "دراسة حالة مؤقتة: وكيل ذكاء اصطناعي داخلي يُعدّ التقارير ويحدّث الأنظمة ويجيب عن الأسئلة المتعلقة بالسياسات."
       }
     }
   },
   "insights": {
     "meta": {
-      "title": "Insights",
-      "description": "Ideas and practical guides from Jules TechRight on websites, mobile apps, agentic AI, edtech and digital transformation."
+      "title": "رؤى",
+      "description": "أفكار وأدلة عملية من Jules TechRight حول المواقع الإلكترونية وتطبيقات الهاتف المحمول والذكاء الاصطناعي الوكيلي وتقنيات التعليم والتحول الرقمي."
     },
     "hero": {
-      "eyebrow": "Insights",
-      "title": "Ideas, guides and lessons from our work",
-      "subtitle": "Practical thinking on building technology that works for everyone."
+      "eyebrow": "رؤى",
+      "title": "أفكار وأدلة ودروس من عملنا",
+      "subtitle": "تفكير عملي في بناء تقنية تخدم الجميع."
     },
-    "readingTime": "{minutes, plural, one {# min read} other {# min read}}",
-    "publishedOn": "Published {date}",
-    "by": "By {author}",
-    "back": "All insights",
-    "empty": "No articles yet. Check back soon.",
-    "notTranslated": "This article is currently available in English only."
+    "readingTime": "{minutes, plural, one {قراءة في دقيقة واحدة} two {قراءة في دقيقتين} few {قراءة في # دقائق} many {قراءة في # دقيقة} other {قراءة في # دقيقة}}",
+    "publishedOn": "نُشر في {date}",
+    "by": "بقلم {author}",
+    "back": "جميع المقالات",
+    "empty": "لا توجد مقالات بعد. عُد قريبًا.",
+    "notTranslated": "هذه المقالة متاحة حاليًا باللغة الإنجليزية فقط."
   },
   "careers": {
     "meta": {
-      "title": "Careers",
-      "description": "Work with Jules TechRight. We hire remotely and build technology that makes a difference."
+      "title": "الوظائف",
+      "description": "اعمل مع Jules TechRight. نوظّف عن بُعد ونبني تقنية تُحدث فرقًا."
     },
     "hero": {
-      "eyebrow": "Careers",
-      "title": "Build technology that matters, from anywhere",
-      "subtitle": "We're a remote-first team that cares about craft, learning and impact."
+      "eyebrow": "الوظائف",
+      "title": "ابنِ تقنية ذات أهمية، من أي مكان",
+      "subtitle": "نحن فريق يعمل عن بُعد أولًا، يهتم بالإتقان والتعلم والأثر."
     },
     "culture": {
-      "title": "How we work",
+      "title": "كيف نعمل",
       "items": [
         {
-          "title": "Remote-first",
-          "body": "We hire talented people wherever they live and work across time zones with clear, async communication."
+          "title": "العمل عن بُعد أولًا",
+          "body": "نوظّف الكفاءات أينما كانوا، ونعمل عبر المناطق الزمنية بتواصل واضح وغير متزامن."
         },
         {
-          "title": "Always learning",
-          "body": "Time and budget for courses, conferences and experimenting with new tools, including AI."
+          "title": "تعلّم مستمر",
+          "body": "وقت وميزانية للدورات والمؤتمرات وتجربة الأدوات الجديدة، بما فيها الذكاء الاصطناعي."
         },
         {
-          "title": "Ownership and impact",
-          "body": "Small teams, real responsibility and work that changes how people learn, work and live."
+          "title": "المسؤولية والأثر",
+          "body": "فرق صغيرة، ومسؤولية حقيقية، وعمل يغيّر طريقة تعلّم الناس وعملهم وحياتهم."
         }
       ]
     },
     "openings": {
-      "title": "Open roles",
-      "none": "There are no open roles right now.",
-      "sendCv": "We're always happy to hear from great people. Send your CV and a short note about what you'd like to work on, and we'll keep you in mind.",
-      "cta": "Send your CV"
+      "title": "الوظائف المتاحة",
+      "none": "لا توجد وظائف متاحة حاليًا.",
+      "sendCv": "يسعدنا دائمًا التواصل مع الكفاءات المتميزة. أرسل سيرتك الذاتية مع نبذة قصيرة عما تودّ العمل عليه، وسنضعك في الاعتبار.",
+      "cta": "أرسل سيرتك الذاتية"
     }
   },
   "contact": {
     "meta": {
-      "title": "Contact",
-      "description": "Start a project with Jules TechRight. Contact us by form, email, phone or WhatsApp, or book a call at a time that suits you."
+      "title": "تواصل معنا",
+      "description": "ابدأ مشروعك مع Jules TechRight. تواصل معنا عبر النموذج أو البريد الإلكتروني أو الهاتف أو WhatsApp، أو احجز مكالمة في الوقت الذي يناسبك."
     },
     "hero": {
-      "eyebrow": "Contact",
-      "title": "Let's talk about your project",
-      "subtitle": "Tell us a little about what you need. We work with clients worldwide and reply within one business day."
+      "eyebrow": "تواصل معنا",
+      "title": "لنتحدث عن مشروعك",
+      "subtitle": "أخبرنا قليلًا عما تحتاجه. نعمل مع عملاء حول العالم ونرد خلال يوم عمل واحد."
     },
     "channels": {
-      "title": "Other ways to reach us",
-      "email": "Email",
-      "phone": "Phone",
+      "title": "طرق أخرى للتواصل معنا",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
       "whatsapp": "WhatsApp",
-      "book": "Book a call",
-      "bookNote": "Pick a slot in your own time zone.",
-      "hq": "Headquarters",
-      "mapTitle": "Map of our Lagos office",
-      "mapPlaceholder": "Map coming soon"
+      "book": "احجز مكالمة",
+      "bookNote": "اختر موعدًا وفق منطقتك الزمنية.",
+      "hq": "المقر الرئيسي",
+      "mapTitle": "خريطة مكتبنا في لاغوس",
+      "mapPlaceholder": "الخريطة قريبًا"
     },
     "form": {
-      "title": "Project enquiry",
-      "name": "Full name",
-      "email": "Email address",
-      "phone": "Phone number",
-      "phoneHint": "Choose your country code, then enter your number.",
-      "company": "Company or organisation",
-      "country": "Country",
-      "countryPlaceholder": "Select your country",
-      "timezone": "Time zone",
-      "service": "Service of interest",
-      "servicePlaceholder": "Select a service",
-      "serviceOther": "Something else",
-      "budget": "Budget range",
-      "budgetPlaceholder": "Select a range",
-      "currency": "Currency",
-      "budgetNotSure": "Not sure yet",
-      "message": "Tell us about your project",
-      "messageHint": "Goals, timeline, links, anything that helps.",
-      "optional": "optional",
-      "consent": "I agree that JTR may use these details to reply to my enquiry, as described in the <link>privacy policy</link>.",
-      "submit": "Send enquiry",
-      "sending": "Sending…",
-      "successTitle": "Thank you, your message is on its way.",
-      "successBody": "We'll reply to {email} within one business day.",
-      "errorTitle": "Something went wrong.",
-      "errorBody": "Your message wasn't sent. Please try again, or email us at {email}.",
+      "title": "استفسار عن مشروع",
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "phoneHint": "اختر رمز دولتك، ثم أدخل رقمك.",
+      "company": "الشركة أو المؤسسة",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر دولتك",
+      "timezone": "المنطقة الزمنية",
+      "service": "الخدمة المطلوبة",
+      "servicePlaceholder": "اختر خدمة",
+      "serviceOther": "خدمة أخرى",
+      "budget": "نطاق الميزانية",
+      "budgetPlaceholder": "اختر نطاقًا",
+      "currency": "العملة",
+      "budgetNotSure": "لم أحدد بعد",
+      "message": "أخبرنا عن مشروعك",
+      "messageHint": "الأهداف، والجدول الزمني، والروابط، وأي شيء يساعدنا.",
+      "optional": "اختياري",
+      "consent": "أوافق على أن تستخدم JTR هذه البيانات للرد على استفساري، وفقًا لما هو موضح في <link>سياسة الخصوصية</link>.",
+      "submit": "إرسال الاستفسار",
+      "sending": "جارٍ الإرسال…",
+      "successTitle": "شكرًا لك، رسالتك في طريقها إلينا.",
+      "successBody": "سنرد على {email} خلال يوم عمل واحد.",
+      "errorTitle": "حدث خطأ ما.",
+      "errorBody": "لم يتم إرسال رسالتك. يُرجى المحاولة مرة أخرى، أو مراسلتنا على {email}.",
       "errors": {
-        "required": "This field is required.",
-        "email": "Enter a valid email address.",
-        "phone": "Enter a valid phone number.",
-        "tooLong": "This is too long.",
-        "tooShort": "Please add a little more detail.",
-        "consent": "Please confirm you agree so we can reply."
+        "required": "هذا الحقل مطلوب.",
+        "email": "أدخل بريدًا إلكترونيًا صالحًا.",
+        "phone": "أدخل رقم هاتف صالحًا.",
+        "tooLong": "النص طويل جدًا.",
+        "tooShort": "يُرجى إضافة مزيد من التفاصيل.",
+        "consent": "يُرجى تأكيد موافقتك حتى نتمكن من الرد."
       }
     }
   },
   "assistant": {
     "name": "JTR Assistant",
     "meta": {
-      "title": "AI Assistant",
-      "description": "Ask the JTR Assistant about our services, process and how we work with clients worldwide."
+      "title": "المساعد الذكي",
+      "description": "اسأل مساعد JTR عن خدماتنا ومنهجية عملنا وكيف نعمل مع العملاء حول العالم."
     },
-    "intro": "Hi! I'm the JTR Assistant. Ask me about our services, how we work with clients worldwide, or tell me about your project.",
-    "open": "Chat with the JTR Assistant",
-    "close": "Close chat",
-    "expand": "Open full screen",
-    "placeholder": "Type your message…",
-    "send": "Send",
-    "stop": "Stop",
-    "thinking": "Thinking…",
-    "disclaimer": "AI-generated answers can be wrong. For quotes and commitments, our team will follow up.",
-    "fallback": "Sorry, I can't answer right now. Please try again in a moment, or contact us at {email}.",
-    "rateLimited": "You're sending messages quickly. Please wait a minute and try again.",
-    "tooLong": "That message is a bit long. Please keep it under {max} characters.",
-    "leadSaved": "Thanks, I've passed your details to the team.",
+    "intro": "مرحبًا! أنا مساعد JTR. اسألني عن خدماتنا، أو كيف نعمل مع العملاء حول العالم، أو أخبرني عن مشروعك.",
+    "open": "تحدّث مع مساعد JTR",
+    "close": "إغلاق المحادثة",
+    "expand": "فتح بملء الشاشة",
+    "placeholder": "اكتب رسالتك…",
+    "send": "إرسال",
+    "stop": "إيقاف",
+    "thinking": "جارٍ التفكير…",
+    "disclaimer": "قد تكون الإجابات المولّدة بالذكاء الاصطناعي غير دقيقة. بالنسبة لعروض الأسعار والالتزامات، سيتابع فريقنا معك.",
+    "fallback": "عذرًا، لا أستطيع الإجابة الآن. يُرجى المحاولة بعد قليل، أو التواصل معنا على {email}.",
+    "rateLimited": "أنت ترسل الرسائل بسرعة. يُرجى الانتظار دقيقة ثم المحاولة مرة أخرى.",
+    "tooLong": "هذه الرسالة طويلة بعض الشيء. يُرجى ألا تتجاوز {max} حرف.",
+    "leadSaved": "شكرًا، لقد أرسلت بياناتك إلى الفريق.",
     "suggestions": [
-      "What services do you offer?",
-      "Can you build an AI agent for my business?",
-      "How do you work with clients abroad?",
-      "I'd like to start a project"
+      "ما الخدمات التي تقدمونها؟",
+      "هل يمكنكم بناء وكيل ذكاء اصطناعي لشركتي؟",
+      "كيف تعملون مع العملاء في الخارج؟",
+      "أودّ بدء مشروع"
     ],
-    "pageTitle": "Talk to the JTR Assistant",
-    "pageSubtitle": "Get quick answers about our services and process, or share your project and we'll take it from there."
+    "pageTitle": "تحدّث مع مساعد JTR",
+    "pageSubtitle": "احصل على إجابات سريعة عن خدماتنا ومنهجية عملنا، أو شاركنا مشروعك وسنتولى الباقي."
   },
   "consent": {
-    "title": "Cookies and privacy",
-    "body": "We use essential cookies to run this site. With your permission we'd also like to use analytics to understand how it's used and improve it.",
-    "accept": "Accept analytics",
-    "reject": "Essential only",
-    "policy": "Privacy policy",
-    "manage": "Cookie settings"
+    "title": "ملفات تعريف الارتباط والخصوصية",
+    "body": "نستخدم ملفات تعريف الارتباط الأساسية لتشغيل هذا الموقع. وبإذنك، نودّ أيضًا استخدام أدوات التحليل لفهم كيفية استخدامه وتحسينه.",
+    "accept": "قبول التحليلات",
+    "reject": "الأساسية فقط",
+    "policy": "سياسة الخصوصية",
+    "manage": "إعدادات ملفات تعريف الارتباط"
   },
   "legal": {
     "privacy": {
-      "title": "Privacy Policy",
-      "description": "How Jules TechRight collects, uses and protects personal data under the GDPR, UK GDPR and Nigeria Data Protection Act."
+      "title": "سياسة الخصوصية",
+      "description": "كيف تجمع Jules TechRight البيانات الشخصية وتستخدمها وتحميها وفقًا للائحة العامة لحماية البيانات (GDPR) واللائحة البريطانية لحماية البيانات وقانون حماية البيانات النيجيري."
     },
     "terms": {
-      "title": "Terms of Use",
-      "description": "The terms that apply when you use the Jules TechRight website."
+      "title": "شروط الاستخدام",
+      "description": "الشروط السارية عند استخدامك لموقع Jules TechRight الإلكتروني."
     },
-    "draftNotice": "This is a placeholder draft for review by a qualified lawyer before launch. It is not legal advice.",
-    "lastUpdated": "Last updated {date}"
+    "draftNotice": "هذه مسودة مؤقتة تخضع لمراجعة محامٍ مؤهل قبل الإطلاق، ولا تُعد استشارة قانونية.",
+    "lastUpdated": "آخر تحديث {date}"
   },
   "footer": {
-    "tagline": "Transforming ideas into innovative digital experiences.",
-    "company": "Company",
-    "services": "Services",
-    "legal": "Legal",
-    "connect": "Connect",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "rights": "© {year} Jules TechRight (JTR) Ltd. All rights reserved.",
-    "hq": "Headquartered in Lagos, working worldwide"
+    "tagline": "نحوّل الأفكار إلى تجارب رقمية مبتكرة.",
+    "company": "الشركة",
+    "services": "الخدمات",
+    "legal": "قانوني",
+    "connect": "تواصل",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "rights": "© {year} Jules TechRight (JTR) Ltd. جميع الحقوق محفوظة.",
+    "hq": "مقرنا الرئيسي في لاغوس، ونعمل حول العالم"
   },
   "notFound": {
-    "title": "Page not found",
-    "body": "The page you're looking for doesn't exist or has moved.",
-    "home": "Go to the home page",
-    "contact": "Contact us"
+    "title": "الصفحة غير موجودة",
+    "body": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "home": "الذهاب إلى الصفحة الرئيسية",
+    "contact": "تواصل معنا"
   }
 }

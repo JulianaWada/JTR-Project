@@ -31,8 +31,10 @@ export async function GlobalReach({ headingLevel = "h2" }: { headingLevel?: "h2"
             <div key={f.id} className="bg-navy p-6">
               <dt className="text-sm text-muted">{t(`home.reach.figures.${f.id}`)}</dt>
               <dd className="font-display mt-2 text-4xl font-semibold text-ink tabular-nums">
-                {format.number(f.value)}
-                <span className="text-primary">{f.suffix}</span>
+                <span dir="ltr" className="[unicode-bidi:isolate]">
+                  {format.number(f.value)}
+                  <span className="text-primary">{f.suffix}</span>
+                </span>
               </dd>
             </div>
           ))}
