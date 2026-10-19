@@ -9,6 +9,8 @@ import { Providers } from "@/components/layout/Providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LocaleSuggestion } from "@/components/layout/LocaleSuggestion";
+import { ChatLauncher } from "@/components/assistant/ChatLauncher";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 import { cn } from "@/lib/cn";
 import "../globals.css";
 
@@ -87,6 +89,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
               {children}
             </main>
             <Footer />
+            <ChatLauncher />
+            <CookieConsent />
           </Providers>
         </NextIntlClientProvider>
       </body>

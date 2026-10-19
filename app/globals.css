@@ -63,6 +63,7 @@
   --container-site: 76rem;
 }
 
+@layer base {
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -96,6 +97,8 @@ body {
 ::selection {
   background: var(--primary);
   color: var(--primary-ink);
+}
+
 }
 
 @media (prefers-reduced-motion: reduce) {
