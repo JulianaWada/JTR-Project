@@ -1,6 +1,8 @@
 import "server-only";
+import { eq } from "drizzle-orm";
 import { siteConfig } from "@/content/site";
 import { getEmailProvider } from "@/lib/email";
+import { getDb, schema } from "@/lib/db";
 import { academyInterestSchema, type AcademyInterest, type AcademyInterestInput } from "./interest-schema";
 
 export type SaveInterestResult = { ok: true } | { ok: false; error: "invalid" | "spam" | "send_failed"; issues?: unknown };
@@ -33,7 +35,34 @@ function formatInterest(entry: AcademyInterest) {
   return { text, html };
 }
 
-/** Validates an Academy interest registration, filters spam and emails the team. */
+/** Saves the registration for the admin board. Returns the row id, or null if the database is unavailable. */
+async function storeInterest(entry: AcademyInterest): Promise<string | null> {
+  try {
+    const db = await getDb();
+    const [row] = await db
+      .insert(schema.academyInterest)
+      .values({
+        name: entry.name,
+        phone: entry.phone,
+        email: entry.email || null,
+        course: entry.course,
+        location: entry.location || null,
+        heardFrom: entry.heardFrom ?? null,
+        locale: entry.locale,
+        consent: entry.consent === true,
+      })
+      .returning({ id: schema.academyInterest.id });
+    return row.id;
+  } catch (err) {
+    console.error("[academy-interest] failed to save", err);
+    return null;
+  }
+}
+
+/**
+ * Validates an Academy interest registration, filters spam, saves it (it shows up in /admin/academy)
+ * and emails the team. Once the entry is saved, a failed email no longer fails the request.
+ */
 export async function saveAcademyInterest(input: AcademyInterestInput): Promise<SaveInterestResult> {
   if (input.website) return { ok: false, error: "spam" };
 
@@ -41,6 +70,7 @@ export async function saveAcademyInterest(input: AcademyInterestInput): Promise<
   if (!parsed.success) return { ok: false, error: "invalid", issues: parsed.error.flatten() };
   const entry = parsed.data;
 
+  const id = await storeInterest(entry);
   const { text, html } = formatInterest(entry);
   try {
     await getEmailProvider().send({
@@ -51,9 +81,13 @@ export async function saveAcademyInterest(input: AcademyInterestInput): Promise<
       text,
       html,
     });
+    if (id) {
+      const db = await getDb();
+      await db.update(schema.academyInterest).set({ emailed: true }).where(eq(schema.academyInterest.id, id)).catch(() => {});
+    }
     return { ok: true };
   } catch (err) {
     console.error("[academy-interest] failed to send", err);
-    return { ok: false, error: "send_failed" };
+    return id ? { ok: true } : { ok: false, error: "send_failed" };
   }
 }

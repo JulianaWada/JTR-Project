@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
       { source: "/academy/:path((?!interest(?:/|$)).*)", destination: `${academyUrl}/academy/:path` },
     ];
   },
+  // PGlite (the embedded Postgres used in test mode) ships WASM files that must not be bundled.
+  serverExternalPackages: ["@electric-sql/pglite"],
+  outputFileTracingIncludes: { "/**": ["./drizzle/**"] },
   poweredByHeader: false,
   devIndicators: false,
   images: {
