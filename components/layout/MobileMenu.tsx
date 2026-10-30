@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { mainNav } from "@/lib/nav";
+import { academyNav, mainNav } from "@/lib/nav";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
@@ -64,6 +64,13 @@ export function MobileMenu() {
                 </li>
               );
             })}
+            {academyNav && (
+              <li>
+                <a href={academyNav.href} className="block border-b border-line py-4 font-display text-xl font-medium text-ink">
+                  {t(`nav.${academyNav.key}`)}
+                </a>
+              </li>
+            )}
             <li>
               <Link href="/assistant" className="flex items-center gap-2 border-b border-line py-4 font-display text-xl font-medium text-ink">
                 <Icon name="sparkle" size={20} className="text-primary" />
