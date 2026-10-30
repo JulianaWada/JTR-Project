@@ -127,10 +127,10 @@ export const projects: {
   },
   {
     id: "ufedo",
-    service: "mobile",
+    service: "websites",
     region: "africa",
     year: 2026,
-    status: "in-progress",
+    status: "live",
     href: "https://ufedo.app/",
   },
   {
