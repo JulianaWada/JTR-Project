@@ -133,14 +133,6 @@ export const projects: {
     status: "live",
     href: "https://ufedo.app/",
   },
-  {
-    id: "learnnaija",
-    service: "edtech",
-    region: "africa",
-    year: 2026,
-    status: "in-progress",
-    href: "https://jmathsacademy.vercel.app/",
-  },
 ];
 
 export const valueIds = [
