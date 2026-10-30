@@ -125,6 +125,22 @@ export const projects: {
     image: "/projects/jtr-website.webp",
     featured: true,
   },
+  {
+    id: "ufedo",
+    service: "mobile",
+    region: "africa",
+    year: 2026,
+    status: "in-progress",
+    href: "https://ufedo.app/",
+  },
+  {
+    id: "learnnaija",
+    service: "edtech",
+    region: "africa",
+    year: 2026,
+    status: "in-progress",
+    href: "https://jmathsacademy.vercel.app/",
+  },
 ];
 
 export const valueIds = [

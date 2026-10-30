@@ -303,6 +303,14 @@
         "title": "Site web de Jules TechRight",
         "summary": "Le site que vous consultez : un site d’entreprise rapide en anglais, français, portugais et arabe (de droite à gauche), avec thèmes clair et sombre, un assistant IA intégré et un formulaire de contact. Réalisé avec Next.js.",
         "imageAlt": "La page d’accueil de Jules TechRight."
+      },
+      "ufedo": {
+        "title": "Ufedo",
+        "summary": "Un jeu pour couples né en Afrique. Chaque partenaire répond aux questions sur son propre téléphone, puis vous découvrez vos réponses ensemble. Au programme : des énigmes, un mode Date Night et un voyage à travers le Nigeria. Les jeux sont gratuits, avec un abonnement UFEDO Plus en option."
+      },
+      "learnnaija": {
+        "title": "LearnNaija",
+        "summary": "Une plateforme de préparation aux examens pour les élèves nigérians qui passent le JAMB, le WAEC et le NECO. Elle propose des cours et des fiches de révision, des examens blancs chronométrés au format CBT, des annales, des plans d’étude et un suivi des progrès. Elle est conçue pour les téléphones Android d’entrée de gamme et consomme peu de données."
       }
     }
   },
