@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { Container } from "@/components/ui/Container";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { serviceIds, siteConfig } from "@/content/site";
+import { academyNav } from "@/lib/nav";
 import { CookieSettingsButton } from "./CookieSettingsButton";
 
 export async function Footer() {
@@ -71,6 +72,13 @@ export async function Footer() {
                 </Link>
               </li>
             ))}
+            {academyNav && (
+              <li>
+                <a href={academyNav.href} className="text-muted transition-colors hover:text-primary">
+                  {t(`nav.${academyNav.key}`)}
+                </a>
+              </li>
+            )}
           </ul>
         </nav>
 
