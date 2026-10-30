@@ -65,7 +65,7 @@ Common edits:
 | Map on the contact page | `siteConfig.mapEmbedUrl` (a Google Maps embed URL; a styled placeholder shows while it is empty) |
 | Social links | `siteConfig.social` |
 | Reach figures (countries, projects…) | `reachFigures` in `content/site.ts` |
-| Add a project | Add an entry to `projects` in `content/site.ts`, then add `projects.items.<id>.title` and `.summary` in every `messages/*.json` |
+| Add a project | Add an entry to `projects` in `content/site.ts` (status `live` or `in-progress`, optional screenshot in `public/projects/` and public link), then add `projects.items.<id>.title`, `.summary` and `.imageAlt` in every `messages/*.json` |
 | Team members | `team` in `content/site.ts` plus `about.team.members.<id>` in every messages file |
 | Service descriptions | `services.<id>` in the messages files |
 | Logo | `public/brand/jtr-emblem.png` (header, footer, JSON-LD) and `app/icon.png` / `app/apple-icon.png` (browser icons). A vector version can go in `public/brand/jtr-emblem.svg`; see `components/brand/Logo.tsx`. |
@@ -157,7 +157,6 @@ Search the code for `TODO` to find each one.
 **Portfolio, team and figures**
 
 - [ ] Reach figures: countries, projects, time zones, response time (`reachFigures`)
-- [ ] The six example projects (`projects` in `content/site.ts` and `projects.items` in every messages file)
 - [ ] Team members, roles and bios (`team` and `about.team.members`), plus photos in `public/team/<id>.jpg`
 - [ ] Approximate exchange rates for budget display (`approxUsdRates`)
 

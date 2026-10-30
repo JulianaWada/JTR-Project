@@ -90,22 +90,42 @@ export const timeZoneCoverage = [
 ] as const;
 
 /**
- * Portfolio entries. Titles and summaries are in messages under "projects.items.<id>".
- * TODO: replace these placeholder projects with real case studies.
+ * Portfolio entries. Titles, summaries and image descriptions are in messages under "projects.items.<id>".
+ * Only real work goes here: no invented clients or results. Mark unfinished work as "in-progress".
  */
+export const projectStatuses = ["live", "in-progress"] as const;
+export type ProjectStatus = (typeof projectStatuses)[number];
+
 export const projects: {
   id: string;
   service: ServiceId;
   region: RegionId;
   year: number;
+  status: ProjectStatus;
+  /** Screenshot in /public/projects (16:10 works best). Without one, the card shows abstract artwork. */
+  image?: string;
+  /** Public link to the project, if there is one. */
+  href?: string;
   featured?: boolean;
 }[] = [
-  { id: "learning-platform", service: "edtech", region: "africa", year: 2026, featured: true },
-  { id: "support-agent", service: "agentic-ai", region: "europe", year: 2026, featured: true },
-  { id: "logistics-app", service: "mobile", region: "middle-east", year: 2025, featured: true },
-  { id: "fintech-site", service: "websites", region: "north-america", year: 2025 },
-  { id: "records-migration", service: "digital-transformation", region: "africa", year: 2025 },
-  { id: "ops-copilot", service: "agentic-ai", region: "global", year: 2026 },
+  {
+    id: "whatsapp-sales-agent",
+    service: "agentic-ai",
+    region: "africa",
+    year: 2026,
+    status: "in-progress",
+    image: "/projects/whatsapp-sales-agent.webp",
+    featured: true,
+  },
+  {
+    id: "jtr-website",
+    service: "websites",
+    region: "global",
+    year: 2026,
+    status: "live",
+    image: "/projects/jtr-website.webp",
+    featured: true,
+  },
 ];
 
 /**

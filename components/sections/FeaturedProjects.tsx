@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/visual/Reveal";
 import { ProjectCardView, toProjectView } from "./ProjectCard";
+import { cn } from "@/lib/cn";
 
 export async function FeaturedProjects() {
   const t = await getTranslations();
@@ -22,11 +23,11 @@ export async function FeaturedProjects() {
           {t("common.viewAll")}
         </ButtonLink>
       </div>
-      <ul className="mt-12 grid gap-6 md:grid-cols-3">
+      <ul className={cn("mt-12 grid gap-6", featured.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2")}>
         {featured.map((p, i) => (
           <li key={p.id}>
             <Reveal delay={i * 0.06} className="h-full">
-              <ProjectCardView project={p} placeholderLabel={t("common.placeholder")} />
+              <ProjectCardView project={p} />
             </Reveal>
           </li>
         ))}

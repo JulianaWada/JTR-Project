@@ -207,7 +207,7 @@
     "projects": {
       "eyebrow": "Trabalhos selecionados",
       "title": "Projetos em destaque",
-      "subtitle": "Uma amostra do tipo de trabalho que fazemos. Os estudos de caso completos estão a caminho."
+      "subtitle": "O que estamos a construir agora, incluindo os nossos próprios produtos. Os estudos de caso completos estão a caminho."
     },
     "cta": {
       "title": "Tem uma ideia? Vamos construí-la juntos.",
@@ -302,12 +302,12 @@
   "projects": {
     "meta": {
       "title": "Projetos",
-      "description": "Projetos selecionados da Jules TechRight em sites, aplicativos móveis, IA agêntica, tecnologia educacional e transformação digital."
+      "description": "Projetos da Jules TechRight, incluindo um agente de vendas com IA no WhatsApp para pequenas empresas e o nosso site institucional multilíngue."
     },
     "hero": {
       "eyebrow": "Portfólio",
       "title": "Trabalhos que fazem a diferença",
-      "subtitle": "Filtre por área de serviço ou região. Os estudos de caso completos chegam em breve."
+      "subtitle": "Projetos reais que já construímos ou estamos a construir. Os estudos de caso completos chegam em breve."
     },
     "filters": {
       "service": "Área de serviço",
@@ -316,30 +316,21 @@
       "results": "{count, plural, =0 {Nenhum projeto corresponde a estes filtros} one {# projeto} other {# projetos}}",
       "reset": "Limpar filtros"
     },
+    "status": {
+      "live": "No ar",
+      "in-progress": "Em andamento"
+    },
+    "visit": "Ver projeto",
     "items": {
-      "learning-platform": {
-        "title": "Plataforma de aprendizagem adaptativa",
-        "summary": "Estudo de caso provisório: uma plataforma de aprendizagem mobile-first com aulas offline e acompanhamento de progresso para milhares de estudantes."
+      "whatsapp-sales-agent": {
+        "title": "Agente de vendas com IA no WhatsApp",
+        "summary": "Um agente de IA que vende no WhatsApp para pequenas empresas, começando por salões de beleza e vendedores de comida na Nigéria. Conversa em inglês e em pidgin nigeriano, responde a perguntas, faz reservas e pedidos, envia links de pagamento Paystack e lembretes, e passa a conversa para uma pessoa quando é preciso. Funciona de ponta a ponta em modo de teste; os pilotos com empresas são o próximo passo.",
+        "imageAlt": "O ecrã de teste do agente: um cliente pede arroz jollof e zobo no WhatsApp e recebe um link de pagamento."
       },
-      "support-agent": {
-        "title": "Agente de IA para atendimento ao cliente",
-        "summary": "Estudo de caso provisório: um assistente agêntico que resolve as solicitações mais comuns dos clientes e encaminha os casos complexos para pessoas."
-      },
-      "logistics-app": {
-        "title": "Aplicativo de logística de campo",
-        "summary": "Estudo de caso provisório: um aplicativo multiplataforma para motoristas com mapas offline, comprovante de entrega e rastreamento em tempo real."
-      },
-      "fintech-site": {
-        "title": "Site de marketing para fintech",
-        "summary": "Estudo de caso provisório: um site de marketing rápido e multilíngue, com fluxo de onboarding, para uma start-up de pagamentos."
-      },
-      "records-migration": {
-        "title": "Registros do papel ao digital",
-        "summary": "Estudo de caso provisório: substituição de registros em papel por um sistema seguro na nuvem, com painéis e capacitação da equipe."
-      },
-      "ops-copilot": {
-        "title": "Copiloto de operações",
-        "summary": "Estudo de caso provisório: um agente de IA interno que redige relatórios, atualiza sistemas e responde a perguntas sobre políticas internas."
+      "jtr-website": {
+        "title": "Site da Jules TechRight",
+        "summary": "O site em que está agora: um site institucional rápido em inglês, francês, português e árabe (da direita para a esquerda), com temas claro e escuro, um assistente de IA integrado e um formulário de contacto. Feito com Next.js.",
+        "imageAlt": "A página inicial da Jules TechRight."
       }
     }
   },

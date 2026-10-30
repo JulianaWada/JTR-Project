@@ -17,7 +17,6 @@ export default async function ProjectsPage({ params }: PageProps<"/[locale]/proj
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("projects");
-  // TODO: replace placeholder projects in content/site.ts and messages projects.items.
   const views = await Promise.all(projects.map(toProjectView));
   return (
     <>

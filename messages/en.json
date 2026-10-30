@@ -206,7 +206,7 @@
     "projects": {
       "eyebrow": "Selected work",
       "title": "Featured projects",
-      "subtitle": "A look at the kind of work we do. Full case studies are on the way."
+      "subtitle": "What we are building right now, including our own products. Full case studies are on the way."
     },
     "cta": {
       "title": "Have an idea? Let's build it together.",
@@ -301,12 +301,12 @@
   "projects": {
     "meta": {
       "title": "Projects",
-      "description": "Selected projects from Jules TechRight across websites, mobile apps, agentic AI, educational technology and digital transformation."
+      "description": "Projects by Jules TechRight, including a WhatsApp AI sales agent for small businesses and our multilingual company website."
     },
     "hero": {
       "eyebrow": "Portfolio",
       "title": "Work that makes a difference",
-      "subtitle": "Filter by service area or region. Full case studies are coming soon."
+      "subtitle": "Real projects we have built or are building now. Full case studies are coming soon."
     },
     "filters": {
       "service": "Service area",
@@ -315,30 +315,21 @@
       "results": "{count, plural, =0 {No projects match these filters} one {# project} other {# projects}}",
       "reset": "Clear filters"
     },
+    "status": {
+      "live": "Live",
+      "in-progress": "In progress"
+    },
+    "visit": "Visit project",
     "items": {
-      "learning-platform": {
-        "title": "Adaptive learning platform",
-        "summary": "Placeholder case study: a mobile-first learning platform with offline lessons and progress tracking for thousands of students."
+      "whatsapp-sales-agent": {
+        "title": "WhatsApp AI sales agent",
+        "summary": "An AI agent that sells for small businesses on WhatsApp, starting with salons and food vendors in Nigeria. It chats in English and Nigerian Pidgin, answers questions, takes bookings and orders, sends Paystack payment links and reminders, and hands over to a person when needed. It works end to end in test mode; pilots with businesses come next.",
+        "imageAlt": "The agent's test screen: a customer orders jollof rice and zobo on WhatsApp and receives a payment link."
       },
-      "support-agent": {
-        "title": "AI customer support agent",
-        "summary": "Placeholder case study: an agentic assistant that resolves common customer requests and hands complex cases to people."
-      },
-      "logistics-app": {
-        "title": "Field logistics app",
-        "summary": "Placeholder case study: a cross-platform app for drivers with offline maps, proof of delivery and live tracking."
-      },
-      "fintech-site": {
-        "title": "Fintech marketing site",
-        "summary": "Placeholder case study: a fast, multilingual marketing site and onboarding flow for a payments start-up."
-      },
-      "records-migration": {
-        "title": "Paper-to-digital records",
-        "summary": "Placeholder case study: replacing paper records with a secure cloud system, dashboards and staff training."
-      },
-      "ops-copilot": {
-        "title": "Operations copilot",
-        "summary": "Placeholder case study: an internal AI agent that drafts reports, updates systems and answers policy questions."
+      "jtr-website": {
+        "title": "Jules TechRight website",
+        "summary": "The site you are on: a fast company website in English, French, Portuguese and Arabic (right to left), with light and dark themes, a built-in AI assistant and a contact form. Built with Next.js.",
+        "imageAlt": "The Jules TechRight home page."
       }
     }
   },

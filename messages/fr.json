@@ -207,7 +207,7 @@
     "projects": {
       "eyebrow": "Réalisations",
       "title": "Projets à la une",
-      "subtitle": "Un aperçu du type de travail que nous réalisons. Les études de cas complètes arrivent bientôt."
+      "subtitle": "Ce que nous construisons en ce moment, y compris nos propres produits. Les études de cas complètes arrivent bientôt."
     },
     "cta": {
       "title": "Une idée ? Construisons-la ensemble.",
@@ -302,12 +302,12 @@
   "projects": {
     "meta": {
       "title": "Projets",
-      "description": "Une sélection de projets Jules TechRight : sites web, applications mobiles, IA agentique, technologies éducatives et transformation digitale."
+      "description": "Les projets de Jules TechRight, dont un agent commercial IA sur WhatsApp pour les petites entreprises et notre site d’entreprise multilingue."
     },
     "hero": {
       "eyebrow": "Portfolio",
       "title": "Des réalisations qui font la différence",
-      "subtitle": "Filtrez par domaine d’expertise ou par région. Les études de cas complètes arrivent bientôt."
+      "subtitle": "De vrais projets, réalisés ou en cours. Les études de cas complètes arrivent bientôt."
     },
     "filters": {
       "service": "Domaine d’expertise",
@@ -316,30 +316,21 @@
       "results": "{count, plural, =0 {Aucun projet ne correspond à ces filtres} one {# projet} other {# projets}}",
       "reset": "Effacer les filtres"
     },
+    "status": {
+      "live": "En ligne",
+      "in-progress": "En cours"
+    },
+    "visit": "Voir le projet",
     "items": {
-      "learning-platform": {
-        "title": "Plateforme d’apprentissage adaptatif",
-        "summary": "Étude de cas provisoire : une plateforme d’apprentissage mobile-first avec leçons hors ligne et suivi de progression pour des milliers d’élèves."
+      "whatsapp-sales-agent": {
+        "title": "Agent commercial IA sur WhatsApp",
+        "summary": "Un agent IA qui vend sur WhatsApp pour les petites entreprises, en commençant par les salons de coiffure et les restaurateurs au Nigeria. Il discute en anglais et en pidgin nigérian, répond aux questions, prend les réservations et les commandes, envoie des liens de paiement Paystack et des rappels, et passe la main à une personne si besoin. Il fonctionne de bout en bout en mode test ; les projets pilotes avec des entreprises sont la prochaine étape.",
+        "imageAlt": "L’écran de test de l’agent : un client commande du riz jollof et du zobo sur WhatsApp et reçoit un lien de paiement."
       },
-      "support-agent": {
-        "title": "Agent IA de support client",
-        "summary": "Étude de cas provisoire : un assistant agentique qui traite les demandes clients courantes et transmet les cas complexes à des conseillers."
-      },
-      "logistics-app": {
-        "title": "Application de logistique terrain",
-        "summary": "Étude de cas provisoire : une application multiplateforme pour les livreurs, avec cartes hors ligne, preuve de livraison et suivi en temps réel."
-      },
-      "fintech-site": {
-        "title": "Site marketing fintech",
-        "summary": "Étude de cas provisoire : un site marketing rapide et multilingue, avec parcours d’inscription, pour une start-up de paiement."
-      },
-      "records-migration": {
-        "title": "Dématérialisation des dossiers",
-        "summary": "Étude de cas provisoire : remplacement des dossiers papier par un système cloud sécurisé, des tableaux de bord et la formation du personnel."
-      },
-      "ops-copilot": {
-        "title": "Copilote des opérations",
-        "summary": "Étude de cas provisoire : un agent IA interne qui rédige des rapports, met à jour les systèmes et répond aux questions sur les procédures internes."
+      "jtr-website": {
+        "title": "Site web de Jules TechRight",
+        "summary": "Le site que vous consultez : un site d’entreprise rapide en anglais, français, portugais et arabe (de droite à gauche), avec thèmes clair et sombre, un assistant IA intégré et un formulaire de contact. Réalisé avec Next.js.",
+        "imageAlt": "La page d’accueil de Jules TechRight."
       }
     }
   },
