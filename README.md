@@ -48,6 +48,11 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 | `RESEND_API_KEY` | Yes in production | Resend API key from https://resend.com. Server-side only. |
 | `LEADS_TO_EMAIL` | Recommended | Inbox that receives enquiries. Defaults to `siteConfig.contact.email`. |
 | `LEADS_FROM_EMAIL` | Recommended | Sender, e.g. `JTR Website <website@julestechright.com>`. Must be on a domain you have verified in Resend. |
+| `DATABASE_URL` | Recommended | Postgres (e.g. Supabase) for leads, Academy sign-ups and project settings. Without it a built-in test database is used, which Vercel wipes now and then. See [Admin board](#admin-board). |
+| `ADMIN_PASSWORD` | For `/admin` | Password for the admin board. Locally `demo1234` is used when it is empty; in production `/admin` stays closed until it is set. |
+| `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Sample data is shown without it. |
+| `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Sample data is shown without it. |
+| `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link. |
 
 ## Editing content
 
@@ -65,6 +70,7 @@ Common edits:
 | Map on the contact page | `siteConfig.mapEmbedUrl` (a Google Maps embed URL; a styled placeholder shows while it is empty) |
 | Social links | `siteConfig.social` |
 | Reach figures (countries, time zones…) | `reachFigures` in `content/site.ts` |
+| Show, hide, reorder or mark a project live | The admin board, `/admin/projects` |
 | Add a project | Add an entry to `projects` in `content/site.ts` (status `live` or `in-progress`, optional screenshot in `public/projects/` and public link), then add `projects.items.<id>.title`, `.summary` and `.imageAlt` in every `messages/*.json` |
 | Team section | Removed for now (2026-10-30). To bring it back, restore it from git history (`about` page, `team` in `content/site.ts`, `about.team` in messages) |
 | Service descriptions | `services.<id>` in the messages files |
@@ -118,10 +124,31 @@ The rate limiter (`lib/rate-limit.ts`) keeps counts in memory, which is enough f
 
 ## Leads and email
 
-- The contact form and the assistant both end up in `saveLead()` in `lib/leads/handler.ts`, which validates the data with zod (`lib/leads/schema.ts`), drops spam caught by the hidden honeypot field, and emails the team with the visitor as reply-to.
+- The contact form and the assistant both end up in `saveLead()` in `lib/leads/handler.ts`, which validates the data with zod (`lib/leads/schema.ts`), drops spam caught by the hidden honeypot field, saves the lead to the database (it shows up in `/admin/leads`) and emails the team with the visitor as reply-to. Once the lead is saved, a failed email no longer fails the form. The Academy interest form works the same way (`lib/academy/interest-handler.ts`).
 - The form posts to `app/api/leads/route.ts` (5 submissions per 10 minutes per IP).
 - Email goes through a small provider interface in `lib/email/`. Resend is used when `RESEND_API_KEY` is set; otherwise, in development, leads are printed to the terminal. To use another service (Postmark, SES, SendGrid…), add a file next to `lib/email/resend.ts` that implements `EmailProvider` and return it from `getEmailProvider()` in `lib/email/index.ts`.
 - Budget ranges are stored in US dollars and converted roughly for display when a visitor picks another currency (`approxUsdRates` in `content/site.ts`). The email states the range and currency the visitor chose.
+
+## Admin board
+
+`/admin` is Jules's dashboard for the whole of JTR. It is in English only, outside the language routes, and hidden from search engines. Sign in with `ADMIN_PASSWORD` (locally: `demo1234`).
+
+| Page | What it shows | Where the data comes from |
+| --- | --- | --- |
+| Overview | New leads, Academy sign-ups, students, payments and WhatsApp businesses at a glance | All of the below |
+| Leads | Contact-form and assistant enquiries; mark them new, contacted or done; download as CSV | `leads` table in this site's database |
+| Academy | Courses, intakes, students and payments, with links into the academy's teacher pages for editing | The academy's database (`ACADEMY_DATABASE_URL`), read only |
+| Academy → Sign-ups | Interest-form registrations from `/academy/interest`, by course; mark them contacted; CSV for WhatsApp broadcast lists | `academy_interest` table in this site's database |
+| WhatsApp agent | Every business with customers, orders, bookings and payments; **Add a business** creates the business and the owner's dashboard login | The sales agent's database (`WHATSAPP_AGENT_DATABASE_URL`) |
+| Projects | Show or hide each project, choose which are on the home page, set live / in progress, change the link and the order | `project_settings` table; the projects themselves and their text in four languages stay in `content/site.ts` and `messages/*.json` |
+
+Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages show sample data and say so. The admin board only reads the academy's tables and never changes them; with the sales agent it reads, and inserts new rows into `tenants` when you add a business. Each app keeps its own schema and migrations.
+
+**Database.** Migrations in `drizzle/` run automatically on the first connection (`lib/db/index.ts`), using their own migrations table, so the website can share a database with the academy. After changing `lib/db/schema.ts`, run `npx drizzle-kit generate`. Without `DATABASE_URL` the site uses PGlite in `.data/pglite` (on Vercel, `/tmp`, which is reset from time to time, so set `DATABASE_URL` before relying on it).
+
+**Login.** One password, checked on the server and kept in a signed, HTTP-only cookie limited to `/admin` for 12 hours. Changing `ADMIN_PASSWORD` signs out every session. After 8 wrong passwords from one address, logins pause for 15 minutes.
+
+**Projects.** The public projects page and the home page refresh at most a minute after a change (straight away on the server that saved it).
 
 ## Privacy, cookies and analytics
 

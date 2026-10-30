@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { projects } from "@/content/site";
+import { getPublicProjects } from "@/lib/projects";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 
 export async function FeaturedProjects() {
   const t = await getTranslations();
-  const featured = await Promise.all(projects.filter((p) => p.featured).map(toProjectView));
+  const featured = await Promise.all((await getPublicProjects()).filter((p) => p.featured).map(toProjectView));
   return (
     <Section tone="surface" labelledBy="featured-title">
       <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">

@@ -1,6 +1,8 @@
 import "server-only";
+import { eq } from "drizzle-orm";
 import { siteConfig } from "@/content/site";
 import { getEmailProvider } from "@/lib/email";
+import { getDb, schema } from "@/lib/db";
 import { leadSchema, type Lead, type LeadInput } from "./schema";
 
 export type SaveLeadResult = { ok: true } | { ok: false; error: "invalid" | "spam" | "send_failed"; issues?: unknown };
@@ -30,9 +32,38 @@ function formatLead(lead: Lead) {
   return { text, html };
 }
 
+/** Saves the lead for the admin board. Returns the row id, or null if the database is unavailable. */
+async function storeLead(lead: Lead): Promise<string | null> {
+  try {
+    const db = await getDb();
+    const [row] = await db
+      .insert(schema.leads)
+      .values({
+        source: lead.source,
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone || null,
+        company: lead.company || null,
+        country: lead.country || null,
+        timezone: lead.timezone || null,
+        service: lead.service ?? null,
+        budget: lead.budget ?? null,
+        currency: lead.currency ?? null,
+        message: lead.message,
+        locale: lead.locale,
+      })
+      .returning({ id: schema.leads.id });
+    return row.id;
+  } catch (err) {
+    console.error("[leads] failed to save", err);
+    return null;
+  }
+}
+
 /**
  * The single entry point for new leads, shared by the contact form API and the AI assistant.
- * Validates, filters spam and emails the team.
+ * Validates, filters spam, saves the lead (it shows up in /admin) and emails the team.
+ * Once the lead is saved, a failed email no longer fails the request.
  */
 export async function saveLead(input: LeadInput): Promise<SaveLeadResult> {
   // Honeypot filled in: pretend success so bots don't learn anything.
@@ -42,6 +73,7 @@ export async function saveLead(input: LeadInput): Promise<SaveLeadResult> {
   if (!parsed.success) return { ok: false, error: "invalid", issues: parsed.error.flatten() };
   const lead = parsed.data;
 
+  const id = await storeLead(lead);
   const { text, html } = formatLead(lead);
   try {
     await getEmailProvider().send({
@@ -52,9 +84,19 @@ export async function saveLead(input: LeadInput): Promise<SaveLeadResult> {
       text,
       html,
     });
+    if (id) await markEmailed(id);
     return { ok: true };
   } catch (err) {
     console.error("[leads] failed to send", err);
-    return { ok: false, error: "send_failed" };
+    return id ? { ok: true } : { ok: false, error: "send_failed" };
+  }
+}
+
+async function markEmailed(id: string) {
+  try {
+    const db = await getDb();
+    await db.update(schema.leads).set({ emailed: true }).where(eq(schema.leads.id, id));
+  } catch (err) {
+    console.error("[leads] failed to mark as emailed", err);
   }
 }
