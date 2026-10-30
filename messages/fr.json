@@ -175,7 +175,6 @@
       "subtitle": "Nous accompagnons des clients sur plusieurs continents, à distance, avec une communication claire et des plages horaires communes fiables avec votre journée de travail.",
       "figures": {
         "countries": "Pays servis",
-        "projects": "Projets livrés",
         "timezones": "Fuseaux horaires couverts",
         "response": "Délai de réponse habituel"
       },
@@ -218,7 +217,7 @@
   "about": {
     "meta": {
       "title": "À propos",
-      "description": "Découvrez Jules TechRight (JTR) : notre histoire, notre mission, notre vision, nos valeurs et l’équipe qui conçoit sites web, applications et IA agentique pour des clients du monde entier."
+      "description": "Découvrez Jules TechRight (JTR) : notre histoire, notre mission, notre vision et nos valeurs, au service de sites web, d’applications et d’IA agentique pour des clients du monde entier."
     },
     "hero": {
       "eyebrow": "À propos de JTR",
@@ -256,33 +255,6 @@
         "excellence": {
           "title": "Excellence",
           "body": "Nous nous imposons des standards internationaux en design, en ingénierie et en exécution."
-        }
-      }
-    },
-    "team": {
-      "eyebrow": "Notre équipe",
-      "title": "Les personnes derrière JTR",
-      "subtitle": "Une équipe distribuée d’ingénieurs, de designers et de spécialistes de l’IA.",
-      "members": {
-        "founder": {
-          "name": "Nom du membre de l’équipe",
-          "role": "Fondateur et PDG",
-          "bio": "Biographie provisoire. Ajoutez une courte présentation, le parcours et le domaine d’expertise."
-        },
-        "engineering": {
-          "name": "Nom du membre de l’équipe",
-          "role": "Directeur de l’ingénierie",
-          "bio": "Biographie provisoire. Ajoutez une courte présentation, le parcours et le domaine d’expertise."
-        },
-        "ai": {
-          "name": "Nom du membre de l’équipe",
-          "role": "Responsable IA agentique",
-          "bio": "Biographie provisoire. Ajoutez une courte présentation, le parcours et le domaine d’expertise."
-        },
-        "design": {
-          "name": "Nom du membre de l’équipe",
-          "role": "Responsable design",
-          "bio": "Biographie provisoire. Ajoutez une courte présentation, le parcours et le domaine d’expertise."
         }
       }
     }

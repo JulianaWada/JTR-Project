@@ -76,7 +76,6 @@ export type RegionId = (typeof regionIds)[number];
  */
 export const reachFigures = [
   { id: "countries", value: 12, suffix: "+" },
-  { id: "projects", value: 40, suffix: "+" },
   { id: "timezones", value: 9, suffix: "" },
   { id: "response", value: 24, suffix: "h" },
 ] as const;
@@ -127,17 +126,6 @@ export const projects: {
     featured: true,
   },
 ];
-
-/**
- * Team profiles. Names, roles and bios are in messages under "about.team.members.<id>".
- * TODO: replace with real team members and add photos to /public/team/<id>.jpg.
- */
-export const team = [
-  { id: "founder", initials: "JT" },
-  { id: "engineering", initials: "EL" },
-  { id: "ai", initials: "AI" },
-  { id: "design", initials: "DL" },
-] as const;
 
 export const valueIds = [
   "innovation",

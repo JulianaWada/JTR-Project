@@ -174,7 +174,6 @@
       "subtitle": "We partner with clients across continents, delivering remotely with clear communication and dependable overlap with your working day.",
       "figures": {
         "countries": "Countries served",
-        "projects": "Projects delivered",
         "timezones": "Time zones covered",
         "response": "Typical response time"
       },
@@ -217,7 +216,7 @@
   "about": {
     "meta": {
       "title": "About us",
-      "description": "Learn about Jules TechRight (JTR): our story, mission, vision, values and the team building websites, apps and agentic AI for clients worldwide."
+      "description": "Learn about Jules TechRight (JTR): our story, mission, vision and values as we build websites, apps and agentic AI for clients worldwide."
     },
     "hero": {
       "eyebrow": "About JTR",
@@ -255,33 +254,6 @@
         "excellence": {
           "title": "Excellence",
           "body": "We hold ourselves to global standards in design, engineering and delivery."
-        }
-      }
-    },
-    "team": {
-      "eyebrow": "Our team",
-      "title": "The people behind JTR",
-      "subtitle": "A distributed team of engineers, designers and AI specialists.",
-      "members": {
-        "founder": {
-          "name": "Team member name",
-          "role": "Founder & CEO",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "engineering": {
-          "name": "Team member name",
-          "role": "Head of Engineering",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "ai": {
-          "name": "Team member name",
-          "role": "Lead, Agentic AI",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "design": {
-          "name": "Team member name",
-          "role": "Design Lead",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
         }
       }
     }

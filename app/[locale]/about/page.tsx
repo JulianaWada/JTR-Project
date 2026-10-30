@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { team, valueIds } from "@/content/site";
+import { valueIds } from "@/content/site";
 import { PageHero } from "@/components/sections/PageHero";
 import { MissionVision } from "@/components/sections/MissionVision";
 import { GlobalReach } from "@/components/sections/GlobalReach";
@@ -70,28 +70,6 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
       </Section>
 
       <GlobalReach />
-
-      <Section labelledBy="team-title">
-        <SectionHeading id="team-title" eyebrow={t("team.eyebrow")} title={t("team.title")} subtitle={t("team.subtitle")} />
-        {/* TODO: replace placeholder team members (content/site.ts + messages about.team.members). */}
-        <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map((m) => (
-            <li key={m.id}>
-              <Card className="h-full text-center">
-                <div
-                  aria-hidden="true"
-                  className="font-display mx-auto grid size-24 -skew-x-6 place-items-center rounded-2xl bg-navy text-2xl font-semibold text-white ring-4 ring-primary/20"
-                >
-                  <span className="skew-x-6">{m.initials}</span>
-                </div>
-                <h3 className="font-display mt-5 text-lg font-semibold text-ink">{t(`team.members.${m.id}.name`)}</h3>
-                <p className="text-sm font-medium text-primary">{t(`team.members.${m.id}.role`)}</p>
-                <p className="mt-3 text-sm text-muted">{t(`team.members.${m.id}.bio`)}</p>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </Section>
 
       <CTABand />
     </>

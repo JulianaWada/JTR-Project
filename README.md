@@ -53,8 +53,8 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 
 Content is split in two so that every language stays in sync:
 
-- **Words visitors read** live in `messages/<locale>.json` (`en`, `fr`, `ar`, `pt`). Headings, paragraphs, button labels, service descriptions, project and team text, form labels and error messages are all there.
-- **Facts and structure** live in `content/site.ts`: company details, contact details, booking link, social links, which services and regions exist, project list (service, region, year, featured), team list, reach figures, time zones, budget ranges and currencies.
+- **Words visitors read** live in `messages/<locale>.json` (`en`, `fr`, `ar`, `pt`). Headings, paragraphs, button labels, service descriptions, project text, form labels and error messages are all there.
+- **Facts and structure** live in `content/site.ts`: company details, contact details, booking link, social links, which services and regions exist, project list (service, region, year, featured), reach figures, time zones, budget ranges and currencies.
 
 Common edits:
 
@@ -64,9 +64,9 @@ Common edits:
 | Booking link (Cal.com) | `siteConfig.bookingUrl` |
 | Map on the contact page | `siteConfig.mapEmbedUrl` (a Google Maps embed URL; a styled placeholder shows while it is empty) |
 | Social links | `siteConfig.social` |
-| Reach figures (countries, projects…) | `reachFigures` in `content/site.ts` |
+| Reach figures (countries, time zones…) | `reachFigures` in `content/site.ts` |
 | Add a project | Add an entry to `projects` in `content/site.ts` (status `live` or `in-progress`, optional screenshot in `public/projects/` and public link), then add `projects.items.<id>.title`, `.summary` and `.imageAlt` in every `messages/*.json` |
-| Team members | `team` in `content/site.ts` plus `about.team.members.<id>` in every messages file |
+| Team section | Removed for now (2026-10-30). To bring it back, restore it from git history (`about` page, `team` in `content/site.ts`, `about.team` in messages) |
 | Service descriptions | `services.<id>` in the messages files |
 | Logo | `public/brand/jtr-emblem.png` (header, footer, JSON-LD) and `app/icon.png` / `app/apple-icon.png` (browser icons). A vector version can go in `public/brand/jtr-emblem.svg`; see `components/brand/Logo.tsx`. |
 | Colours | CSS variables at the top of `app/globals.css` (light and dark sets) |
@@ -156,8 +156,7 @@ Search the code for `TODO` to find each one.
 
 **Portfolio, team and figures**
 
-- [ ] Reach figures: countries, projects, time zones, response time (`reachFigures`)
-- [ ] Team members, roles and bios (`team` and `about.team.members`), plus photos in `public/team/<id>.jpg`
+- [ ] Reach figures: countries, time zones, response time (`reachFigures`)
 - [ ] Approximate exchange rates for budget display (`approxUsdRates`)
 
 **Brand**

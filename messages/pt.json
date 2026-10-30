@@ -175,7 +175,6 @@
       "subtitle": "Somos parceiros de clientes em vários continentes, com entrega remota, comunicação clara e sobreposição confiável com o seu dia de trabalho.",
       "figures": {
         "countries": "Países atendidos",
-        "projects": "Projetos entregues",
         "timezones": "Fusos horários cobertos",
         "response": "Tempo médio de resposta"
       },
@@ -218,7 +217,7 @@
   "about": {
     "meta": {
       "title": "Sobre nós",
-      "description": "Conheça a Jules TechRight (JTR): nossa história, missão, visão, valores e a equipe que cria sites, aplicativos e IA agêntica para clientes em todo o mundo."
+      "description": "Conheça a Jules TechRight (JTR): nossa história, missão, visão e valores, criando sites, aplicativos e IA agêntica para clientes em todo o mundo."
     },
     "hero": {
       "eyebrow": "Sobre a JTR",
@@ -256,33 +255,6 @@
         "excellence": {
           "title": "Excelência",
           "body": "Seguimos padrões globais em design, engenharia e entrega."
-        }
-      }
-    },
-    "team": {
-      "eyebrow": "Nossa equipe",
-      "title": "As pessoas por trás da JTR",
-      "subtitle": "Uma equipe distribuída de engenheiros, designers e especialistas em IA.",
-      "members": {
-        "founder": {
-          "name": "Nome do membro da equipe",
-          "role": "Fundador(a) e CEO",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "engineering": {
-          "name": "Nome do membro da equipe",
-          "role": "Diretor(a) de Engenharia",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "ai": {
-          "name": "Nome do membro da equipe",
-          "role": "Líder de IA agêntica",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "design": {
-          "name": "Nome do membro da equipe",
-          "role": "Líder de Design",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
         }
       }
     }
