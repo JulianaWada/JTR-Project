@@ -483,5 +483,77 @@
     "body": "La page que vous recherchez n’existe pas ou a été déplacée.",
     "home": "Retour à l’accueil",
     "contact": "Nous contacter"
+  },
+  "academyInterest": {
+    "meta": {
+      "title": "Inscrivez votre intérêt pour la JTR Academy",
+      "description": "Cours en ligne en direct pour booster vos ventes avec l'IA et créer des vidéos d'animation avec l'IA, avec certificat et badge à la fin."
+    },
+    "hero": {
+      "eyebrow": "JTR Academy",
+      "title": "Apprenez les compétences IA qui font grandir votre entreprise",
+      "subtitle": "Des cours pratiques en direct, en ligne. Inscrivez votre intérêt et nous vous contacterons avec les dates, les tarifs et les modalités."
+    },
+    "courses": {
+      "title": "Cours",
+      "sales": {
+        "name": "Booster ses ventes avec l'IA",
+        "summary": "Utilisez l'IA pour trouver des clients, répondre plus vite et vendre plus."
+      },
+      "animation": {
+        "name": "Créer des vidéos d'animation avec l'IA",
+        "summary": "Réalisez des vidéos animées percutantes, sans studio."
+      }
+    },
+    "perks": {
+      "live": "Cours en direct et interactifs",
+      "certificate": "Certificat à la fin du cours",
+      "badge": "Badge numérique à partager",
+      "note": "L'inscription d'intérêt est gratuite et sans engagement."
+    },
+    "form": {
+      "title": "Inscrivez votre intérêt",
+      "intro": "Laissez vos coordonnées et nous vous contacterons à l'ouverture des prochaines sessions.",
+      "name": "Nom complet",
+      "phone": "Numéro de téléphone ou WhatsApp",
+      "phoneHint": "Nous l'utiliserons pour vous envoyer les détails des cours sur WhatsApp.",
+      "countryCode": "Indicatif",
+      "email": "Adresse e-mail",
+      "location": "Ville ou région",
+      "locationPlaceholder": "ex. Lagos",
+      "course": "Quel cours vous intéresse ?",
+      "courses": {
+        "sales": "Booster ses ventes avec l'IA",
+        "animation": "Vidéos d'animation avec l'IA",
+        "both": "Les deux cours"
+      },
+      "heardFrom": "Comment nous avez-vous connus ?",
+      "heardFromPlaceholder": "Choisissez une option",
+      "heardFromOptions": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "x": "X (Twitter)",
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "friend": "Un ami ou collègue",
+        "other": "Ailleurs"
+      },
+      "optional": "facultatif",
+      "consent": "J'accepte que JTR me contacte au sujet de la JTR Academy avec ces informations, comme décrit dans la <link>politique de confidentialité</link>.",
+      "submit": "M'inscrire",
+      "sending": "Envoi…",
+      "successTitle": "Merci, vous êtes sur la liste.",
+      "successBody": "Nous vous contacterons par WhatsApp ou e-mail avec les dates et les modalités.",
+      "errorTitle": "Une erreur s'est produite.",
+      "errorBody": "Vos informations n'ont pas été envoyées. Réessayez ou écrivez-nous à {email}.",
+      "errors": {
+        "required": "Ce champ est obligatoire.",
+        "email": "Saisissez une adresse e-mail valide.",
+        "phone": "Saisissez un numéro de téléphone valide.",
+        "tooLong": "C'est trop long.",
+        "course": "Veuillez choisir un cours.",
+        "consent": "Veuillez confirmer votre accord pour que nous puissions vous contacter."
+      }
+    }
   }
 }

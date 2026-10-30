@@ -483,5 +483,77 @@
     "body": "A página que você procura não existe ou foi movida.",
     "home": "Ir para a página inicial",
     "contact": "Fale conosco"
+  },
+  "academyInterest": {
+    "meta": {
+      "title": "Registe o seu interesse na JTR Academy",
+      "description": "Aulas online ao vivo para aumentar vendas com IA e criar vídeos de animação com IA, com certificado e crachá no fim."
+    },
+    "hero": {
+      "eyebrow": "JTR Academy",
+      "title": "Aprenda as competências de IA que fazem o seu negócio crescer",
+      "subtitle": "Aulas práticas ao vivo, online. Registe o seu interesse e contactamos com datas, preços e como participar."
+    },
+    "courses": {
+      "title": "Cursos",
+      "sales": {
+        "name": "Aumentar vendas com IA",
+        "summary": "Use a IA para encontrar clientes, responder mais rápido e vender mais."
+      },
+      "animation": {
+        "name": "Criar vídeos de animação com IA",
+        "summary": "Crie vídeos animados apelativos, sem estúdio."
+      }
+    },
+    "perks": {
+      "live": "Aulas ao vivo e interativas",
+      "certificate": "Certificado de conclusão",
+      "badge": "Crachá digital para partilhar",
+      "note": "Registar interesse é gratuito e não o compromete a nada."
+    },
+    "form": {
+      "title": "Registe o seu interesse",
+      "intro": "Deixe os seus dados e contactamos quando abrirem as próximas turmas.",
+      "name": "Nome completo",
+      "phone": "Número de telefone ou WhatsApp",
+      "phoneHint": "Usamos este número para enviar detalhes das aulas pelo WhatsApp.",
+      "countryCode": "Indicativo",
+      "email": "Endereço de e-mail",
+      "location": "Cidade ou estado",
+      "locationPlaceholder": "ex. Lagos",
+      "course": "Que curso lhe interessa?",
+      "courses": {
+        "sales": "Aumentar vendas com IA",
+        "animation": "Vídeos de animação com IA",
+        "both": "Ambos os cursos"
+      },
+      "heardFrom": "Como soube de nós?",
+      "heardFromPlaceholder": "Escolha uma opção",
+      "heardFromOptions": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "x": "X (Twitter)",
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "friend": "Um amigo ou colega",
+        "other": "Outro sítio"
+      },
+      "optional": "opcional",
+      "consent": "Concordo que a JTR me contacte sobre a JTR Academy com estes dados, conforme descrito na <link>política de privacidade</link>.",
+      "submit": "Registar interesse",
+      "sending": "A enviar…",
+      "successTitle": "Obrigado, está na lista.",
+      "successBody": "Vamos contactá-lo por WhatsApp ou e-mail com as datas e como participar.",
+      "errorTitle": "Algo correu mal.",
+      "errorBody": "Os seus dados não foram enviados. Tente novamente ou escreva para {email}.",
+      "errors": {
+        "required": "Este campo é obrigatório.",
+        "email": "Introduza um e-mail válido.",
+        "phone": "Introduza um número de telefone válido.",
+        "tooLong": "É demasiado longo.",
+        "course": "Escolha um curso.",
+        "consent": "Confirme que concorda para podermos contactá-lo."
+      }
+    }
   }
 }

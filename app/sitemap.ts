@@ -3,7 +3,7 @@ import { locales } from "@/i18n/routing";
 import { getAllSlugs } from "@/lib/blog";
 import { languageAlternates, localeUrl } from "@/lib/seo";
 
-const staticPaths = ["", "/about", "/services", "/projects", "/insights", "/careers", "/contact", "/assistant", "/privacy", "/terms"];
+const staticPaths = ["", "/about", "/services", "/projects", "/insights", "/careers", "/contact", "/academy/interest", "/assistant", "/privacy", "/terms"];
 
 /** One entry per page per language, each listing its translations (hreflang). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
