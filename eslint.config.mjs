@@ -12,8 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Separate app with its own config.
+    // Separate apps with their own configs.
     "academy/**",
+    "whatsapp-agent/**",
   ]),
 ]);
 
