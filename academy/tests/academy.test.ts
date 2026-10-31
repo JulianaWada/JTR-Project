@@ -10,7 +10,8 @@ import { classState } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
-import { seedCourses } from "@/lib/seed";
+import { readFileSync } from "node:fs";
+import { seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { askTutor } from "@/lib/tutor";
 import { hashPassword } from "@/lib/passwords";
@@ -23,7 +24,7 @@ let student: typeof schema.users.$inferSelect;
 
 beforeEach(async () => {
   db = await createInMemoryDb();
-  seeded = await seedCourses(db);
+  seeded = await seedCourses(db, { demo: true });
   [student] = await db
     .insert(schema.users)
     .values({ email: "amaka@example.com", name: "Amaka Obi", passwordHash: hashPassword("password123") })
@@ -72,7 +73,7 @@ describe("enrolment and payment", () => {
   });
 
   it("refuses closed or full intakes", async () => {
-    expect(await startCheckout(db, student, seeded.animationDone.cohort.id, null)).toEqual({ error: expect.stringContaining("closed") });
+    expect(await startCheckout(db, student, seeded.animationDone!.cohort.id, null)).toEqual({ error: expect.stringContaining("closed") });
     await db.update(schema.cohorts).set({ capacity: 0 }).where(eq(schema.cohorts.id, seeded.animationNext.cohort.id));
     expect(await startCheckout(db, student, seeded.animationNext.cohort.id, null)).toEqual({ error: expect.stringContaining("full") });
   });
@@ -89,10 +90,10 @@ describe("enrolment and payment", () => {
 describe("progress, badges and certificates", () => {
   it("issues the certificate once attendance and the final project meet the rule", async () => {
     // Use the finished intake: every class is in the past.
-    const cohortId = seeded.animationDone.cohort.id;
+    const cohortId = seeded.animationDone!.cohort.id;
     await db.update(schema.cohorts).set({ enrolmentOpen: true, startsAt: new Date(Date.now() + 86400000) }).where(eq(schema.cohorts.id, cohortId));
     await enrolAndPay(cohortId);
-    const lessons = seeded.animationDone.classes;
+    const lessons = seeded.animationDone!.classes;
 
     // 4 of 6 classes is 67%, below the 80% rule.
     await db.insert(schema.attendance).values(lessons.slice(0, 4).map((l) => ({ classId: l.id, userId: student.id, source: "join" as const })));
@@ -185,6 +186,34 @@ describe("class reminders", () => {
     await db.update(schema.classes).set({ startsAt: addMinutes(new Date(), 120) }).where(eq(schema.classes.id, first.id));
     expect((await sendClassReminders(db)).emails).toBe(1);
     expect((await sendClassReminders(db)).emails).toBe(0);
+  });
+});
+
+describe("going live", () => {
+  it("seeds only the courses and an upcoming intake without demo mode", async () => {
+    const live = await createInMemoryDb();
+    const s = await seedCourses(live);
+    expect(s.animationDone).toBeNull();
+    expect(s.animationNext.cohort.meetUrl).toBe("");
+    expect(await live.query.discountCodes.findMany()).toEqual([]);
+    expect(await live.query.users.findMany()).toEqual([]);
+  });
+
+  it("removes the sample students and links but keeps real signups and courses", async () => {
+    await seedDemoStudents(db, "demo1234", seeded);
+    await enrolAndPay(seeded.animationNext.cohort.id);
+    const sql = readFileSync("drizzle/0002_remove_demo_data.sql", "utf8");
+    for (const statement of sql.split("--> statement-breakpoint")) await db.execute(statement);
+
+    const emails = (await db.query.users.findMany()).map((u) => u.email);
+    expect(emails).toEqual(["amaka@example.com"]);
+    expect(await db.query.certificates.findMany()).toEqual([]);
+    expect(await db.query.courses.findMany()).toHaveLength(2);
+    expect(await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, seeded.animationDone!.cohort.id) })).toBeUndefined();
+    const next = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, seeded.animationNext.cohort.id) });
+    expect(next?.meetUrl).toBe("");
+    const paid = await db.query.enrolments.findMany({ where: eq(schema.enrolments.userId, student.id) });
+    expect(paid.map((e) => e.status)).toEqual(["active"]);
   });
 });
 

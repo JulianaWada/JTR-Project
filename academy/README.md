@@ -35,6 +35,8 @@ With no keys everything runs in **test mode**: an embedded database (`.data/`), 
 
 Delete `academy/.data` to start again with fresh demo data.
 
+**In production there is no sample data.** Without `DEMO_PASSWORD` the first start adds only the two courses (the recorded Sales course and one January intake of Animation, with no Meet link yet) and Jules's teacher account. Students, payments and certificates come only from real signups. Migration `0002_remove_demo_data` also clears any demo students, sample intake, demo Meet link, demo recordings and the unused `EARLYBIRD` code from a database that already had them; real signups and courses are kept.
+
 ## Going live
 
 1. **Database (Supabase).** Create a project, then copy *Project settings > Database > Connection string > Transaction pooler* (port 6543) into `DATABASE_URL`. Tables are created automatically on every build.

@@ -7,10 +7,11 @@ export default async function LearnLayout({ children }: { children: React.ReactN
     <AppShell
       user={user}
       home="/learn"
+      area="Academy"
       items={[
-        { href: "/learn", label: "My learning", exact: true },
-        { href: "/learn/badges", label: "Badges & certificates" },
-        { href: "/", label: "All courses", exact: true },
+        { href: "/learn", label: "My learning", icon: "home", exact: true },
+        { href: "/learn/badges", label: "Badges & certificates", icon: "award" },
+        ...(user.role === "teacher" ? [{ href: "/teach", label: "Teacher dashboard", icon: "grid" as const, exact: true }] : []),
       ]}
     >
       {children}

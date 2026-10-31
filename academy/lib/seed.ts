@@ -64,12 +64,12 @@ async function insertCohort(
   name: string,
   firstClassWeeksFromNow: number,
   now: Date,
-  opts: { enrolmentOpen: boolean; withRecordings: boolean },
+  opts: { enrolmentOpen: boolean; withRecordings: boolean; meetUrl: string },
 ) {
   const startsAt = classSlot(now, firstClassWeeksFromNow);
   const [cohort] = await db
     .insert(cohorts)
-    .values({ courseId, name, startsAt, meetUrl: "https://meet.google.com/jtr-demo-class", enrolmentOpen: opts.enrolmentOpen })
+    .values({ courseId, name, startsAt, meetUrl: opts.meetUrl, enrolmentOpen: opts.enrolmentOpen })
     .returning();
   const rows = await db
     .insert(classes)
@@ -91,18 +91,25 @@ async function insertCohort(
   return { cohort, classes: rows };
 }
 
-/** The two starter courses with their intakes. Safe to run on a real database: it adds no people. */
-export async function seedCourses(db: Database, now = new Date()) {
+/**
+ * The two starter courses. Safe to run on a real database: it adds no people.
+ * With `demo` it also adds sample intakes (one finished, with recordings), a sample Meet link and the EARLYBIRD code;
+ * without it (production) Animation gets one upcoming intake with no Meet link, for Jules to fill in.
+ */
+export async function seedCourses(db: Database, { demo = false }: { demo?: boolean } = {}, now = new Date()) {
   const [sales, animation] = courseTemplates;
   const salesCourse = await insertCourse(db, sales, 0);
   const animationCourse = await insertCourse(db, animation, 1);
 
-  // Sales is a recorded course with one self-paced intake. Animation is live: a finished intake and one open for January.
+  // Sales is a recorded course with one self-paced intake. Animation is live, with an intake open for January.
   const [salesSelfPaced] = await ensureSelfPacedCohorts(db, now);
-  const animationDone = await insertCohort(db, animation, animationCourse.id, "September 2026", -8, now, { enrolmentOpen: false, withRecordings: true });
-  const animationNext = await insertCohort(db, animation, animationCourse.id, "January 2027", 11, now, { enrolmentOpen: true, withRecordings: false });
+  const meetUrl = demo ? "https://meet.google.com/jtr-demo-class" : "";
+  const animationDone = demo
+    ? await insertCohort(db, animation, animationCourse.id, "September 2026", -8, now, { enrolmentOpen: false, withRecordings: true, meetUrl })
+    : null;
+  const animationNext = await insertCohort(db, animation, animationCourse.id, "January 2027", 11, now, { enrolmentOpen: true, withRecordings: false, meetUrl });
 
-  await db.insert(discountCodes).values({ code: "EARLYBIRD", percentOff: 20 });
+  if (demo) await db.insert(discountCodes).values({ code: "EARLYBIRD", percentOff: 20 });
   return { salesCourse, animationCourse, salesSelfPaced, animationDone, animationNext };
 }
 
@@ -135,7 +142,9 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
     ])
     .returning();
 
-  const { salesCourse, animationCourse, salesSelfPaced: salesIntake, animationDone } = seeded;
+  const { salesCourse, animationCourse, salesSelfPaced: salesIntake } = seeded;
+  const animationDone = seeded.animationDone;
+  if (!animationDone) throw new Error("Demo students need the courses seeded with { demo: true }.");
   const salesAssignments = await db.query.assignments.findMany({ where: eq(assignments.courseId, salesCourse.id) });
   const animationAssignments = await db.query.assignments.findMany({ where: eq(assignments.courseId, animationCourse.id) });
   const salesQuizzes = await db.query.quizzes.findMany({ where: eq(quizzes.courseId, salesCourse.id) });
@@ -228,7 +237,7 @@ export async function ensureDemoData(db: Database) {
   const [{ value }] = await db.select({ value: count() }).from(courses);
   if (value > 0) return;
 
-  const seeded = await seedCourses(db);
+  const seeded = await seedCourses(db, { demo: Boolean(env.demoPassword) });
   const teacherPassword = process.env.TEACHER_PASSWORD?.trim() || env.demoPassword;
   if (teacherPassword) {
     await db
