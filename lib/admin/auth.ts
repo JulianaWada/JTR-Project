@@ -16,6 +16,11 @@ export function adminPassword(): string | undefined {
   return process.env.NODE_ENV === "production" ? undefined : DEMO_ADMIN_PASSWORD;
 }
 
+/** When ADMIN_EMAIL is set, the login also asks for that email address (any letter case). */
+export function adminEmail(): string | undefined {
+  return process.env.ADMIN_EMAIL?.trim().toLowerCase() || undefined;
+}
+
 export function isDemoLogin() {
   return !process.env.ADMIN_PASSWORD?.trim();
 }
@@ -36,9 +41,14 @@ function safeEqual(a: string, b: string) {
   return timingSafeEqual(x, y);
 }
 
-export function checkPassword(attempt: string): boolean {
+export function checkLogin(attempt: { email: string; password: string }): boolean {
   const password = adminPassword();
-  return Boolean(password) && safeEqual(attempt, password!);
+  if (!password) return false;
+  const email = adminEmail();
+  // Both are always compared, so a wrong email takes as long to reject as a wrong password.
+  const emailOk = email ? safeEqual(attempt.email.trim().toLowerCase(), email) : true;
+  const passwordOk = safeEqual(attempt.password, password);
+  return emailOk && passwordOk;
 }
 
 export function createAdminToken(now = Date.now()): string | null {
