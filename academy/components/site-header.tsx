@@ -57,7 +57,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Logo size={42} />
           <p className="mt-4 text-sm text-muted">
-            Live online courses from Jules TechRight. Learn practical AI skills from Jules, with an AI tutor between classes.
+            Online AI courses from Jules TechRight, as video lessons or live classes, with an AI tutor between lessons.
           </p>
         </div>
         <div>

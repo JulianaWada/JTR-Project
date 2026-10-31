@@ -1,4 +1,4 @@
-import type { CourseWeek, QuizQuestion, Resource } from "@/lib/db/schema";
+import type { CourseFormat, CourseWeek, QuizQuestion, Resource } from "@/lib/db/schema";
 
 // Starter content for the first two courses. It is copied into the database once (lib/seed.ts);
 // after that Jules edits everything from the teacher dashboard. Prices are placeholders.
@@ -13,6 +13,7 @@ export type CourseTemplate = {
   audience: string[];
   outcomes: string[];
   priceNaira: number;
+  format: CourseFormat;
   accent: "blue" | "violet";
   outline: CourseWeek[];
   lessons: LessonTemplate[];
@@ -25,7 +26,7 @@ export const salesCourse: CourseTemplate = {
   title: "Boost Sales with AI",
   tagline: "Use AI to find customers, write adverts that sell and reply to every enquiry fast.",
   description:
-    "A practical six-week live course for business owners and sales teams. Each week you learn one way AI can bring in more sales, try it on your own business during class, and leave with something you can use the next morning. No technical background needed: if you can use WhatsApp, you can do this course.",
+    "A practical video course for business owners and sales teams, in six short lessons you watch whenever it suits you. Each lesson shows one way AI can bring in more sales; try it on your own business straight away and leave with something you can use the next morning. No technical background needed: if you can use WhatsApp, you can do this course.",
   audience: [
     "Small business owners selling online or on WhatsApp and Instagram",
     "Sales and marketing staff who want to work faster",
@@ -40,6 +41,7 @@ export const salesCourse: CourseTemplate = {
     "Leave with a written AI sales plan for your own business",
   ],
   priceNaira: 50000,
+  format: "recorded",
   accent: "blue",
   outline: [
     { week: 1, title: "AI for your business: getting started", summary: "What AI can and can't do for sales, and setting up ChatGPT and Claude." },
@@ -214,6 +216,7 @@ export const animationCourse: CourseTemplate = {
     "Finish and export your own 30 to 60 second animated video",
   ],
   priceNaira: 50000,
+  format: "live",
   accent: "violet",
   outline: [
     { week: 1, title: "What makes a great short video", summary: "Hooks, length and formats, plus a tour of AI video and animation tools." },

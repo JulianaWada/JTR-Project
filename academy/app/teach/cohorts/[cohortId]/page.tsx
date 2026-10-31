@@ -21,10 +21,24 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
   const lessons = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: asc(schema.classes.startsAt) });
   const enrolled = await db.query.enrolments.findMany({ where: eq(schema.enrolments.cohortId, cohortId) });
   const active = enrolled.filter((e) => e.status === "active");
-  const people = enrolled.length ? await db.query.users.findMany({ where: inArray(schema.users.id, enrolled.map((e) => e.userId)) }) : [];
+  const people = enrolled.length
+    ? await db.query.users.findMany({
+        where: inArray(
+          schema.users.id,
+          enrolled.map((e) => e.userId),
+        ),
+      })
+    : [];
   const present = new Set(
     lessons.length
-      ? (await db.query.attendance.findMany({ where: inArray(schema.attendance.classId, lessons.map((l) => l.id)) })).map((a) => `${a.userId}:${a.classId}`)
+      ? (
+          await db.query.attendance.findMany({
+            where: inArray(
+              schema.attendance.classId,
+              lessons.map((l) => l.id),
+            ),
+          })
+        ).map((a) => `${a.userId}:${a.classId}`)
       : [],
   );
   const students = await Promise.all(
@@ -39,32 +53,35 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
   );
   const pending = enrolled.filter((e) => e.status === "pending").map((e) => people.find((p) => p.id === e.userId)!);
   const now = new Date();
+  const selfPaced = cohort.selfPaced;
 
   return (
     <>
       <Link href={`/teach/courses/${course.id}`} className="text-sm text-muted hover:text-primary">
         ← {course.title}
       </Link>
-      <PageTitle title={`${course.title}: ${cohort.name}`}>
-        Starts {formatDate(cohort.startsAt)} · {active.length}/{cohort.capacity} students · {cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}
+      <PageTitle title={selfPaced ? `${course.title}: video lessons` : `${course.title}: ${cohort.name}`}>
+        {selfPaced
+          ? `Self-paced · ${active.length} students · ${cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}`
+          : `Starts ${formatDate(cohort.startsAt)} · ${active.length}/${cohort.capacity} students · ${cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}`}
       </PageTitle>
       <Flash searchParams={searchParams} />
 
       <section className="card">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-display text-lg font-semibold text-ink">Classes</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Video lessons" : "Classes"}</h2>
           <Link href={`/teach/cohorts/${cohortId}/classes/new`} className="btn-secondary btn-sm">
-            + Add a class
+            {selfPaced ? "+ Add a lesson" : "+ Add a class"}
           </Link>
         </div>
         <table className="table mt-3">
           <thead>
             <tr>
-              <th>Week</th>
-              <th>Class</th>
-              <th>When (Lagos)</th>
-              <th>Attended</th>
-              <th>Recording</th>
+              <th>{selfPaced ? "Lesson" : "Week"}</th>
+              <th>{selfPaced ? "Title" : "Class"}</th>
+              {!selfPaced && <th>When (Lagos)</th>}
+              <th>{selfPaced ? "Watched" : "Attended"}</th>
+              <th>{selfPaced ? "Video" : "Recording"}</th>
               <th />
             </tr>
           </thead>
@@ -73,11 +90,9 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
               <tr key={l.id}>
                 <td>{l.week}</td>
                 <td className="font-medium text-ink">{l.title}</td>
-                <td className="text-muted">{formatDateTime(l.startsAt)}</td>
-                <td>
-                  {l.startsAt < now ? `${active.filter((e) => present.has(`${e.userId}:${l.id}`)).length}/${active.length}` : "–"}
-                </td>
-                <td>{l.recordingUrl ? <Pill tone="success">Added</Pill> : l.startsAt < now ? <Pill tone="warning">Missing</Pill> : "–"}</td>
+                {!selfPaced && <td className="text-muted">{formatDateTime(l.startsAt)}</td>}
+                <td>{selfPaced || l.startsAt < now ? `${active.filter((e) => present.has(`${e.userId}:${l.id}`)).length}/${active.length}` : "–"}</td>
+                <td>{l.recordingUrl ? <Pill tone="success">Added</Pill> : selfPaced || l.startsAt < now ? <Pill tone="warning">Missing</Pill> : "–"}</td>
                 <td className="text-end">
                   <Link href={`/teach/cohorts/${cohortId}/classes/${l.id}`} className="text-sm font-medium text-primary hover:underline">
                     Edit
@@ -90,10 +105,13 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
       </section>
 
       <section id="students" className="card mt-6 scroll-mt-24">
-        <h2 className="font-display text-lg font-semibold text-ink">Students and attendance</h2>
+        <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Students and progress" : "Students and attendance"}</h2>
         <p className="mt-1 text-sm text-muted">
-          Attendance is recorded when students join from their dashboard. Tick or untick boxes to correct it, then save. Certificates issue automatically once a student
-          reaches {course.completionAttendancePercent}% attendance{course.requiresFinalProject ? " and passes the final project" : ""}.
+          {selfPaced
+            ? "A lesson is ticked when the student marks it done. Tick or untick boxes to correct it, then save."
+            : "Attendance is recorded when students join from their dashboard. Tick or untick boxes to correct it, then save."}{" "}
+          Certificates issue automatically once a student reaches {course.completionAttendancePercent}% {selfPaced ? "of lessons watched" : "attendance"}
+          {course.requiresFinalProject ? " and passes the final project" : ""}.
         </p>
         {students.length === 0 ? (
           <p className="mt-4 text-sm text-muted">No students yet.</p>
@@ -136,7 +154,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                       </td>
                     ))}
                     <td className="text-xs whitespace-nowrap text-muted">
-                      {progress.attendancePercent}% attendance
+                      {progress.attendancePercent}% {selfPaced ? "watched" : "attendance"}
                       <br />
                       {progress.passed}/{progress.totalAssignments} passed
                     </td>
@@ -146,7 +164,10 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                           <a href={asset(`/certificates/${progress.certificateCode}/pdf`)} className="text-sm font-medium text-success hover:underline">
                             🎓 {progress.certificateCode}
                           </a>
-                          <button formAction={revokeCertificateAction.bind(null, cohortId, progress.certificateCode)} className="block text-xs text-danger hover:underline">
+                          <button
+                            formAction={revokeCertificateAction.bind(null, cohortId, progress.certificateCode)}
+                            className="block text-xs text-danger hover:underline"
+                          >
                             Withdraw
                           </button>
                         </div>
@@ -160,19 +181,17 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                 ))}
               </tbody>
             </table>
-            <button className="btn-primary btn-sm mt-4">Save attendance</button>
+            <button className="btn-primary btn-sm mt-4">{selfPaced ? "Save progress" : "Save attendance"}</button>
           </form>
         )}
         {pending.length > 0 && (
-          <p className="mt-4 text-sm text-muted">
-            Started enrolling but not paid yet: {pending.map((p) => `${p.name} (${p.email})`).join(", ")}.
-          </p>
+          <p className="mt-4 text-sm text-muted">Started enrolling but not paid yet: {pending.map((p) => `${p.name} (${p.email})`).join(", ")}.</p>
         )}
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section id="announce" className="card scroll-mt-24">
-          <h2 className="font-display text-lg font-semibold text-ink">Email everyone in this intake</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Email all students on this course" : "Email everyone in this intake"}</h2>
           <form action={sendAnnouncement.bind(null, cohortId)} className="mt-4 space-y-3">
             <input className="input" name="subject" placeholder="Subject, e.g. Tonight's class starts 30 min later" required />
             <textarea className="input min-h-32" name="body" placeholder="Your message" required />
@@ -180,28 +199,37 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
           </form>
         </section>
         <section className="card">
-          <h2 className="font-display text-lg font-semibold text-ink">Intake settings</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Enrolment" : "Intake settings"}</h2>
           <form action={updateCohort.bind(null, cohortId)} className="mt-4 space-y-3">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className="label" htmlFor="name">
-                  Name
-                </label>
-                <input className="input" id="name" name="name" defaultValue={cohort.name} required />
-              </div>
-              <div>
-                <label className="label" htmlFor="capacity">
-                  Seats
-                </label>
-                <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={cohort.capacity} />
-              </div>
-            </div>
-            <div>
-              <label className="label" htmlFor="meetUrl">
-                Google Meet link for all classes
-              </label>
-              <input className="input" id="meetUrl" name="meetUrl" type="url" defaultValue={cohort.meetUrl} placeholder="https://meet.google.com/…" />
-            </div>
+            {selfPaced ? (
+              <>
+                <input type="hidden" name="name" value={cohort.name} />
+                <input type="hidden" name="capacity" value={cohort.capacity} />
+              </>
+            ) : (
+              <>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="label" htmlFor="name">
+                      Name
+                    </label>
+                    <input className="input" id="name" name="name" defaultValue={cohort.name} required />
+                  </div>
+                  <div>
+                    <label className="label" htmlFor="capacity">
+                      Seats
+                    </label>
+                    <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={cohort.capacity} />
+                  </div>
+                </div>
+                <div>
+                  <label className="label" htmlFor="meetUrl">
+                    Google Meet link for all classes
+                  </label>
+                  <input className="input" id="meetUrl" name="meetUrl" type="url" defaultValue={cohort.meetUrl} placeholder="https://meet.google.com/…" />
+                </div>
+              </>
+            )}
             <label className="flex items-center gap-2 text-sm text-ink">
               <input type="checkbox" name="enrolmentOpen" defaultChecked={cohort.enrolmentOpen} /> Enrolment open
             </label>

@@ -28,6 +28,9 @@ export const users = pgTable("users", {
 
 export type CourseWeek = { week: number; title: string; summary: string };
 
+/** "live": weekly classes on Google Meet in intakes. "recorded": video lessons students watch at their own pace. */
+export type CourseFormat = "live" | "recorded";
+
 export const courses = pgTable("courses", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
@@ -40,7 +43,8 @@ export const courses = pgTable("courses", {
   outcomes: text("outcomes").notNull().default(""),
   outline: jsonb("outline").$type<CourseWeek[]>().notNull().default([]),
   priceKobo: integer("price_kobo").notNull(),
-  /** Share of live classes a student must attend to earn the certificate. */
+  format: text("format").$type<CourseFormat>().notNull().default("live"),
+  /** Share of classes a student must attend (live) or watch (recorded) to earn the certificate. */
   completionAttendancePercent: integer("completion_attendance_percent").notNull().default(80),
   /** Whether the final project must be passed to earn the certificate. */
   requiresFinalProject: boolean("requires_final_project").notNull().default(true),
@@ -65,6 +69,8 @@ export const cohorts = pgTable(
     /** Default Google Meet or Zoom link for this cohort's classes. */
     meetUrl: text("meet_url").notNull().default(""),
     enrolmentOpen: boolean("enrolment_open").notNull().default(true),
+    /** The single always-open intake of a recorded course; its classes are video lessons. */
+    selfPaced: boolean("self_paced").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("cohorts_course_idx").on(t.courseId)],
@@ -72,7 +78,7 @@ export const cohorts = pgTable(
 
 export type Resource = { label: string; url: string };
 
-/** A live class. Notes and resources become the lesson page, and feed the AI tutor. */
+/** A live class, or a video lesson in a self-paced intake. Notes and resources become the lesson page, and feed the AI tutor. */
 export const classes = pgTable(
   "classes",
   {
@@ -155,8 +161,8 @@ export const attendance = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    /** "join" when the student clicked Join, "teacher" when Jules marked them present. */
-    source: text("source").$type<"join" | "teacher">().notNull(),
+    /** "join" when the student clicked Join, "teacher" when Jules marked them present, "watched" when they finished a video lesson. */
+    source: text("source").$type<"join" | "teacher" | "watched">().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.classId, t.userId] })],

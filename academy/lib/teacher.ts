@@ -33,7 +33,7 @@ export async function courseWithCohorts(db: Database) {
   const rows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
   return Promise.all(
     rows.map(async (course) => {
-      const list = await db.query.cohorts.findMany({ where: eq(cohorts.courseId, course.id), orderBy: desc(cohorts.startsAt) });
+      const list = await db.query.cohorts.findMany({ where: eq(cohorts.courseId, course.id), orderBy: [desc(cohorts.selfPaced), desc(cohorts.startsAt)] });
       return {
         course,
         cohorts: await Promise.all(

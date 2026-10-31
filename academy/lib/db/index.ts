@@ -41,6 +41,8 @@ export async function getDb(): Promise<Database> {
       globalForDb.__jtrAcademyDb = state;
       const { ensureDemoData } = await import("@/lib/seed");
       await ensureDemoData(state.db);
+      const { ensureSelfPacedCohorts } = await import("@/lib/self-paced");
+      await ensureSelfPacedCohorts(state.db);
       return state;
     })();
     // A failed start (e.g. the database is unreachable) is retried on the next request.

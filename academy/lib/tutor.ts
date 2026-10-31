@@ -8,20 +8,20 @@ import { addDays } from "@/lib/time";
 export const DAILY_QUESTION_LIMIT = 40;
 const HISTORY_MESSAGES = 20;
 
-type Material = { courseTitle: string; lessons: { week: number; title: string; notes: string }[]; assignments: { week: number; title: string; brief: string }[] };
+type Material = { courseTitle: string; recorded?: boolean; lessons: { week: number; title: string; notes: string }[]; assignments: { week: number; title: string; brief: string }[] };
 
 async function loadMaterial(db: Database, cohortId: string): Promise<Material> {
   const cohort = (await db.query.cohorts.findFirst({ where: eq(cohorts.id, cohortId) }))!;
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
   const lessons = await db.query.classes.findMany({ where: eq(classes.cohortId, cohortId), orderBy: asc(classes.week) });
   const tasks = await db.query.assignments.findMany({ where: eq(assignments.courseId, course.id), orderBy: asc(assignments.week) });
-  return { courseTitle: course.title, lessons, assignments: tasks };
+  return { courseTitle: course.title, recorded: course.format === "recorded", lessons, assignments: tasks };
 }
 
 export function tutorSystemPrompt(m: Material) {
   const lessons = m.lessons.map((l) => `<lesson week="${l.week}" title="${l.title}">\n${l.notes.trim()}\n</lesson>`).join("\n\n");
   const tasks = m.assignments.map((a) => `<assignment week="${a.week}" title="${a.title}">${a.brief}</assignment>`).join("\n");
-  return `You are the AI tutor for "${m.courseTitle}", a live online course at JTR Academy taught by Jules (Jules TechRight, Nigeria). Students are mostly Nigerian business owners and creators, many new to AI.
+  return `You are the AI tutor for "${m.courseTitle}", ${m.recorded ? "a self-paced video course" : "a live online course"} at JTR Academy taught by Jules (Jules TechRight, Nigeria). Students are mostly Nigerian business owners and creators, many new to AI.
 
 How to help:
 - Answer from the course material below first, and say which week covers it so students can revisit the notes and recording.
@@ -89,7 +89,7 @@ export function mockAnswer(m: Material, question: string) {
     }
   }
   if (!best || best.score === 0) {
-    return `(Test mode: the AI tutor answers properly once the Claude API key is added.)\n\nI couldn't find that in the ${m.courseTitle} notes yet. Try asking about a topic from one of the weeks, or bring the question to the next live class.`;
+    return `(Test mode: the AI tutor answers properly once the Claude API key is added.)\n\nI couldn't find that in the ${m.courseTitle} notes yet. Try asking about a topic from one of the weeks, or send the question to Jules.`;
   }
   const excerpt = best.body.replace(/\*\*/g, "").split("\n").slice(0, 6).join("\n");
   return `(Test mode: this answer is taken straight from the notes. With the Claude API key added, the tutor explains in its own words.)\n\nWeek ${best.week} covers this under "${best.heading}":\n\n${excerpt}`;

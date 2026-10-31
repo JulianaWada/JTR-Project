@@ -25,6 +25,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
                 <div className="flex flex-wrap gap-2">
                   {course.published ? <Pill tone="success">Published</Pill> : <Pill tone="warning">Draft</Pill>}
                   <Pill>{naira(course.priceKobo)}</Pill>
+                  <Pill tone={course.format === "recorded" ? "violet" : "primary"}>{course.format === "recorded" ? "Video course" : "Live classes"}</Pill>
                 </div>
                 <h2 className="mt-2 font-display text-xl font-semibold text-ink">{course.title}</h2>
                 <p className="text-sm text-muted">{course.tagline}</p>
@@ -52,13 +53,11 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
                   <tr key={c.id}>
                     <td>
                       <Link href={`/teach/cohorts/${c.id}`} className="font-medium text-primary hover:underline">
-                        {c.name}
+                        {c.selfPaced ? "Video lessons (self-paced)" : c.name}
                       </Link>
                     </td>
-                    <td className="text-muted">{formatDate(c.startsAt)}</td>
-                    <td>
-                      {c.students}/{c.capacity}
-                    </td>
+                    <td className="text-muted">{c.selfPaced ? "Any time" : formatDate(c.startsAt)}</td>
+                    <td>{c.selfPaced ? c.students : `${c.students}/${c.capacity}`}</td>
                     <td>{c.enrolmentOpen ? <Pill tone="success">Open</Pill> : <Pill>Closed</Pill>}</td>
                   </tr>
                 ))}

@@ -100,9 +100,9 @@ export async function certificatePdf(cert: { code: string; studentName: string; 
   while (serif.widthOfTextAtSize(cert.studentName, nameSize) > width - 160 && nameSize > 18) nameSize -= 2;
   center(cert.studentName, nameSize, serif, height - 300);
   page.drawLine({ start: { x: width / 2 - 180, y: height - 312 }, end: { x: width / 2 + 180, y: height - 312 }, color: silver, thickness: 1 });
-  center("has successfully completed the live course", 13, sans, height - 340, muted);
+  center("has successfully completed the course", 13, sans, height - 340, muted);
   center(cert.courseTitle, 22, sansBold, height - 372);
-  center("including live classes, assignments and a final project", 11, sans, height - 395, muted);
+  center("including all lessons, assignments and a final project", 11, sans, height - 395, muted);
 
   page.drawText("Jules", { x: 120, y: 120, size: 24, font: serif, color: navy });
   page.drawLine({ start: { x: 110, y: 110 }, end: { x: 300, y: 110 }, color: silver, thickness: 1 });

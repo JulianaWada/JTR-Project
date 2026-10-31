@@ -7,7 +7,7 @@ import { Flash, PageTitle } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
 import { addDays, toLagosParts } from "@/lib/time";
 
-export const metadata: Metadata = { title: "Add a class" };
+export const metadata: Metadata = { title: "Add a lesson" };
 
 export default async function NewClass({ params, searchParams }: PageProps<"/teach/cohorts/[cohortId]/classes/new">) {
   const { cohortId } = await params;
@@ -18,12 +18,13 @@ export default async function NewClass({ params, searchParams }: PageProps<"/tea
   return (
     <div className="mx-auto max-w-4xl">
       <Link href={`/teach/cohorts/${cohortId}`} className="text-sm text-muted hover:text-primary">
-        ← {cohort.name} intake
+        ← {cohort.selfPaced ? "Video lessons" : `${cohort.name} intake`}
       </Link>
-      <PageTitle title="Add a class" />
+      <PageTitle title={cohort.selfPaced ? "Add a video lesson" : "Add a class"} />
       <Flash searchParams={searchParams} />
       <ClassForm
         cohortId={cohortId}
+        selfPaced={cohort.selfPaced}
         defaults={{ week: (last?.week ?? 0) + 1, date: toLagosParts(last ? addDays(last.startsAt, 7) : cohort.startsAt).date }}
       />
     </div>

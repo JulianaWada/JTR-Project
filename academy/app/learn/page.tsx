@@ -41,7 +41,7 @@ export default async function LearnHome() {
                 <CourseArt slug={course.slug} accent={course.accent} className="h-28" />
                 <div className="p-6">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Pill tone={course.accent === "violet" ? "violet" : "primary"}>{cohort.name} intake</Pill>
+                    <Pill tone={course.accent === "violet" ? "violet" : "primary"}>{cohort.selfPaced ? "Video course" : `${cohort.name} intake`}</Pill>
                     {progress?.certificateCode && <Pill tone="success">🎓 Completed</Pill>}
                     {enrolment.status === "pending" && <Pill tone="warning">Payment not finished</Pill>}
                   </div>
@@ -49,7 +49,7 @@ export default async function LearnHome() {
 
                   {enrolment.status === "pending" ? (
                     <div className="mt-4">
-                      <p className="text-sm text-muted">Finish paying to unlock your classes, notes and AI tutor.</p>
+                      <p className="text-sm text-muted">Finish paying to unlock your {cohort.selfPaced ? "lessons" : "classes"}, notes and AI tutor.</p>
                       <Link
                         href={pendingPayment?.provider === "test" ? `/pay/test/${pendingPayment.reference}` : `/enrol/${cohort.id}`}
                         className="btn-primary mt-4"
@@ -66,10 +66,10 @@ export default async function LearnHome() {
                         </div>
                         <ProgressBar value={progress!.overallPercent} tone={progress!.certificateCode ? "success" : "primary"} />
                         <p className="mt-2 text-xs text-muted">
-                          {progress!.attended} of {progress!.totalClasses} classes attended · {progress!.passed} of {progress!.totalAssignments} assignments passed
+                          {progress!.attended} of {progress!.totalClasses} {cohort.selfPaced ? "lessons watched" : "classes attended"} · {progress!.passed} of {progress!.totalAssignments} assignments passed
                         </p>
                       </div>
-                      {nextClass && state !== "ended" ? (
+                      {nextClass && !cohort.selfPaced && state !== "ended" ? (
                         <div className="mt-5 rounded-xl bg-surface-2 p-4">
                           <p className="text-xs font-semibold tracking-wide text-muted uppercase">
                             {state === "live" ? "Live now" : `Next class ${untilText(nextClass.startsAt)}`}

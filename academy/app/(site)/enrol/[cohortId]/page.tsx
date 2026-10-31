@@ -35,27 +35,30 @@ export default async function EnrolPage({ params }: PageProps<"/enrol/[cohortId]
         </Link>
         <h1 className="mt-3 font-display text-3xl font-semibold text-ink">Enrol in {course.title}</h1>
         <p className="mt-2 text-muted">
-          {cohort.name} intake, starting {formatDate(cohort.startsAt)}. You&apos;re enrolling as <strong className="text-ink">{user.name}</strong> (
+          {cohort.selfPaced ? "Video course: start straight after paying and learn at your own pace." : `${cohort.name} intake, starting ${formatDate(cohort.startsAt)}.`}{" "}
+          You&apos;re enrolling as <strong className="text-ink">{user.name}</strong> (
           {user.email}).
         </p>
-        <h2 className="mt-8 font-semibold text-ink">Your live classes</h2>
+        <h2 className="mt-8 font-semibold text-ink">{cohort.selfPaced ? "Your video lessons" : "Your live classes"}</h2>
         <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface">
           {lessons.map((l) => (
             <li key={l.id} className="flex items-center justify-between gap-4 px-5 py-3 text-sm">
               <span className="text-ink">
-                <span className="text-muted">Week {l.week} · </span>
+                <span className="text-muted">{cohort.selfPaced ? "Lesson" : "Week"} {l.week} · </span>
                 {l.title}
               </span>
-              <span className="shrink-0 text-muted">{formatDateTime(l.startsAt)}</span>
+              {!cohort.selfPaced && <span className="shrink-0 text-muted">{formatDateTime(l.startsAt)}</span>}
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-muted">All times are Lagos time (WAT). Every class is recorded in case you miss one.</p>
+        <p className="mt-3 text-xs text-muted">
+          {cohort.selfPaced ? "Watch on your phone or computer, as many times as you like." : "All times are Lagos time (WAT). Every class is recorded in case you miss one."}
+        </p>
       </div>
       <aside className="card lg:self-start">
         <p className="text-sm text-muted">Total</p>
         <p className="font-display text-4xl font-semibold text-ink">{naira(course.priceKobo)}</p>
-        <p className="mt-1 mb-6 text-xs text-muted">Includes all live classes, recordings, the AI tutor and your certificate.</p>
+        <p className="mt-1 mb-6 text-xs text-muted">{cohort.selfPaced ? "Includes every video lesson, the notes, the AI tutor and your certificate." : "Includes all live classes, recordings, the AI tutor and your certificate."}</p>
         {open ? (
           <CheckoutForm cohortId={cohortId} price={naira(course.priceKobo)} testMode={modes().paystack === "test"} />
         ) : (

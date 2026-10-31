@@ -21,6 +21,7 @@ import { courseTemplates, type CourseTemplate } from "@/lib/course-content";
 import { env } from "@/lib/env";
 import { koboFromNaira } from "@/lib/money";
 import { hashPassword } from "@/lib/passwords";
+import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { addDays, fromLagos, toLagosParts } from "@/lib/time";
 
 export const TEACHER_EMAIL = "jules@julestechright.com";
@@ -43,6 +44,9 @@ async function insertCourse(db: Database, t: CourseTemplate, sortOrder: number) 
       outcomes: t.outcomes.join("\n"),
       outline: t.outline,
       priceKobo: koboFromNaira(t.priceNaira),
+      format: t.format,
+      // A recorded course is complete once every lesson is watched.
+      completionAttendancePercent: t.format === "recorded" ? 100 : 80,
       accent: t.accent,
       sortOrder,
     })
@@ -93,14 +97,13 @@ export async function seedCourses(db: Database, now = new Date()) {
   const salesCourse = await insertCourse(db, sales, 0);
   const animationCourse = await insertCourse(db, animation, 1);
 
-  // An intake in progress (classes 1 to 3 done), an intake open for January, and a finished one.
-  const salesNow = await insertCohort(db, sales, salesCourse.id, "November 2026", -3, now, { enrolmentOpen: false, withRecordings: true });
-  const salesNext = await insertCohort(db, sales, salesCourse.id, "January 2027", 10, now, { enrolmentOpen: true, withRecordings: false });
+  // Sales is a recorded course with one self-paced intake. Animation is live: a finished intake and one open for January.
+  const [salesSelfPaced] = await ensureSelfPacedCohorts(db, now);
   const animationDone = await insertCohort(db, animation, animationCourse.id, "September 2026", -8, now, { enrolmentOpen: false, withRecordings: true });
   const animationNext = await insertCohort(db, animation, animationCourse.id, "January 2027", 11, now, { enrolmentOpen: true, withRecordings: false });
 
   await db.insert(discountCodes).values({ code: "EARLYBIRD", percentOff: 20 });
-  return { salesCourse, animationCourse, salesNow, salesNext, animationDone, animationNext };
+  return { salesCourse, animationCourse, salesSelfPaced, animationDone, animationNext };
 }
 
 async function enrolPaid(db: Database, userId: string, cohortId: string, priceKobo: number, paidAt: Date) {
@@ -132,17 +135,17 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
     ])
     .returning();
 
-  const { salesCourse, animationCourse, salesNow, animationDone } = seeded;
+  const { salesCourse, animationCourse, salesSelfPaced: salesIntake, animationDone } = seeded;
   const salesAssignments = await db.query.assignments.findMany({ where: eq(assignments.courseId, salesCourse.id) });
   const animationAssignments = await db.query.assignments.findMany({ where: eq(assignments.courseId, animationCourse.id) });
   const salesQuizzes = await db.query.quizzes.findMany({ where: eq(quizzes.courseId, salesCourse.id) });
 
-  // Ada and Tunde are in the November sales intake; three classes have happened.
-  for (const student of [ada, tunde]) await enrolPaid(db, student.id, salesNow.cohort.id, salesCourse.priceKobo, addDays(now, -25));
-  const past = salesNow.classes.filter((c) => c.startsAt < now);
+  // Ada and Tunde are taking the recorded sales course: Ada has watched three lessons, Tunde one.
+  for (const student of [ada, tunde]) await enrolPaid(db, student.id, salesIntake.cohort.id, salesCourse.priceKobo, addDays(now, -25));
+  const watched = salesIntake.classes.slice(0, 3);
   await db.insert(attendance).values([
-    ...past.map((c) => ({ classId: c.id, userId: ada.id, source: "join" as const })),
-    { classId: past[0].id, userId: tunde.id, source: "join" as const },
+    ...watched.map((c) => ({ classId: c.id, userId: ada.id, source: "watched" as const })),
+    { classId: watched[0].id, userId: tunde.id, source: "watched" as const },
   ]);
   const week1Quiz = salesQuizzes.find((q) => q.week === 1)!;
   await db.insert(quizAttempts).values({ quizId: week1Quiz.id, userId: ada.id, answers: [1, 1, 0], score: 3, total: 3 });
@@ -152,7 +155,7 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
     {
       assignmentId: profile.id,
       userId: ada.id,
-      cohortId: salesNow.cohort.id,
+      cohortId: salesIntake.cohort.id,
       text: "My ideal customer is a working mum in Abuja, 28 to 40, who buys children's clothes online in the evening. Top questions: sizes, delivery time to Gwarinpa, whether I take transfers.",
       grade: "pass",
       feedback: "Great detail on when she buys. Use the evening timing in your adverts.",
@@ -162,24 +165,24 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
     {
       assignmentId: adverts.id,
       userId: ada.id,
-      cohortId: salesNow.cohort.id,
+      cohortId: salesIntake.cohort.id,
       link: "https://docs.google.com/document/d/demo-adverts",
       text: "Five adverts for the school uniform bundle.",
       submittedAt: addDays(now, -2),
     },
   ]);
   await db.insert(userBadges).values([
-    { userId: ada.id, cohortId: salesNow.cohort.id, badge: "first-class" },
-    { userId: ada.id, cohortId: salesNow.cohort.id, badge: "first-assignment" },
-    { userId: ada.id, cohortId: salesNow.cohort.id, badge: "quiz-ace" },
-    { userId: ada.id, cohortId: salesNow.cohort.id, badge: "halfway" },
-    { userId: tunde.id, cohortId: salesNow.cohort.id, badge: "first-class" },
+    { userId: ada.id, cohortId: salesIntake.cohort.id, badge: "first-class" },
+    { userId: ada.id, cohortId: salesIntake.cohort.id, badge: "first-assignment" },
+    { userId: ada.id, cohortId: salesIntake.cohort.id, badge: "quiz-ace" },
+    { userId: ada.id, cohortId: salesIntake.cohort.id, badge: "halfway" },
+    { userId: tunde.id, cohortId: salesIntake.cohort.id, badge: "first-class" },
   ]);
   await db.insert(tutorMessages).values([
-    { userId: ada.id, cohortId: salesNow.cohort.id, role: "user", content: "How do I reply when a customer says my price is too high?", createdAt: addDays(now, -4) },
+    { userId: ada.id, cohortId: salesIntake.cohort.id, role: "user", content: "How do I reply when a customer says my price is too high?", createdAt: addDays(now, -4) },
     {
       userId: ada.id,
-      cohortId: salesNow.cohort.id,
+      cohortId: salesIntake.cohort.id,
       role: "assistant",
       content:
         "Lead with value before you talk about price. From week 4: ask AI for three polite replies that explain what's included (quality, delivery, after-sales) without cutting the price. Offering a basic, standard and premium option (week 5) also helps the customer choose instead of haggling.",

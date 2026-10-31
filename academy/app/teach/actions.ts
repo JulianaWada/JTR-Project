@@ -10,6 +10,7 @@ import { sendEmail } from "@/lib/email";
 import { url } from "@/lib/env";
 import { koboFromNaira } from "@/lib/money";
 import { parseQuiz, parseResources } from "@/lib/quiz-format";
+import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { addDays, fromLagos } from "@/lib/time";
 
 // Every action here re-checks that the caller is the teacher; server actions are public endpoints.
@@ -65,7 +66,9 @@ export async function updateCourse(courseId: string, form: FormData) {
   const price = Number(str(form, "price"));
   const pct = Number(str(form, "attendance"));
   if (!str(form, "title") || !Number.isFinite(price) || price < 0) back(path, { error: "Title and price are required." });
-  if (!Number.isInteger(pct) || pct < 0 || pct > 100) back(path, { error: "Attendance must be a whole number from 0 to 100." });
+  if (!Number.isInteger(pct) || pct < 0 || pct > 100) back(path, { error: "The share needed for the certificate must be a whole number from 0 to 100." });
+  const format = form.get("format") === "recorded" ? "recorded" : "live";
+  const before = await db.query.courses.findFirst({ where: eq(schema.courses.id, courseId) });
   const outline = str(form, "outline")
     .split("\n")
     .map((l) => l.trim())
@@ -84,14 +87,29 @@ export async function updateCourse(courseId: string, form: FormData) {
       outcomes: str(form, "outcomes"),
       outline,
       priceKobo: koboFromNaira(price),
+      format,
       completionAttendancePercent: pct,
       requiresFinalProject: form.get("requiresFinalProject") === "on",
       published: form.get("published") === "on",
       accent: form.get("accent") === "violet" ? "violet" : "blue",
     })
     .where(eq(schema.courses.id, courseId));
+  if (before && before.format !== format) await switchFormat(courseId, format);
   revalidatePath("/", "layout");
-  back(path, { saved: "Course saved." });
+  back(path, { saved: format === "recorded" && before?.format !== format ? "Saved. This is now a video course: add a video to each lesson below." : "Course saved." });
+}
+
+/** Recorded: students enrol in the self-paced intake (created if needed). Live: they choose a dated intake again. */
+async function switchFormat(courseId: string, format: "live" | "recorded") {
+  const db = await getDb();
+  if (format === "recorded") {
+    await ensureSelfPacedCohorts(db);
+    await db.update(schema.cohorts).set({ enrolmentOpen: false }).where(and(eq(schema.cohorts.courseId, courseId), eq(schema.cohorts.selfPaced, false)));
+  }
+  await db
+    .update(schema.cohorts)
+    .set({ enrolmentOpen: format === "recorded" })
+    .where(and(eq(schema.cohorts.courseId, courseId), eq(schema.cohorts.selfPaced, true)));
 }
 
 export async function saveAssignment(courseId: string, assignmentId: string | null, form: FormData) {
@@ -189,32 +207,38 @@ export async function saveClass(cohortId: string, classId: string | null, form: 
   await requireTeacher();
   const db = await getDb();
   const path = classId ? `/teach/cohorts/${cohortId}/classes/${classId}` : `/teach/cohorts/${cohortId}`;
-  const startsAt = fromLagos(str(form, "date"), str(form, "time"));
+  const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
+  if (!cohort) back("/teach/courses", { error: "Intake not found." });
+  const existing = classId
+    ? await db.query.classes.findFirst({ where: and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)) })
+    : undefined;
+  // Video lessons keep their place in the list; a new one goes at the end.
+  const startsAt = cohort.selfPaced ? (existing?.startsAt ?? new Date()) : fromLagos(str(form, "date"), str(form, "time"));
   const duration = Number(str(form, "duration") || "90");
   const week = Number(str(form, "week"));
-  if (!startsAt || !str(form, "title") || !Number.isInteger(week) || week < 1) back(path, { error: "A class needs a week, a title, a date and a time." });
+  if (!startsAt || !str(form, "title") || !Number.isInteger(week) || week < 1)
+    back(path, { error: cohort.selfPaced ? "A lesson needs a number and a title." : "A class needs a week, a title, a date and a time." });
   const values = {
     week,
     title: str(form, "title"),
     startsAt,
-    durationMinutes: Number.isInteger(duration) && duration > 0 ? duration : 90,
+    durationMinutes: cohort.selfPaced ? 0 : Number.isInteger(duration) && duration > 0 ? duration : 90,
     meetUrl: str(form, "meetUrl") || null,
     recordingUrl: str(form, "recordingUrl") || null,
     notes: String(form.get("notes") ?? ""),
     resources: parseResources(String(form.get("resources") ?? "")),
   };
   if (classId) {
-    const existing = await db.query.classes.findFirst({ where: and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)) });
     // Moving a class re-arms its reminder.
     const moved = existing && existing.startsAt.getTime() !== startsAt.getTime();
     await db
       .update(schema.classes)
       .set({ ...values, ...(moved ? { reminderSentAt: null } : {}) })
       .where(and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)));
-    back(path, { saved: "Class saved." });
+    back(path, { saved: cohort.selfPaced ? "Lesson saved." : "Class saved." });
   }
   const [created] = await db.insert(schema.classes).values({ ...values, cohortId }).returning();
-  redirect(`/teach/cohorts/${cohortId}/classes/${created.id}?saved=${encodeURIComponent("Class added.")}`);
+  redirect(`/teach/cohorts/${cohortId}/classes/${created.id}?saved=${encodeURIComponent(cohort.selfPaced ? "Lesson added." : "Class added.")}`);
 }
 
 export async function deleteClass(cohortId: string, classId: string) {
