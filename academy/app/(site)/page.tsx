@@ -1,3 +1,4 @@
+import { BadgeIcon } from "@/components/badge-icon";
 import Link from "next/link";
 import { CourseCard } from "@/components/course-card";
 import { BADGES, BADGE_ORDER } from "@/lib/badges";
@@ -72,17 +73,13 @@ export default async function AcademyHome() {
             <ul className="mt-4 grid grid-cols-2 gap-3">
               {BADGE_ORDER.slice(0, 6).map((key) => (
                 <li key={key} className="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
-                  <span className="text-2xl" aria-hidden>
-                    {BADGES[key].icon}
-                  </span>
+                  <BadgeIcon badge={key} className="size-9" />
                   <span className="text-sm leading-tight font-medium text-ink">{BADGES[key].name}</span>
                 </li>
               ))}
             </ul>
             <div className="mt-4 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary-soft p-4">
-              <span className="text-3xl" aria-hidden>
-                🎓
-              </span>
+              <BadgeIcon badge="certificate" className="size-11" />
               <div>
                 <p className="font-semibold text-ink">Certificate of completion</p>
                 <p className="text-sm text-muted">With a verification link for employers and clients.</p>

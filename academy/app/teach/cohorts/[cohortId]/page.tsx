@@ -162,7 +162,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                       {progress.certificateCode ? (
                         <div className="space-y-1">
                           <a href={asset(`/certificates/${progress.certificateCode}/pdf`)} className="text-sm font-medium text-success hover:underline">
-                            🎓 {progress.certificateCode}
+                            {progress.certificateCode}
                           </a>
                           <button
                             formAction={revokeCertificateAction.bind(null, cohortId, progress.certificateCode)}

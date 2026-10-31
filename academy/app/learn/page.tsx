@@ -1,3 +1,4 @@
+import { BadgeIcon } from "@/components/badge-icon";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { KpiCard } from "@/components/charts";
@@ -56,7 +57,7 @@ export default async function LearnHome() {
                 <div className="p-6">
                   <div className="flex flex-wrap items-center gap-2">
                     <Pill tone={course.accent === "violet" ? "violet" : "primary"}>{cohort.selfPaced ? "Video course" : `${cohort.name} intake`}</Pill>
-                    {progress?.certificateCode && <Pill tone="success">🎓 Completed</Pill>}
+                    {progress?.certificateCode && <Pill tone="success">Completed</Pill>}
                     {enrolment.status === "pending" && <Pill tone="warning">Payment not finished</Pill>}
                   </div>
                   <h2 className="mt-3 font-display text-xl font-semibold text-ink">{course.title}</h2>
@@ -130,9 +131,7 @@ export default async function LearnHome() {
               if (!badge) return null;
               return (
                 <li key={`${b.cohortId}-${b.badge}`} className="flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 ps-2 pe-4 text-sm">
-                  <span className="text-lg" aria-hidden>
-                    {badge.icon}
-                  </span>
+                  <BadgeIcon badge={b.badge as BadgeKey} className="size-7" />
                   <span className="font-medium text-ink">{badge.name}</span>
                 </li>
               );
