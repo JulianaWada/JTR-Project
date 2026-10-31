@@ -1,6 +1,8 @@
 # JTR Academy
 
-The online school on the JTR website: paid six-week live courses taught by Jules, with lesson notes, recordings, assignments, quizzes, an AI tutor (Claude), badges and verifiable certificates. It starts with two courses: **Boost Sales with AI** and **Create Animation Videos with AI**.
+The online school on the JTR website: paid courses taught by Jules, with lesson notes, assignments, quizzes, an AI tutor (Claude), badges and verifiable certificates. It starts with two courses: **Boost Sales with AI**, a recorded video course students take at their own pace, and **Create Animation Videos with AI**, six weeks of live classes.
+
+**Two formats** (set per course in the teacher dashboard): *live* courses run in dated intakes with weekly Google Meet classes; *recorded* courses have one always-open self-paced intake whose lessons are videos (paste a YouTube unlisted, Vimeo, Loom or Google Drive link and it plays inside the lesson page). Students mark each video lesson done, and the certificate needs every lesson watched plus the final project.
 
 It is a separate Next.js app in this folder, served under `/academy` on the website's own address (Next.js [multi-zones](https://nextjs.org/docs/app/guides/multi-zones)). Visitors see one site; work on the academy can't break the website.
 

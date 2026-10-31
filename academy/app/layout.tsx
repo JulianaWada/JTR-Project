@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(env.appUrl),
   title: { default: "JTR Academy: live AI courses", template: "%s · JTR Academy" },
   description:
-    "Live online courses from Jules TechRight: boost your sales with AI and create animation videos with AI. Earn badges and a verified certificate.",
+    "Online courses from Jules TechRight: boost your sales with AI and create animation videos with AI. Earn badges and a verified certificate.",
   applicationName: "JTR Academy",
 };
 

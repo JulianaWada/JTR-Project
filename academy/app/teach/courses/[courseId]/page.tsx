@@ -20,6 +20,8 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
   const quizList = await db.query.quizzes.findMany({ where: eq(schema.quizzes.courseId, courseId), orderBy: asc(schema.quizzes.week) });
   const cohorts = await db.query.cohorts.findMany({ where: eq(schema.cohorts.courseId, courseId), orderBy: desc(schema.cohorts.startsAt) });
   const suggestedStart = toLagosParts(addDays(new Date(), 28));
+  const recorded = course.format === "recorded";
+  const selfPaced = cohorts.find((c) => c.selfPaced);
 
   return (
     <>
@@ -88,12 +90,21 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             name="outline"
             defaultValue={course.outline.map((w) => `${w.title} | ${w.summary}`).join("\n")}
           />
-          <p className="mt-1 text-xs text-muted">New intakes get one weekly class per line.</p>
+          <p className="mt-1 text-xs text-muted">{recorded ? "One lesson per line." : "New intakes get one weekly class per line."}</p>
+        </div>
+        <div>
+          <label className="label" htmlFor="format">
+            Format
+          </label>
+          <select className="input" id="format" name="format" defaultValue={course.format}>
+            <option value="live">Live classes in dated intakes (Google Meet)</option>
+            <option value="recorded">Recorded video lessons, self-paced (students start any time)</option>
+          </select>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label className="label" htmlFor="attendance">
-              Attendance needed for the certificate (%)
+              {recorded ? "Lessons watched for the certificate (%)" : "Attendance needed for the certificate (%)"}
             </label>
             <input className="input" id="attendance" name="attendance" type="number" min={0} max={100} defaultValue={course.completionAttendancePercent} />
           </div>
@@ -118,56 +129,76 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
         <button className="btn-primary">Save course</button>
       </form>
 
-      <section id="intakes" className="card mt-6 scroll-mt-24">
-        <h2 className="font-display text-lg font-semibold text-ink">Intakes</h2>
-        <ul className="mt-3 divide-y divide-line">
-          {cohorts.map((c) => (
-            <li key={c.id} className="flex items-center justify-between py-2.5 text-sm">
-              <Link href={`/teach/cohorts/${c.id}`} className="font-medium text-primary hover:underline">
-                {c.name}
+      {recorded && (
+        <section id="lessons" className="card mt-6 scroll-mt-24">
+          <h2 className="font-display text-lg font-semibold text-ink">Video lessons and students</h2>
+          {selfPaced ? (
+            <>
+              <p className="mt-1 text-sm text-muted">Add a video link to each lesson, see who&apos;s watched what, and mark final projects.</p>
+              <Link href={`/teach/cohorts/${selfPaced.id}`} className="btn-primary btn-sm mt-4">
+                Manage lessons and students
               </Link>
-              <span className="text-muted">Starts {formatDate(c.startsAt)}</span>
-            </li>
-          ))}
-        </ul>
-        <form action={createCohort.bind(null, courseId)} className="mt-5 rounded-xl bg-surface-2 p-4">
-          <h3 className="font-semibold text-ink">Open a new intake</h3>
-          <div className="mt-3 grid gap-3 sm:grid-cols-5">
-            <div className="sm:col-span-1">
-              <label className="label" htmlFor="name">
-                Name
-              </label>
-              <input className="input" id="name" name="name" placeholder="March 2027" required />
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-muted">Save the course to create its lessons.</p>
+          )}
+        </section>
+      )}
+
+      {!recorded && (
+        <section id="intakes" className="card mt-6 scroll-mt-24">
+          <h2 className="font-display text-lg font-semibold text-ink">Intakes</h2>
+          <ul className="mt-3 divide-y divide-line">
+            {cohorts
+              .filter((c) => !c.selfPaced)
+              .map((c) => (
+                <li key={c.id} className="flex items-center justify-between py-2.5 text-sm">
+                  <Link href={`/teach/cohorts/${c.id}`} className="font-medium text-primary hover:underline">
+                    {c.name}
+                  </Link>
+                  <span className="text-muted">Starts {formatDate(c.startsAt)}</span>
+                </li>
+              ))}
+          </ul>
+          <form action={createCohort.bind(null, courseId)} className="mt-5 rounded-xl bg-surface-2 p-4">
+            <h3 className="font-semibold text-ink">Open a new intake</h3>
+            <div className="mt-3 grid gap-3 sm:grid-cols-5">
+              <div className="sm:col-span-1">
+                <label className="label" htmlFor="name">
+                  Name
+                </label>
+                <input className="input" id="name" name="name" placeholder="March 2027" required />
+              </div>
+              <div>
+                <label className="label" htmlFor="date">
+                  First class
+                </label>
+                <input className="input" id="date" name="date" type="date" defaultValue={suggestedStart.date} required />
+              </div>
+              <div>
+                <label className="label" htmlFor="time">
+                  Time (Lagos)
+                </label>
+                <input className="input" id="time" name="time" type="time" defaultValue="19:00" required />
+              </div>
+              <div>
+                <label className="label" htmlFor="capacity">
+                  Seats
+                </label>
+                <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={30} />
+              </div>
+              <div>
+                <label className="label" htmlFor="meetUrl">
+                  Google Meet link
+                </label>
+                <input className="input" id="meetUrl" name="meetUrl" type="url" placeholder="https://meet.google.com/…" />
+              </div>
             </div>
-            <div>
-              <label className="label" htmlFor="date">
-                First class
-              </label>
-              <input className="input" id="date" name="date" type="date" defaultValue={suggestedStart.date} required />
-            </div>
-            <div>
-              <label className="label" htmlFor="time">
-                Time (Lagos)
-              </label>
-              <input className="input" id="time" name="time" type="time" defaultValue="19:00" required />
-            </div>
-            <div>
-              <label className="label" htmlFor="capacity">
-                Seats
-              </label>
-              <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={30} />
-            </div>
-            <div>
-              <label className="label" htmlFor="meetUrl">
-                Google Meet link
-              </label>
-              <input className="input" id="meetUrl" name="meetUrl" type="url" placeholder="https://meet.google.com/…" />
-            </div>
-          </div>
-          <button className="btn-primary btn-sm mt-3">Create intake</button>
-          <p className="mt-2 text-xs text-muted">Classes are created weekly from the first date, with notes copied from the last intake.</p>
-        </form>
-      </section>
+            <button className="btn-primary btn-sm mt-3">Create intake</button>
+            <p className="mt-2 text-xs text-muted">Classes are created weekly from the first date, with notes copied from the last intake.</p>
+          </form>
+        </section>
+      )}
 
       <section id="assignments" className="card mt-6 scroll-mt-24">
         <h2 className="font-display text-lg font-semibold text-ink">Assignments</h2>

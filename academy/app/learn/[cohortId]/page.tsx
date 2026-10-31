@@ -45,19 +45,25 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
   }
   const progress = await getProgress(db, user.id, cohortId);
   const badges = await db.query.userBadges.findMany({ where: and(eq(schema.userBadges.userId, user.id), eq(schema.userBadges.cohortId, cohortId)) });
-  const next = lessons.find((l) => classState(l) !== "ended");
+  const selfPaced = cohort.selfPaced;
+  const next = selfPaced ? undefined : lessons.find((l) => classState(l) !== "ended");
   const nextState = next ? classState(next) : null;
+  const nextToWatch = selfPaced ? lessons.find((l) => !attended.has(l.id)) : undefined;
 
   return (
     <>
       {welcome && (
         <div className="mb-6 rounded-card border border-success/30 bg-success-soft p-5 text-success">
           <p className="font-semibold">🎉 Welcome to {course.title}!</p>
-          <p className="mt-1 text-sm">Your receipt and timetable have been emailed to you. Join each class from this page so your attendance counts.</p>
+          <p className="mt-1 text-sm">
+            {selfPaced
+              ? "Your receipt has been emailed to you. Watch the lessons in order and mark each one done as you go."
+              : "Your receipt and timetable have been emailed to you. Join each class from this page so your attendance counts."}
+          </p>
         </div>
       )}
       <PageTitle
-        eyebrow={`${cohort.name} intake`}
+        eyebrow={selfPaced ? "Video course · learn at your own pace" : `${cohort.name} intake`}
         title={course.title}
         actions={
           <Link href={`/learn/${cohortId}/tutor`} className="btn-primary">
@@ -90,8 +96,23 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
             </section>
           )}
 
+          {nextToWatch && (
+            <section className="card border-primary/40">
+              <p className="eyebrow">{attended.size ? "Continue where you left off" : "Start here"}</p>
+              <h2 className="mt-2 font-display text-xl font-semibold text-ink">
+                Lesson {nextToWatch.week}: {nextToWatch.title}
+              </h2>
+              <p className="mt-1 text-muted">
+                {attended.size} of {lessons.length} lessons done
+              </p>
+              <Link href={`/learn/${cohortId}/classes/${nextToWatch.id}`} className="btn-primary mt-4">
+                ▶ Watch the lesson
+              </Link>
+            </section>
+          )}
+
           <section className="card">
-            <h2 className="font-display text-lg font-semibold text-ink">Timetable</h2>
+            <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Lessons" : "Timetable"}</h2>
             <ol className="mt-4 divide-y divide-line">
               {lessons.map((l) => {
                 const state = classState(l);
@@ -102,7 +123,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         className={`grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold ${
                           attended.has(l.id) ? "bg-success-soft text-success" : "bg-surface-2 text-muted"
                         }`}
-                        title={attended.has(l.id) ? "Attended" : undefined}
+                        title={attended.has(l.id) ? (selfPaced ? "Done" : "Attended") : undefined}
                       >
                         {attended.has(l.id) ? "✓" : l.week}
                       </span>
@@ -110,11 +131,19 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         <Link href={`/learn/${cohortId}/classes/${l.id}`} className="font-medium text-ink hover:text-primary">
                           {l.title}
                         </Link>
-                        <p className="text-xs text-muted">{formatDateTime(l.startsAt)}</p>
+                        <p className="text-xs text-muted">{selfPaced ? `Lesson ${l.week}` : formatDateTime(l.startsAt)}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {state === "ended" ? (
+                      {selfPaced ? (
+                        attended.has(l.id) ? (
+                          <Pill tone="success">Done</Pill>
+                        ) : l.recordingUrl ? (
+                          <Pill tone="primary">Video</Pill>
+                        ) : (
+                          <Pill>Video coming soon</Pill>
+                        )
+                      ) : state === "ended" ? (
                         <>
                           {attended.has(l.id) ? <Pill tone="success">Attended</Pill> : <Pill>Missed</Pill>}
                           {l.recordingUrl && <Pill tone="primary">Recording</Pill>}
@@ -143,7 +172,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {t.title}
                       </Link>
                       <p className="text-xs text-muted">
-                        Week {t.week}
+                        {selfPaced ? "Lesson" : "Week"} {t.week}
                         {t.isFinalProject ? " · Final project" : ""}
                       </p>
                     </div>
@@ -173,7 +202,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                       <Link href={`/learn/${cohortId}/quizzes/${q.id}`} className="font-medium text-ink hover:text-primary">
                         {q.title}
                       </Link>
-                      <p className="text-xs text-muted">Week {q.week} · {q.questions.length} questions</p>
+                      <p className="text-xs text-muted">
+                        {selfPaced ? "Lesson" : "Week"} {q.week} · {q.questions.length} questions
+                      </p>
                     </div>
                     {best ? (
                       <Pill tone={best.score === best.total ? "success" : "primary"}>
@@ -210,7 +241,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                 <div className="mt-4 space-y-4">
                   <div>
                     <div className="mb-1.5 flex justify-between text-sm">
-                      <span className="text-ink">Attendance</span>
+                      <span className="text-ink">{selfPaced ? "Lessons watched" : "Attendance"}</span>
                       <span className="text-muted">
                         {progress.attended}/{progress.totalClasses} · need {progress.requiredAttendancePercent}%
                       </span>

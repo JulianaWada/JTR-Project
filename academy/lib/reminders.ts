@@ -25,7 +25,8 @@ export async function sendClassReminders(db: Database, now = new Date()) {
     const active = await db.query.enrolments.findMany({
       where: and(eq(enrolments.cohortId, cohort.id), eq(enrolments.status, "active")),
     });
-    if (!active.length) continue;
+    // Video lessons of a recorded course have no start time worth a reminder.
+    if (cohort.selfPaced || !active.length) continue;
     const students = await db.query.users.findMany({ where: inArray(users.id, active.map((e) => e.userId)) });
     for (const student of students) {
       await sendEmail(db, {

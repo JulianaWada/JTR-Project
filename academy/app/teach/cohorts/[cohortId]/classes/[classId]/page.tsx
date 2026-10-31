@@ -18,10 +18,10 @@ export default async function EditClass({ params, searchParams }: PageProps<"/te
   return (
     <div className="mx-auto max-w-4xl">
       <Link href={`/teach/cohorts/${cohortId}`} className="text-sm text-muted hover:text-primary">
-        ← {cohort.name} intake
+        ← {cohort.selfPaced ? "Video lessons" : `${cohort.name} intake`}
       </Link>
       <PageTitle
-        title={`Week ${lesson.week}: ${lesson.title}`}
+        title={`${cohort.selfPaced ? "Lesson" : "Week"} ${lesson.week}: ${lesson.title}`}
         actions={
           <Link href={`/learn/${cohortId}/classes/${classId}`} className="btn-secondary btn-sm">
             Preview as student
@@ -29,9 +29,9 @@ export default async function EditClass({ params, searchParams }: PageProps<"/te
         }
       />
       <Flash searchParams={searchParams} />
-      <ClassForm cohortId={cohortId} lesson={lesson} />
+      <ClassForm cohortId={cohortId} lesson={lesson} selfPaced={cohort.selfPaced} />
       <form action={deleteClass.bind(null, cohortId, classId)} className="mt-4 text-end">
-        <button className="text-sm text-danger hover:underline">Delete this class</button>
+        <button className="text-sm text-danger hover:underline">Delete this {cohort.selfPaced ? "lesson" : "class"}</button>
       </form>
     </div>
   );

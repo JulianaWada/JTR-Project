@@ -29,6 +29,8 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
   if (!data) notFound();
   const { course, intakes } = data;
   const violet = course.accent === "violet";
+  const recorded = course.format === "recorded";
+  const selfPaced = recorded ? intakes.find((i) => i.selfPaced) : undefined;
 
   return (
     <>
@@ -39,8 +41,8 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
               ← All courses
             </Link>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Pill tone={violet ? "violet" : "primary"}>Live online course</Pill>
-              <Pill>{course.outline.length} weeks · 1 class a week</Pill>
+              <Pill tone={violet ? "violet" : "primary"}>{recorded ? "Video course" : "Live online course"}</Pill>
+              <Pill>{recorded ? `${course.outline.length} lessons · learn at your own pace` : `${course.outline.length} weeks · 1 class a week`}</Pill>
               <Pill>Certificate</Pill>
             </div>
             <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-ink sm:text-5xl">{course.title}</h1>
@@ -70,7 +72,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-semibold text-ink">Week by week</h2>
+            <h2 className="font-display text-2xl font-semibold text-ink">{recorded ? "Lesson by lesson" : "Week by week"}</h2>
             <ol className="mt-4 divide-y divide-line rounded-card border border-line bg-surface">
               {course.outline.map((w) => (
                 <li key={w.week} className="flex gap-4 p-5">
@@ -98,9 +100,13 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           <section className="rounded-card border border-line bg-surface p-6">
             <h2 className="font-display text-xl font-semibold text-ink">Earning your certificate</h2>
             <p className="mt-2 text-muted">
-              Attend at least {course.completionAttendancePercent}% of the live classes
-              {course.requiresFinalProject ? " and pass the final project" : ""}. Your certificate is issued automatically, with a link anyone can use to
-              verify it. You&apos;ll also collect badges along the way.
+              {recorded
+                ? course.completionAttendancePercent >= 100
+                  ? "Watch every lesson"
+                  : `Watch at least ${course.completionAttendancePercent}% of the lessons`
+                : `Attend at least ${course.completionAttendancePercent}% of the live classes`}
+              {course.requiresFinalProject ? " and pass the final project" : ""}. Your certificate is issued automatically, with a link anyone can use to verify
+              it. You&apos;ll also collect badges along the way.
             </p>
           </section>
         </div>
@@ -111,44 +117,66 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             <p className="font-display text-4xl font-semibold text-ink">{naira(course.priceKobo)}</p>
             <p className="mt-1 text-xs text-muted">Pay with card, bank transfer or USSD via Paystack.</p>
 
-            <h2 className="mt-6 text-sm font-semibold text-ink">Choose your intake</h2>
-            {intakes.length === 0 ? (
-              <div className="mt-3 rounded-xl bg-surface-2 p-4 text-sm text-muted">
-                <p>No intake is open right now.</p>
-                {/* The register-interest page lives on the website, not in this app. */}
-                <a href={`${env.websiteUrl}/academy/interest`} className="mt-2 inline-block font-medium text-primary hover:underline">
-                  Tell me when the next one opens →
-                </a>
-              </div>
+            {recorded ? (
+              selfPaced ? (
+                <>
+                  <p className="mt-6 text-sm text-muted">Start straight after paying. Your lessons stay in your dashboard to rewatch any time.</p>
+                  <Link href={`/enrol/${selfPaced.id}`} className="btn-primary mt-4 w-full">
+                    Enrol for {naira(course.priceKobo)}
+                  </Link>
+                </>
+              ) : (
+                <p className="mt-6 rounded-xl bg-surface-2 p-4 text-sm text-muted">Enrolment opens soon.</p>
+              )
             ) : (
-              <ul className="mt-3 space-y-3">
-                {intakes.map((intake) => (
-                  <li key={intake.id} className="rounded-xl border border-line p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-ink">{intake.name}</p>
-                        <p className="text-sm text-muted">
-                          Starts {formatDate(intake.startsAt)}
-                          {intake.classes[0] ? `, ${formatTime(intake.classes[0].startsAt)} Lagos time` : ""}
-                        </p>
-                        <p className="text-sm text-muted">{intake.classes.length} weekly live classes</p>
-                      </div>
-                      <Pill tone={intake.seatsLeft <= 5 ? "warning" : "success"}>
-                        {intake.seatsLeft === 0 ? "Full" : `${intake.seatsLeft} seats left`}
-                      </Pill>
-                    </div>
-                    {intake.seatsLeft > 0 && (
-                      <Link href={`/enrol/${intake.id}`} className="btn-primary mt-4 w-full">
-                        Enrol for {naira(course.priceKobo)}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <>
+                <h2 className="mt-6 text-sm font-semibold text-ink">Choose your intake</h2>
+                {intakes.length === 0 ? (
+                  <div className="mt-3 rounded-xl bg-surface-2 p-4 text-sm text-muted">
+                    <p>No intake is open right now.</p>
+                    {/* The register-interest page lives on the website, not in this app. */}
+                    <a href={`${env.websiteUrl}/academy/interest`} className="mt-2 inline-block font-medium text-primary hover:underline">
+                      Tell me when the next one opens →
+                    </a>
+                  </div>
+                ) : (
+                  <ul className="mt-3 space-y-3">
+                    {intakes.map((intake) => (
+                      <li key={intake.id} className="rounded-xl border border-line p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-ink">{intake.name}</p>
+                            <p className="text-sm text-muted">
+                              Starts {formatDate(intake.startsAt)}
+                              {intake.classes[0] ? `, ${formatTime(intake.classes[0].startsAt)} Lagos time` : ""}
+                            </p>
+                            <p className="text-sm text-muted">{intake.classes.length} weekly live classes</p>
+                          </div>
+                          <Pill tone={intake.seatsLeft <= 5 ? "warning" : "success"}>{intake.seatsLeft === 0 ? "Full" : `${intake.seatsLeft} seats left`}</Pill>
+                        </div>
+                        {intake.seatsLeft > 0 && (
+                          <Link href={`/enrol/${intake.id}`} className="btn-primary mt-4 w-full">
+                            Enrol for {naira(course.priceKobo)}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
             <ul className="mt-6 space-y-2 border-t border-line pt-4 text-sm text-muted">
-              <li>✓ Live classes with Jules on Google Meet</li>
-              <li>✓ Recordings and notes after every class</li>
+              {recorded ? (
+                <>
+                  <li>✓ {course.outline.length} video lessons with Jules, watch any time</li>
+                  <li>✓ Notes, assignments and quizzes for every lesson</li>
+                </>
+              ) : (
+                <>
+                  <li>✓ Live classes with Jules on Google Meet</li>
+                  <li>✓ Recordings and notes after every class</li>
+                </>
+              )}
               <li>✓ AI tutor available any time</li>
               <li>✓ Badges and a verified certificate</li>
             </ul>

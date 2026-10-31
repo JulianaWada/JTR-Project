@@ -140,21 +140,32 @@ export async function markPaymentSuccessful(db: Database, reference: string, che
     where: (c, { eq }) => eq(c.cohortId, cohort.id),
     orderBy: (c, { asc }) => asc(c.startsAt),
   });
+  const intro = `Your payment of ${naira(payment.amountKobo)} was received. Reference: ${reference}.`;
   await sendEmail(db, {
     to: user.email,
     subject: `You're enrolled: ${course.title}`,
-    body: [
-      `Hi ${user.name},`,
-      "",
-      `Welcome to ${course.title} (${cohort.name} intake). Your payment of ${naira(payment.amountKobo)} was received. Reference: ${reference}.`,
-      firstClass ? `Your first live class is ${formatDateTime(firstClass.startsAt)} (Lagos time).` : "",
-      `Your class timetable, notes and AI tutor are here: ${url(`/learn/${cohort.id}`)}`,
-      "",
-      "See you in class,",
-      "Jules, JTR Academy",
-    ]
-      .filter((line) => line !== null)
-      .join("\n"),
+    body: (cohort.selfPaced
+      ? [
+          `Hi ${user.name},`,
+          "",
+          `Welcome to ${course.title}. ${intro}`,
+          `Your video lessons, notes and AI tutor are here, ready whenever you are: ${url(`/learn/${cohort.id}`)}`,
+          "Watch each lesson and mark it done to work towards your certificate.",
+          "",
+          "Enjoy the course,",
+          "Jules, JTR Academy",
+        ]
+      : [
+          `Hi ${user.name},`,
+          "",
+          `Welcome to ${course.title} (${cohort.name} intake). ${intro}`,
+          firstClass ? `Your first live class is ${formatDateTime(firstClass.startsAt)} (Lagos time).` : "",
+          `Your class timetable, notes and AI tutor are here: ${url(`/learn/${cohort.id}`)}`,
+          "",
+          "See you in class,",
+          "Jules, JTR Academy",
+        ]
+    ).join("\n"),
   });
   return { ...payment, status: "success" as const };
 }

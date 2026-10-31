@@ -8,16 +8,22 @@ import { env } from "@/lib/env";
 export const dynamic = "force-dynamic";
 
 const steps = [
-  { title: "Choose a course and pay", body: "Pick an intake and pay securely with Paystack: card, bank transfer or USSD." },
-  { title: "Join live classes", body: "One 90-minute class a week with Jules on Google Meet. Join from your dashboard and get a reminder the day before." },
+  { title: "Choose a course and pay", body: "Pick a course and pay securely with Paystack: card, bank transfer or USSD." },
+  {
+    title: "Watch or join your classes",
+    body: "Video courses: watch each lesson whenever it suits you. Live courses: one 90-minute class a week with Jules on Google Meet, with a reminder the day before.",
+  },
   { title: "Practise with your AI tutor", body: "Notes, recordings, assignments and quizzes after every class, plus an AI tutor that knows the course and answers any time." },
   { title: "Earn badges and your certificate", body: "Collect badges as you go. Finish the course and get a certificate anyone can verify online." },
 ];
 
 const faqs = [
   { q: "Do I need any technical background?", a: "No. If you can use WhatsApp and a web browser, you can follow both courses. Everything is shown step by step in class." },
-  { q: "What if I miss a class?", a: "Every class is recorded and the notes stay in your dashboard. You need to attend at least 80% of the live classes to earn the certificate." },
-  { q: "How do I get the certificate?", a: "Attend at least 80% of the live classes and pass the final project. Your certificate is issued automatically, as a PDF with a link anyone can use to check it." },
+  { q: "What's the difference between a video course and a live course?", a: "A video course has recorded lessons you watch at your own pace, starting any day. A live course has a weekly class with Jules in a small group, recorded in case you miss one." },
+  {
+    q: "How do I get the certificate?",
+    a: "Watch every lesson of a video course, or attend at least 80% of a live course's classes, and pass the final project. Your certificate is issued automatically, as a PDF with a link anyone can use to check it.",
+  },
   { q: "How do I pay?", a: "Online with Paystack, by card, bank transfer or USSD, in naira. You get a receipt by email and access straight away." },
   { q: "What do I need for the classes?", a: "A phone or laptop with internet. A laptop is best for the animation course." },
 ];
@@ -30,13 +36,13 @@ export default async function AcademyHome() {
         <div className="glow pointer-events-none absolute -top-40 right-0 size-[36rem] [--glow:22%]" />
         <div className="relative mx-auto grid max-w-site items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div>
-            <p className="eyebrow">JTR Academy · Live online classes</p>
+            <p className="eyebrow">JTR Academy · Online AI courses</p>
             <h1 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-ink sm:text-5xl">
-              Learn practical AI skills, live with Jules.
+              Learn practical AI skills with Jules.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
-              Six-week live courses for business owners and creators: grow your sales with AI, or make animated videos with AI. Small classes,
-              an AI tutor between lessons, and a certificate at the end.
+              For business owners and creators: grow your sales with AI in a video course you take at your own pace, or make animated videos with AI in
+              six weeks of live classes. An AI tutor between lessons, and a certificate at the end.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#courses" className="btn-primary h-12 px-7 text-base">
@@ -49,14 +55,14 @@ export default async function AcademyHome() {
             <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-6">
               <div>
                 <dt className="text-xs text-muted">Format</dt>
-                <dd className="mt-1 font-display font-semibold text-ink">Live + recorded</dd>
+                <dd className="mt-1 font-display font-semibold text-ink">Video + live</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Length</dt>
-                <dd className="mt-1 font-display font-semibold text-ink">6 weeks</dd>
+                <dd className="mt-1 font-display font-semibold text-ink">6 lessons</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted">Class size</dt>
+                <dt className="text-xs text-muted">Live class size</dt>
                 <dd className="mt-1 font-display font-semibold text-ink">Up to 30</dd>
               </div>
             </dl>

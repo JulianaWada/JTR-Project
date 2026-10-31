@@ -1,4 +1,4 @@
-import { and, asc, eq, gt } from "drizzle-orm";
+import { and, asc, eq, gt, or } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses } from "@/lib/db/schema";
 import { seatsTaken } from "@/lib/enrolment";
@@ -6,10 +6,10 @@ import { seatsTaken } from "@/lib/enrolment";
 export type CourseRow = typeof courses.$inferSelect;
 export type CohortRow = typeof cohorts.$inferSelect;
 
-/** Cohorts students can still join, soonest first, with seats left. */
+/** Cohorts students can still join (a self-paced one at any time), soonest first, with seats left. */
 export async function openCohorts(db: Database, courseId: string, now = new Date()) {
   const rows = await db.query.cohorts.findMany({
-    where: and(eq(cohorts.courseId, courseId), eq(cohorts.enrolmentOpen, true), gt(cohorts.startsAt, now)),
+    where: and(eq(cohorts.courseId, courseId), eq(cohorts.enrolmentOpen, true), or(gt(cohorts.startsAt, now), eq(cohorts.selfPaced, true))),
     orderBy: asc(cohorts.startsAt),
   });
   return Promise.all(
