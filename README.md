@@ -51,8 +51,8 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 | `DATABASE_URL` | Recommended | Postgres (e.g. Supabase) for leads, Academy sign-ups and project settings. Without it a built-in test database is used, which Vercel wipes now and then. See [Admin board](#admin-board). |
 | `ADMIN_EMAIL` | Optional | Email address for the admin login. When set, `/admin` asks for it as well as the password. |
 | `ADMIN_PASSWORD` | For `/admin` | Password for the admin board. Locally `demo1234` is used when it is empty; in production `/admin` stays closed until it is set. |
-| `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Sample data is shown without it. |
-| `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Sample data is shown without it. |
+| `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Until it is set, the board says the academy is not connected. |
+| `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Until it is set, the board says the academy is not connected. |
 | `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link. |
 
 ## Editing content
@@ -143,7 +143,7 @@ The rate limiter (`lib/rate-limit.ts`) keeps counts in memory, which is enough f
 | WhatsApp agent | Every business with customers, orders, bookings and payments; **Add a business** creates the business and the owner's dashboard login | The sales agent's database (`WHATSAPP_AGENT_DATABASE_URL`) |
 | Projects | Show or hide each project, choose which are on the home page, set live / in progress, change the link and the order | `project_settings` table; the projects themselves and their text in four languages stay in `content/site.ts` and `messages/*.json` |
 
-Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages show sample data and say so. The admin board only reads the academy's tables and never changes them; with the sales agent it reads, and inserts new rows into `tenants` when you add a business. Each app keeps its own schema and migrations.
+Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages say the app is not connected yet. The board never shows made-up data. The admin board only reads the academy's tables and never changes them; with the sales agent it reads, and inserts new rows into `tenants` when you add a business. Each app keeps its own schema and migrations.
 
 **Database.** Migrations in `drizzle/` run automatically on the first connection (`lib/db/index.ts`), using their own migrations table, so the website can share a database with the academy. After changing `lib/db/schema.ts`, run `npx drizzle-kit generate`. Without `DATABASE_URL` the site uses PGlite in `.data/pglite` (on Vercel, `/tmp`, which is reset from time to time, so set `DATABASE_URL` before relying on it).
 

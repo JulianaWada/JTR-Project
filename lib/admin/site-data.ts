@@ -87,3 +87,30 @@ export async function saveProjectOrder(ids: string[]) {
   });
 }
 
+
+export type DailyCount = { day: string; leads: number; signups: number };
+
+/** Leads and Academy sign-ups per day (Lagos time) for the last `days` days, oldest first, including empty days. */
+export async function dailyCounts(days = 14): Promise<DailyCount[]> {
+  const db = await getDb();
+  const since = new Date(Date.now() - days * 86_400_000);
+  const dayOf = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(d);
+  const [leadRows, interestRows] = await Promise.all([
+    db.select({ at: schema.leads.createdAt }).from(schema.leads).where(gte(schema.leads.createdAt, since)),
+    db.select({ at: schema.academyInterest.createdAt }).from(schema.academyInterest).where(gte(schema.academyInterest.createdAt, since)),
+  ]);
+  const result = new Map<string, DailyCount>();
+  for (let i = days - 1; i >= 0; i--) {
+    const day = dayOf(new Date(Date.now() - i * 86_400_000));
+    result.set(day, { day, leads: 0, signups: 0 });
+  }
+  for (const r of leadRows) {
+    const entry = result.get(dayOf(r.at));
+    if (entry) entry.leads += 1;
+  }
+  for (const r of interestRows) {
+    const entry = result.get(dayOf(r.at));
+    if (entry) entry.signups += 1;
+  }
+  return [...result.values()];
+}

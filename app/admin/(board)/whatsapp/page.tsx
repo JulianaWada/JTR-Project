@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageTitle, Panel, Pill, SampleNotice, Stat, Table, Td, buttonClass, humanise, statusTone } from "@/components/admin/ui";
+import { NotConnected, PageTitle, Panel, Pill, Stat, Table, Td, buttonClass, humanise, statusTone } from "@/components/admin/ui";
 import { formatDate, formatDateTime, formatNaira } from "@/lib/admin/money";
 import { listBusinesses, recentOrders, recentPayments, whatsappAppUrl, whatsappMode } from "@/lib/admin/sources/whatsapp";
 
@@ -23,28 +23,28 @@ export default async function WhatsappPage() {
         title="WhatsApp sales agent"
         subtitle="Every business on the agent. Each owner manages their own chats, orders and bookings from their dashboard."
         actions={
-          <Link href="/admin/whatsapp/new" className={buttonClass}>
-            Add a business
-          </Link>
+          whatsappMode() === "live" ? (
+            <Link href="/admin/whatsapp/new" className={buttonClass}>
+              Add a business
+            </Link>
+          ) : undefined
         }
       />
-      {whatsappMode() === "sample" && (
-        <SampleNotice>
-          These are the agent&apos;s demo businesses. Add WHATSAPP_AGENT_DATABASE_URL to see real ones. Businesses you add now are kept only
-          until the site restarts.
-        </SampleNotice>
-      )}
-      {!data ? (
+      {whatsappMode() === "off" ? (
+        <NotConnected app="The WhatsApp sales agent" envVar="WHATSAPP_AGENT_DATABASE_URL">
+          You can add businesses from here once it is.
+        </NotConnected>
+      ) : !data ? (
         <Panel>
           <p className="p-6 text-sm text-danger">The sales agent&apos;s database could not be reached. Check WHATSAPP_AGENT_DATABASE_URL.</p>
         </Panel>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Businesses" value={data.businesses.length} />
-            <Stat label="Customers" value={data.businesses.reduce((n, b) => n + b.customers, 0)} />
-            <Stat label="Need a person" value={data.businesses.reduce((n, b) => n + b.needsAttention, 0)} note="chats handed over by the agent" />
-            <Stat label="Paid through the agent" value={formatNaira(data.businesses.reduce((n, b) => n + b.paidKobo, 0))} />
+            <Stat label="Businesses" value={data.businesses.length} icon="briefcase" tone="blue" />
+            <Stat label="Customers" value={data.businesses.reduce((n, b) => n + b.customers, 0)} icon="users" tone="violet" />
+            <Stat label="Need a person" value={data.businesses.reduce((n, b) => n + b.needsAttention, 0)} note="chats handed over by the agent" icon="chat" tone="amber" />
+            <Stat label="Paid through the agent" value={formatNaira(data.businesses.reduce((n, b) => n + b.paidKobo, 0))} icon="trendingUp" tone="green" />
           </div>
 
           <Panel title="Businesses">

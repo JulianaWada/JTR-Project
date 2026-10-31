@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageTitle, Panel, Pill, SampleNotice, Stat, Table, Td, humanise, statusTone } from "@/components/admin/ui";
+import { NotConnected, PageTitle, Panel, Pill, Stat, Table, Td, humanise, statusTone } from "@/components/admin/ui";
 import { formatDate, formatDateTime, formatNaira } from "@/lib/admin/money";
 import { siteCounts } from "@/lib/admin/site-data";
 import { academyMode, academyTeachUrl, listCohorts, listCourses, listPayments, listStudents } from "@/lib/admin/sources/academy";
@@ -33,20 +33,26 @@ export default async function AcademyPage() {
         subtitle="Courses, intakes, students and payments. Edit courses, classes and marking in the academy's own teacher pages."
         actions={<EditLink path="">Open the academy dashboard</EditLink>}
       />
-      {academyMode() === "sample" && (
-        <SampleNotice>These are the academy&apos;s demo courses and students. Add ACADEMY_DATABASE_URL to see the real ones.</SampleNotice>
-      )}
-      {!data ? (
+      {academyMode() === "off" ? (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat label="Interest sign-ups" value={counts.allInterest} note={`${counts.newInterest} new`} href="/admin/academy/interest" icon="edtech" tone="violet" />
+          </div>
+          <NotConnected app="The academy" envVar="ACADEMY_DATABASE_URL">
+            Courses, students and payments will appear here. Interest sign-ups already work.
+          </NotConnected>
+        </>
+      ) : !data ? (
         <Panel>
           <p className="p-6 text-sm text-danger">The academy database could not be reached. Check ACADEMY_DATABASE_URL.</p>
         </Panel>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Interest sign-ups" value={counts.allInterest} note={`${counts.newInterest} new`} href="/admin/academy/interest" />
-            <Stat label="Students" value={data.students.length} note={`${data.courses.reduce((n, c) => n + c.activeStudents, 0)} active enrolments`} />
-            <Stat label="Paid" value={formatNaira(paid.reduce((n, p) => n + p.amountKobo, 0))} note={`${paid.length} payments`} />
-            <Stat label="Open for enrolment" value={data.cohorts.filter((c) => c.enrolmentOpen).length} note="intakes" />
+            <Stat label="Interest sign-ups" value={counts.allInterest} note={`${counts.newInterest} new`} href="/admin/academy/interest" icon="edtech" tone="violet" />
+            <Stat label="Students" value={data.students.length} note={`${data.courses.reduce((n, c) => n + c.activeStudents, 0)} active enrolments`} icon="users" tone="blue" />
+            <Stat label="Paid" value={formatNaira(paid.reduce((n, p) => n + p.amountKobo, 0))} note={`${paid.length} payments`} icon="trendingUp" tone="green" />
+            <Stat label="Open for enrolment" value={data.cohorts.filter((c) => c.enrolmentOpen).length} note="intakes" icon="calendar" tone="amber" />
           </div>
 
           <Panel title="Courses">
@@ -55,6 +61,7 @@ export default async function AcademyPage() {
                 <tr key={c.id}>
                   <Td>
                     <p className="font-semibold text-ink">{c.title}</p>
+                    <p className="text-muted">{c.format === "recorded" ? "Recorded, self-paced" : "Live classes"}</p>
                     {!c.published && <Pill>Hidden</Pill>}
                   </Td>
                   <Td>{formatNaira(c.priceKobo)}</Td>
