@@ -22,6 +22,7 @@
     "breadcrumb": "Breadcrumb"
   },
   "nav": {
+    "academy": "Academy",
     "home": "Home",
     "about": "About",
     "services": "Services",
@@ -174,7 +175,6 @@
       "subtitle": "We partner with clients across continents, delivering remotely with clear communication and dependable overlap with your working day.",
       "figures": {
         "countries": "Countries served",
-        "projects": "Projects delivered",
         "timezones": "Time zones covered",
         "response": "Typical response time"
       },
@@ -206,7 +206,7 @@
     "projects": {
       "eyebrow": "Selected work",
       "title": "Featured projects",
-      "subtitle": "A look at the kind of work we do. Full case studies are on the way."
+      "subtitle": "What we are building right now, including our own products. Full case studies are on the way."
     },
     "cta": {
       "title": "Have an idea? Let's build it together.",
@@ -217,7 +217,7 @@
   "about": {
     "meta": {
       "title": "About us",
-      "description": "Learn about Jules TechRight (JTR): our story, mission, vision, values and the team building websites, apps and agentic AI for clients worldwide."
+      "description": "Learn about Jules TechRight (JTR): our story, mission, vision and values as we build websites, apps and agentic AI for clients worldwide."
     },
     "hero": {
       "eyebrow": "About JTR",
@@ -257,33 +257,6 @@
           "body": "We hold ourselves to global standards in design, engineering and delivery."
         }
       }
-    },
-    "team": {
-      "eyebrow": "Our team",
-      "title": "The people behind JTR",
-      "subtitle": "A distributed team of engineers, designers and AI specialists.",
-      "members": {
-        "founder": {
-          "name": "Team member name",
-          "role": "Founder & CEO",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "engineering": {
-          "name": "Team member name",
-          "role": "Head of Engineering",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "ai": {
-          "name": "Team member name",
-          "role": "Lead, Agentic AI",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        },
-        "design": {
-          "name": "Team member name",
-          "role": "Design Lead",
-          "bio": "Placeholder bio. Add a short introduction, background and focus area."
-        }
-      }
     }
   },
   "servicesPage": {
@@ -301,12 +274,12 @@
   "projects": {
     "meta": {
       "title": "Projects",
-      "description": "Selected projects from Jules TechRight across websites, mobile apps, agentic AI, educational technology and digital transformation."
+      "description": "Projects by Jules TechRight, including a WhatsApp AI sales agent for small businesses and our multilingual company website."
     },
     "hero": {
       "eyebrow": "Portfolio",
       "title": "Work that makes a difference",
-      "subtitle": "Filter by service area or region. Full case studies are coming soon."
+      "subtitle": "Real projects we have built or are building now. Full case studies are coming soon."
     },
     "filters": {
       "service": "Service area",
@@ -315,30 +288,25 @@
       "results": "{count, plural, =0 {No projects match these filters} one {# project} other {# projects}}",
       "reset": "Clear filters"
     },
+    "status": {
+      "live": "Live",
+      "in-progress": "In progress"
+    },
+    "visit": "Visit project",
     "items": {
-      "learning-platform": {
-        "title": "Adaptive learning platform",
-        "summary": "Placeholder case study: a mobile-first learning platform with offline lessons and progress tracking for thousands of students."
+      "whatsapp-sales-agent": {
+        "title": "WhatsApp AI sales agent",
+        "summary": "An AI agent that sells for small businesses on WhatsApp, starting with salons and food vendors in Nigeria. It chats in English and Nigerian Pidgin, answers questions, takes bookings and orders, sends Paystack payment links and reminders, and hands over to a person when needed. It works end to end in test mode; pilots with businesses come next.",
+        "imageAlt": "The agent's test screen: a customer orders jollof rice and zobo on WhatsApp and receives a payment link."
       },
-      "support-agent": {
-        "title": "AI customer support agent",
-        "summary": "Placeholder case study: an agentic assistant that resolves common customer requests and hands complex cases to people."
+      "jtr-website": {
+        "title": "Jules TechRight website",
+        "summary": "The site you are on: a fast company website in English, French, Portuguese and Arabic (right to left), with light and dark themes, a built-in AI assistant and a contact form. Built with Next.js.",
+        "imageAlt": "The Jules TechRight home page."
       },
-      "logistics-app": {
-        "title": "Field logistics app",
-        "summary": "Placeholder case study: a cross-platform app for drivers with offline maps, proof of delivery and live tracking."
-      },
-      "fintech-site": {
-        "title": "Fintech marketing site",
-        "summary": "Placeholder case study: a fast, multilingual marketing site and onboarding flow for a payments start-up."
-      },
-      "records-migration": {
-        "title": "Paper-to-digital records",
-        "summary": "Placeholder case study: replacing paper records with a secure cloud system, dashboards and staff training."
-      },
-      "ops-copilot": {
-        "title": "Operations copilot",
-        "summary": "Placeholder case study: an internal AI agent that drafts reports, updates systems and answers policy questions."
+      "ufedo": {
+        "title": "Ufedo",
+        "summary": "A couples game made in Africa, live as a web app. Partners answer questions on their own phones, then reveal their answers together. It includes puzzles, Date Night and a journey across Nigeria. The games are free, with an optional UFEDO Plus subscription."
       }
     }
   },
@@ -515,5 +483,77 @@
     "body": "The page you're looking for doesn't exist or has moved.",
     "home": "Go to the home page",
     "contact": "Contact us"
+  },
+  "academyInterest": {
+    "meta": {
+      "title": "Register your interest in JTR Academy",
+      "description": "Live online classes on boosting sales with AI and creating animation videos with AI, with a certificate and badge when you finish."
+    },
+    "hero": {
+      "eyebrow": "JTR Academy",
+      "title": "Learn the AI skills that grow your business",
+      "subtitle": "Practical live classes taught online. Register your interest and we'll contact you with dates, fees and how to join."
+    },
+    "courses": {
+      "title": "Courses",
+      "sales": {
+        "name": "Boost Sales with AI",
+        "summary": "Use AI to find customers, reply faster and sell more."
+      },
+      "animation": {
+        "name": "Create Animation Videos with AI",
+        "summary": "Make eye-catching animated videos, no studio needed."
+      }
+    },
+    "perks": {
+      "live": "Live, interactive classes",
+      "certificate": "Certificate on completion",
+      "badge": "Digital badge to share",
+      "note": "Registering your interest is free and doesn't commit you to anything."
+    },
+    "form": {
+      "title": "Register your interest",
+      "intro": "Leave your details and we'll be in touch when the next classes open.",
+      "name": "Full name",
+      "phone": "Phone or WhatsApp number",
+      "phoneHint": "We'll use this to send you class details on WhatsApp.",
+      "countryCode": "Country code",
+      "email": "Email address",
+      "location": "City or state",
+      "locationPlaceholder": "e.g. Lagos",
+      "course": "Which course interests you?",
+      "courses": {
+        "sales": "Boost Sales with AI",
+        "animation": "Animation Videos with AI",
+        "both": "Both courses"
+      },
+      "heardFrom": "How did you hear about us?",
+      "heardFromPlaceholder": "Select an option",
+      "heardFromOptions": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "x": "X (Twitter)",
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "friend": "A friend or colleague",
+        "other": "Somewhere else"
+      },
+      "optional": "optional",
+      "consent": "I agree that JTR may contact me about JTR Academy using these details, as described in the <link>privacy policy</link>.",
+      "submit": "Register my interest",
+      "sending": "Sending…",
+      "successTitle": "Thank you, you're on the list.",
+      "successBody": "We'll contact you on WhatsApp or email with class dates and how to join.",
+      "errorTitle": "Something went wrong.",
+      "errorBody": "Your details weren't sent. Please try again, or email us at {email}.",
+      "errors": {
+        "required": "This field is required.",
+        "email": "Enter a valid email address.",
+        "phone": "Enter a valid phone number.",
+        "tooLong": "This is too long.",
+        "course": "Please choose a course.",
+        "consent": "Please confirm you agree so we can contact you."
+      }
+    }
   }
 }

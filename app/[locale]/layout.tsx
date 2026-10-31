@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { preload } from "react-dom";
-import { Readex_Pro, IBM_Plex_Sans } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isRtl, routing } from "@/i18n/routing";
@@ -13,25 +12,8 @@ import { LocaleSuggestion } from "@/components/layout/LocaleSuggestion";
 import { ChatLauncher } from "@/components/assistant/ChatLauncher";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { cn } from "@/lib/cn";
+import { bodyFont, headingFont } from "@/lib/fonts";
 import "../globals.css";
-
-// Readex Pro for headings. Only the Latin file is preloaded here (French and Portuguese accents are in it);
-// the Arabic file is self-hosted in /public/fonts and preloaded on Arabic pages only.
-const heading = Readex_Pro({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-});
-
-// IBM Plex Sans for Latin body text. IBM Plex Sans Arabic is self-hosted in /public/fonts (see globals.css)
-// so Arabic pages can preload it without slowing down the other languages.
-const body = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
-  display: "swap",
-});
-
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -95,7 +77,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       lang={locale}
       dir={isRtl(locale) ? "rtl" : "ltr"}
       suppressHydrationWarning
-      className={cn(heading.variable, body.variable, "antialiased")}
+      className={cn(headingFont.variable, bodyFont.variable, "antialiased")}
     >
       <body className="flex min-h-screen flex-col">
         <script

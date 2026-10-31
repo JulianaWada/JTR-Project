@@ -23,6 +23,7 @@
     "breadcrumb": "Trilha de navegação"
   },
   "nav": {
+    "academy": "Academia",
     "home": "Início",
     "about": "Sobre",
     "services": "Serviços",
@@ -175,7 +176,6 @@
       "subtitle": "Somos parceiros de clientes em vários continentes, com entrega remota, comunicação clara e sobreposição confiável com o seu dia de trabalho.",
       "figures": {
         "countries": "Países atendidos",
-        "projects": "Projetos entregues",
         "timezones": "Fusos horários cobertos",
         "response": "Tempo médio de resposta"
       },
@@ -207,7 +207,7 @@
     "projects": {
       "eyebrow": "Trabalhos selecionados",
       "title": "Projetos em destaque",
-      "subtitle": "Uma amostra do tipo de trabalho que fazemos. Os estudos de caso completos estão a caminho."
+      "subtitle": "O que estamos a construir agora, incluindo os nossos próprios produtos. Os estudos de caso completos estão a caminho."
     },
     "cta": {
       "title": "Tem uma ideia? Vamos construí-la juntos.",
@@ -218,7 +218,7 @@
   "about": {
     "meta": {
       "title": "Sobre nós",
-      "description": "Conheça a Jules TechRight (JTR): nossa história, missão, visão, valores e a equipe que cria sites, aplicativos e IA agêntica para clientes em todo o mundo."
+      "description": "Conheça a Jules TechRight (JTR): nossa história, missão, visão e valores, criando sites, aplicativos e IA agêntica para clientes em todo o mundo."
     },
     "hero": {
       "eyebrow": "Sobre a JTR",
@@ -258,33 +258,6 @@
           "body": "Seguimos padrões globais em design, engenharia e entrega."
         }
       }
-    },
-    "team": {
-      "eyebrow": "Nossa equipe",
-      "title": "As pessoas por trás da JTR",
-      "subtitle": "Uma equipe distribuída de engenheiros, designers e especialistas em IA.",
-      "members": {
-        "founder": {
-          "name": "Nome do membro da equipe",
-          "role": "Fundador(a) e CEO",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "engineering": {
-          "name": "Nome do membro da equipe",
-          "role": "Diretor(a) de Engenharia",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "ai": {
-          "name": "Nome do membro da equipe",
-          "role": "Líder de IA agêntica",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        },
-        "design": {
-          "name": "Nome do membro da equipe",
-          "role": "Líder de Design",
-          "bio": "Biografia provisória. Adicione uma breve apresentação, formação e área de atuação."
-        }
-      }
     }
   },
   "servicesPage": {
@@ -302,12 +275,12 @@
   "projects": {
     "meta": {
       "title": "Projetos",
-      "description": "Projetos selecionados da Jules TechRight em sites, aplicativos móveis, IA agêntica, tecnologia educacional e transformação digital."
+      "description": "Projetos da Jules TechRight, incluindo um agente de vendas com IA no WhatsApp para pequenas empresas e o nosso site institucional multilíngue."
     },
     "hero": {
       "eyebrow": "Portfólio",
       "title": "Trabalhos que fazem a diferença",
-      "subtitle": "Filtre por área de serviço ou região. Os estudos de caso completos chegam em breve."
+      "subtitle": "Projetos reais que já construímos ou estamos a construir. Os estudos de caso completos chegam em breve."
     },
     "filters": {
       "service": "Área de serviço",
@@ -316,30 +289,25 @@
       "results": "{count, plural, =0 {Nenhum projeto corresponde a estes filtros} one {# projeto} other {# projetos}}",
       "reset": "Limpar filtros"
     },
+    "status": {
+      "live": "No ar",
+      "in-progress": "Em andamento"
+    },
+    "visit": "Ver projeto",
     "items": {
-      "learning-platform": {
-        "title": "Plataforma de aprendizagem adaptativa",
-        "summary": "Estudo de caso provisório: uma plataforma de aprendizagem mobile-first com aulas offline e acompanhamento de progresso para milhares de estudantes."
+      "whatsapp-sales-agent": {
+        "title": "Agente de vendas com IA no WhatsApp",
+        "summary": "Um agente de IA que vende no WhatsApp para pequenas empresas, começando por salões de beleza e vendedores de comida na Nigéria. Conversa em inglês e em pidgin nigeriano, responde a perguntas, faz reservas e pedidos, envia links de pagamento Paystack e lembretes, e passa a conversa para uma pessoa quando é preciso. Funciona de ponta a ponta em modo de teste; os pilotos com empresas são o próximo passo.",
+        "imageAlt": "O ecrã de teste do agente: um cliente pede arroz jollof e zobo no WhatsApp e recebe um link de pagamento."
       },
-      "support-agent": {
-        "title": "Agente de IA para atendimento ao cliente",
-        "summary": "Estudo de caso provisório: um assistente agêntico que resolve as solicitações mais comuns dos clientes e encaminha os casos complexos para pessoas."
+      "jtr-website": {
+        "title": "Site da Jules TechRight",
+        "summary": "O site em que está agora: um site institucional rápido em inglês, francês, português e árabe (da direita para a esquerda), com temas claro e escuro, um assistente de IA integrado e um formulário de contacto. Feito com Next.js.",
+        "imageAlt": "A página inicial da Jules TechRight."
       },
-      "logistics-app": {
-        "title": "Aplicativo de logística de campo",
-        "summary": "Estudo de caso provisório: um aplicativo multiplataforma para motoristas com mapas offline, comprovante de entrega e rastreamento em tempo real."
-      },
-      "fintech-site": {
-        "title": "Site de marketing para fintech",
-        "summary": "Estudo de caso provisório: um site de marketing rápido e multilíngue, com fluxo de onboarding, para uma start-up de pagamentos."
-      },
-      "records-migration": {
-        "title": "Registros do papel ao digital",
-        "summary": "Estudo de caso provisório: substituição de registros em papel por um sistema seguro na nuvem, com painéis e capacitação da equipe."
-      },
-      "ops-copilot": {
-        "title": "Copiloto de operações",
-        "summary": "Estudo de caso provisório: um agente de IA interno que redige relatórios, atualiza sistemas e responde a perguntas sobre políticas internas."
+      "ufedo": {
+        "title": "Ufedo",
+        "summary": "Um jogo para casais criado em África, já disponível como aplicação web. Cada parceiro responde às perguntas no seu próprio telemóvel e depois revelam as respostas juntos. Inclui quebra-cabeças, Date Night e uma viagem pela Nigéria. Os jogos são gratuitos, com uma assinatura opcional UFEDO Plus."
       }
     }
   },
@@ -516,5 +484,77 @@
     "body": "A página que você procura não existe ou foi movida.",
     "home": "Ir para a página inicial",
     "contact": "Fale conosco"
+  },
+  "academyInterest": {
+    "meta": {
+      "title": "Registe o seu interesse na JTR Academy",
+      "description": "Aulas online ao vivo para aumentar vendas com IA e criar vídeos de animação com IA, com certificado e crachá no fim."
+    },
+    "hero": {
+      "eyebrow": "JTR Academy",
+      "title": "Aprenda as competências de IA que fazem o seu negócio crescer",
+      "subtitle": "Aulas práticas ao vivo, online. Registe o seu interesse e contactamos com datas, preços e como participar."
+    },
+    "courses": {
+      "title": "Cursos",
+      "sales": {
+        "name": "Aumentar vendas com IA",
+        "summary": "Use a IA para encontrar clientes, responder mais rápido e vender mais."
+      },
+      "animation": {
+        "name": "Criar vídeos de animação com IA",
+        "summary": "Crie vídeos animados apelativos, sem estúdio."
+      }
+    },
+    "perks": {
+      "live": "Aulas ao vivo e interativas",
+      "certificate": "Certificado de conclusão",
+      "badge": "Crachá digital para partilhar",
+      "note": "Registar interesse é gratuito e não o compromete a nada."
+    },
+    "form": {
+      "title": "Registe o seu interesse",
+      "intro": "Deixe os seus dados e contactamos quando abrirem as próximas turmas.",
+      "name": "Nome completo",
+      "phone": "Número de telefone ou WhatsApp",
+      "phoneHint": "Usamos este número para enviar detalhes das aulas pelo WhatsApp.",
+      "countryCode": "Indicativo",
+      "email": "Endereço de e-mail",
+      "location": "Cidade ou estado",
+      "locationPlaceholder": "ex. Lagos",
+      "course": "Que curso lhe interessa?",
+      "courses": {
+        "sales": "Aumentar vendas com IA",
+        "animation": "Vídeos de animação com IA",
+        "both": "Ambos os cursos"
+      },
+      "heardFrom": "Como soube de nós?",
+      "heardFromPlaceholder": "Escolha uma opção",
+      "heardFromOptions": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "x": "X (Twitter)",
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "friend": "Um amigo ou colega",
+        "other": "Outro sítio"
+      },
+      "optional": "opcional",
+      "consent": "Concordo que a JTR me contacte sobre a JTR Academy com estes dados, conforme descrito na <link>política de privacidade</link>.",
+      "submit": "Registar interesse",
+      "sending": "A enviar…",
+      "successTitle": "Obrigado, está na lista.",
+      "successBody": "Vamos contactá-lo por WhatsApp ou e-mail com as datas e como participar.",
+      "errorTitle": "Algo correu mal.",
+      "errorBody": "Os seus dados não foram enviados. Tente novamente ou escreva para {email}.",
+      "errors": {
+        "required": "Este campo é obrigatório.",
+        "email": "Introduza um e-mail válido.",
+        "phone": "Introduza um número de telefone válido.",
+        "tooLong": "É demasiado longo.",
+        "course": "Escolha um curso.",
+        "consent": "Confirme que concorda para podermos contactá-lo."
+      }
+    }
   }
 }

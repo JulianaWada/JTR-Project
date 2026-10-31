@@ -1,0 +1,63 @@
+# JTR Academy
+
+The online school on the JTR website: paid six-week live courses taught by Jules, with lesson notes, recordings, assignments, quizzes, an AI tutor (Claude), badges and verifiable certificates. It starts with two courses: **Boost Sales with AI** and **Create Animation Videos with AI**.
+
+It is a separate Next.js app in this folder, served under `/academy` on the website's own address (Next.js [multi-zones](https://nextjs.org/docs/app/guides/multi-zones)). Visitors see one site; work on the academy can't break the website.
+
+## What's inside
+
+| For | Pages |
+| --- | --- |
+| Visitors | Academy home, course pages with intakes and seats left, certificate verification (`/academy/verify`) |
+| Students | Sign up, Paystack checkout with discount codes, dashboard, class timetable with a Join button (records attendance, then opens Google Meet), lesson notes and recordings, assignments, quizzes, AI tutor, badges, certificate PDF |
+| Jules (teacher) | Overview, courses (details, outline, assignments, quizzes as plain text), intakes (classes, attendance grid, issue or withdraw certificates, email everyone), marking with feedback, payments and discount codes, questions students ask the tutor, every email sent |
+
+**Certificates** are issued automatically when a student attends at least 80% of the live classes and passes the final project (both editable per course). Each has an ID like `JTR-7K3F9` and a public page at `/academy/verify/<ID>`.
+
+**Badges:** First class, Getting to work, Quiz ace, Halfway there, Perfect attendance, Project passed, Graduate.
+
+## Run it locally
+
+```bash
+cd academy
+npm install
+npm run dev          # http://localhost:3200/academy
+npm test             # 11 tests, all in test mode
+```
+
+With no keys everything runs in **test mode**: an embedded database (`.data/`), a practice checkout instead of Paystack, a tutor that quotes the lesson notes instead of calling Claude, and emails that are saved to the teacher's Emails page instead of being sent. Demo logins (password `demo1234`):
+
+- Student in progress: `ada@example.com`
+- Graduate with a certificate: `chioma@example.com` (certificate `JTR-DEMO7`)
+- Teacher: `jules@julestechright.com`
+
+Delete `academy/.data` to start again with fresh demo data.
+
+## Going live
+
+1. **Database (Supabase).** Create a project, then copy *Project settings > Database > Connection string > Transaction pooler* (port 6543) into `DATABASE_URL`. Tables are created automatically on every build.
+2. **Vercel.** Add a new project from this repository with **Root Directory = `academy`**. Set the environment variables below. Vercel Cron sends class reminders every hour (`vercel.json`).
+3. **Connect it to the website.** In the website's Vercel project, set `ACADEMY_URL` to the academy's address (e.g. `https://jtr-academy.vercel.app`) and redeploy. The "Academy" link then appears in the website's menu and footer, and `/academy` on the website shows the academy. `/academy/interest` stays a website page.
+4. **Paystack.** Use your secret key, and set the webhook URL to `https://<website>/academy/api/paystack/webhook`.
+5. **Emails (Resend).** Verify the sending domain and set `RESEND_API_KEY`.
+
+| Variable | What it's for |
+| --- | --- |
+| `APP_URL` | The website's public address, e.g. `https://jtr-project.vercel.app` (used in emails and on certificates) |
+| `WEBSITE_URL` | The JTR website, for "back to website" links (usually the same as `APP_URL`) |
+| `ALLOWED_ORIGINS` | Any other domain that forwards `/academy` here (the Vercel address and julestechright.com are already allowed) |
+| `SESSION_SECRET` | A long random string; required in production |
+| `DATABASE_URL` | Supabase connection string |
+| `TEACHER_EMAIL`, `TEACHER_PASSWORD` | Jules's teacher login, created on first start |
+| `ANTHROPIC_API_KEY`, `TUTOR_MODEL` | The AI tutor (default model `claude-sonnet-5-5`) |
+| `PAYSTACK_SECRET_KEY` | Real payments |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Real emails |
+| `CRON_SECRET` | Protects the reminders endpoint; Vercel sends it automatically |
+| `DEMO_PASSWORD` | Leave empty in production (it creates the demo students) |
+
+## Still to decide
+
+- Course prices (₦50,000 each is a placeholder), intake dates and the Google Meet link for each intake.
+- Lesson notes are a starting draft written for this build: please review and edit them in the teacher dashboard.
+- The certificate is signed "Jules, Lead Instructor".
+- Privacy policy and terms should mention student data and payments.

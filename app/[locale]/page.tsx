@@ -8,6 +8,9 @@ import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
 import { CTABand } from "@/components/sections/CTABand";
 import { pageMetadata } from "@/lib/seo";
 
+// Featured projects can be changed in /admin/projects.
+export const revalidate = 60;
+
 export async function generateMetadata({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   return pageMetadata({ locale, path: "" });

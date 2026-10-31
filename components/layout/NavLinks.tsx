@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { mainNav } from "@/lib/nav";
+import { academyNav, mainNav } from "@/lib/nav";
 import { cn } from "@/lib/cn";
 
 export function NavLinks() {
@@ -27,6 +27,13 @@ export function NavLinks() {
           </li>
         );
       })}
+      {academyNav && (
+        <li>
+          <a href={academyNav.href} className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-primary">
+            {t(academyNav.key)}
+          </a>
+        </li>
+      )}
     </ul>
   );
 }

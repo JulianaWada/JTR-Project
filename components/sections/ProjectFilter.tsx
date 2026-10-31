@@ -51,6 +51,11 @@ export function ProjectFilter({ projects }: { projects: ProjectView[] }) {
   const [service, setService] = useState<ServiceId | "all">("all");
   const [region, setRegion] = useState<RegionId | "all">("all");
 
+  // Only offer filters that match at least one project, and skip the filter panel while the list is short.
+  const serviceOptions = useMemo(() => serviceIds.filter((id) => projects.some((p) => p.service === id)), [projects]);
+  const regionOptions = useMemo(() => regionIds.filter((id) => projects.some((p) => p.region === id)), [projects]);
+  const showFilters = projects.length >= 4;
+
   const visible = useMemo(
     () => projects.filter((p) => (service === "all" || p.service === service) && (region === "all" || p.region === region)),
     [projects, service, region],
@@ -58,45 +63,49 @@ export function ProjectFilter({ projects }: { projects: ProjectView[] }) {
 
   return (
     <div>
-      <div className="grid gap-6 rounded-card border border-line bg-surface p-6 lg:grid-cols-2">
-        <FilterGroup
-          legend={t("projects.filters.service")}
-          options={serviceIds}
-          value={service}
-          onChange={setService}
-          allLabel={t("projects.filters.all")}
-          labelFor={(v) => t(`services.${v}.name`)}
-        />
-        <FilterGroup
-          legend={t("projects.filters.region")}
-          options={regionIds}
-          value={region}
-          onChange={setRegion}
-          allLabel={t("projects.filters.all")}
-          labelFor={(v) => t(`regions.${v}`)}
-        />
-      </div>
-      <div className="mt-8 flex items-center justify-between gap-4">
-        <p role="status" className="text-sm text-muted">
-          {t("projects.filters.results", { count: visible.length })}
-        </p>
-        {(service !== "all" || region !== "all") && (
-          <button
-            type="button"
-            onClick={() => {
-              setService("all");
-              setRegion("all");
-            }}
-            className="text-sm font-semibold text-primary hover:underline"
-          >
-            {t("projects.filters.reset")}
-          </button>
-        )}
-      </div>
-      <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {showFilters && (
+        <>
+          <div className="grid gap-6 rounded-card border border-line bg-surface p-6 lg:grid-cols-2">
+            <FilterGroup
+              legend={t("projects.filters.service")}
+              options={serviceOptions}
+              value={service}
+              onChange={setService}
+              allLabel={t("projects.filters.all")}
+              labelFor={(v) => t(`services.${v}.name`)}
+            />
+            <FilterGroup
+              legend={t("projects.filters.region")}
+              options={regionOptions}
+              value={region}
+              onChange={setRegion}
+              allLabel={t("projects.filters.all")}
+              labelFor={(v) => t(`regions.${v}`)}
+            />
+          </div>
+          <div className="mt-8 flex items-center justify-between gap-4">
+            <p role="status" className="text-sm text-muted">
+              {t("projects.filters.results", { count: visible.length })}
+            </p>
+            {(service !== "all" || region !== "all") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setService("all");
+                  setRegion("all");
+                }}
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                {t("projects.filters.reset")}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+      <ul className={cn("grid gap-6 sm:grid-cols-2", projects.length > 2 && "lg:grid-cols-3", showFilters && "mt-6")}>
         {visible.map((p) => (
           <li key={p.id}>
-            <ProjectCardView project={p} placeholderLabel={t("common.placeholder")} />
+            <ProjectCardView project={p} />
           </li>
         ))}
       </ul>

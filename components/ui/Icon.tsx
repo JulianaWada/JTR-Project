@@ -133,6 +133,13 @@ const paths = {
       <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18" />
     </>
   ),
+  trendingUp: <path d="m3 17 6-6 4 4 8-8m-7 0h7v7" />,
+  video: (
+    <>
+      <rect x="2" y="6" width="14" height="12" rx="2" />
+      <path d="m16 10 6-3v10l-6-3" />
+    </>
+  ),
 } as const;
 
 export type IconName = keyof typeof paths;

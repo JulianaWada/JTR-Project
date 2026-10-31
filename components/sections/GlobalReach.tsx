@@ -25,7 +25,7 @@ export async function GlobalReach({ headingLevel = "h2" }: { headingLevel?: "h2"
           subtitle={t("home.reach.subtitle")}
         />
         {/* TODO: replace placeholder figures in content/site.ts (reachFigures). */}
-        <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line lg:grid-cols-4">
+        <dl className="mt-12 grid gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-3">
           {reachFigures.map((f) => (
             <div key={f.id} className="bg-navy p-6">
               <dt className="text-sm text-muted">{t(`home.reach.figures.${f.id}`)}</dt>
