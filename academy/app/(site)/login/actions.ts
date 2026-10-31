@@ -1,11 +1,22 @@
 "use server";
 
+import { createHash, timingSafeEqual } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { endSession, safeNext, startSession } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/passwords";
+import { ensureTeacherAccount, TEACHER_EMAIL } from "@/lib/seed";
+
+function isTeacherLogin(email: string, password: string) {
+  const teacherPassword = process.env.TEACHER_PASSWORD?.trim();
+  if (!teacherPassword) return false;
+  const teacherEmail = process.env.TEACHER_EMAIL?.trim().toLowerCase() || TEACHER_EMAIL;
+  const a = createHash("sha256").update(password.trim()).digest();
+  const b = createHash("sha256").update(teacherPassword).digest();
+  return email === teacherEmail && timingSafeEqual(a, b);
+}
 
 export type FormState = { error?: string } | undefined;
 
@@ -13,7 +24,12 @@ export async function login(_prev: FormState, form: FormData): Promise<FormState
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
   const db = await getDb();
-  const user = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
+  let user = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
+  if ((!user || !verifyPassword(password, user.passwordHash)) && isTeacherLogin(email, password)) {
+    // The teacher typed TEACHER_EMAIL and TEACHER_PASSWORD: bring the account in line now, without waiting for a fresh start.
+    await ensureTeacherAccount(db);
+    user = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
+  }
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return { error: "That email and password don't match." };
   }
