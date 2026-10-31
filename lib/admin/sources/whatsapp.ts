@@ -1,9 +1,9 @@
 import "server-only";
-import { randomBytes, randomUUID, scryptSync } from "node:crypto";
+import { randomBytes, scryptSync } from "node:crypto";
 import { connect, envUrl, type SourceMode } from "./pg";
 
 // The WhatsApp sales agent (whatsapp-agent/). Its schema is whatsapp-agent/lib/db/schema.ts.
-// Set WHATSAPP_AGENT_DATABASE_URL to read it; without it the board shows sample businesses.
+// Set WHATSAPP_AGENT_DATABASE_URL to read it; until then the board shows that the agent is not connected.
 
 export type BusinessKind = "salon" | "food" | "other";
 
@@ -59,7 +59,7 @@ export type NewBusiness = {
 export type AddBusinessResult = { ok: true; slug: string; password: string } | { ok: false; error: string };
 
 export function whatsappMode(): SourceMode {
-  return envUrl("WHATSAPP_AGENT_DATABASE_URL") ? "live" : "sample";
+  return envUrl("WHATSAPP_AGENT_DATABASE_URL") ? "live" : "off";
 }
 
 /** Link to the business dashboard login, if the agent's address is known. */
@@ -72,7 +72,7 @@ function db() {
 }
 
 export async function listBusinesses(): Promise<BusinessSummary[]> {
-  if (whatsappMode() === "sample") return sample().businesses;
+  if (whatsappMode() === "off") return [];
   const rows = await db()`
     select t.id, t.slug, t.name, t.kind, t.whatsapp_display_number, t.owner_phone, t.created_at,
       (select count(*) from customers c where c.tenant_id = t.id)::int as customers,
@@ -101,7 +101,7 @@ export async function listBusinesses(): Promise<BusinessSummary[]> {
 }
 
 export async function recentOrders(limit = 20): Promise<AgentOrder[]> {
-  if (whatsappMode() === "sample") return sample().orders.slice(0, limit);
+  if (whatsappMode() === "off") return [];
   const rows = await db()`
     select o.id, o.code, t.name as business, coalesce(c.name, c.profile_name, c.wa_id) as customer,
       o.total_kobo, o.status, o.fulfilment, o.created_at
@@ -120,7 +120,7 @@ export async function recentOrders(limit = 20): Promise<AgentOrder[]> {
 }
 
 export async function recentPayments(limit = 20): Promise<AgentPayment[]> {
-  if (whatsappMode() === "sample") return sample().payments.slice(0, limit);
+  if (whatsappMode() === "off") return [];
   const rows = await db()`
     select p.id, p.reference, t.name as business, coalesce(c.name, c.profile_name, c.wa_id) as customer,
       p.amount_kobo, p.status, p.provider, p.created_at,
@@ -169,25 +169,8 @@ const defaultHours = {
  */
 export async function addBusiness(input: NewBusiness): Promise<AddBusinessResult> {
   const password = newPassword();
-  if (whatsappMode() === "sample") {
-    const data = sample();
-    if (data.businesses.some((b) => b.slug === input.slug)) return { ok: false, error: "That web address is already used by another business." };
-    data.businesses.push({
-      id: randomUUID(),
-      slug: input.slug,
-      name: input.name,
-      kind: input.kind,
-      displayNumber: input.whatsappDisplayNumber ?? null,
-      ownerPhone: input.ownerPhone ?? null,
-      createdAt: new Date(),
-      customers: 0,
-      needsAttention: 0,
-      orders: 0,
-      upcomingBookings: 0,
-      paidKobo: 0,
-      lastMessageAt: null,
-    });
-    return { ok: true, slug: input.slug, password };
+  if (whatsappMode() === "off") {
+    return { ok: false, error: "Connect the WhatsApp sales agent first: set WHATSAPP_AGENT_DATABASE_URL in Vercel." };
   }
   try {
     await db()`
@@ -211,61 +194,4 @@ export async function addBusiness(input: NewBusiness): Promise<AddBusinessResult
     console.error("[admin] failed to add business", err);
     return { ok: false, error: "The business could not be saved. Check the sales agent's database connection." };
   }
-}
-
-// --- Sample data for test mode (mirrors the agent's own demo businesses) -------------------------
-
-type Sample = { businesses: BusinessSummary[]; orders: AgentOrder[]; payments: AgentPayment[] };
-const globalForSample = globalThis as unknown as { __jtrAdminWhatsappSample?: Sample };
-
-function ago(hours: number) {
-  return new Date(Date.now() - hours * 3_600_000);
-}
-
-function sample(): Sample {
-  globalForSample.__jtrAdminWhatsappSample ??= {
-    businesses: [
-      {
-        id: "sample-salon",
-        slug: "glow-up-studio",
-        name: "Glow Up Studio",
-        kind: "salon",
-        displayNumber: "+234 800 000 0001",
-        ownerPhone: "2348030000001",
-        createdAt: ago(24 * 9),
-        customers: 14,
-        needsAttention: 1,
-        orders: 0,
-        upcomingBookings: 6,
-        paidKobo: 4_500_000,
-        lastMessageAt: ago(0.4),
-      },
-      {
-        id: "sample-food",
-        slug: "mama-nkechi-kitchen",
-        name: "Mama Nkechi's Kitchen",
-        kind: "food",
-        displayNumber: "+234 800 000 0002",
-        ownerPhone: "2348030000002",
-        createdAt: ago(24 * 7),
-        customers: 23,
-        needsAttention: 0,
-        orders: 31,
-        upcomingBookings: 0,
-        paidKobo: 18_760_000,
-        lastMessageAt: ago(1.5),
-      },
-    ],
-    orders: [
-      { id: "o1", code: "OR-7K3F", business: "Mama Nkechi's Kitchen", customer: "Bisi A.", totalKobo: 850_000, status: "preparing", fulfilment: "delivery", createdAt: ago(0.6) },
-      { id: "o2", code: "OR-Q2MD", business: "Mama Nkechi's Kitchen", customer: "Emeka O.", totalKobo: 420_000, status: "awaiting_payment", fulfilment: "pickup", createdAt: ago(1.2) },
-      { id: "o3", code: "OR-9TXA", business: "Mama Nkechi's Kitchen", customer: "Funmi K.", totalKobo: 1_230_000, status: "completed", fulfilment: "delivery", createdAt: ago(20) },
-    ],
-    payments: [
-      { id: "p1", reference: "jtr_7k3f", business: "Mama Nkechi's Kitchen", customer: "Bisi A.", amountKobo: 850_000, status: "success", provider: "mock", forWhat: "Order", createdAt: ago(0.55) },
-      { id: "p2", reference: "jtr_bk21", business: "Glow Up Studio", customer: "Ngozi U.", amountKobo: 750_000, status: "success", provider: "mock", forWhat: "Booking deposit", createdAt: ago(3) },
-      { id: "p3", reference: "jtr_q2md", business: "Mama Nkechi's Kitchen", customer: "Emeka O.", amountKobo: 420_000, status: "pending", provider: "mock", forWhat: "Order", createdAt: ago(1.2) },
-    ],
-  };
-  return globalForSample.__jtrAdminWhatsappSample;
 }

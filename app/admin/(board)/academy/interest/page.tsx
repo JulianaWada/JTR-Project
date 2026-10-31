@@ -47,9 +47,9 @@ export default async function InterestPage({ searchParams }: { searchParams: Pro
         }
       />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Boost Sales with AI" value={(byCourse.sales ?? 0) + (byCourse.both ?? 0)} note="including both" />
-        <Stat label="Animation videos" value={(byCourse.animation ?? 0) + (byCourse.both ?? 0)} note="including both" />
-        <Stat label="Want both courses" value={byCourse.both ?? 0} />
+        <Stat label="Boost Sales with AI" value={(byCourse.sales ?? 0) + (byCourse.both ?? 0)} note="including both" icon="trendingUp" tone="blue" />
+        <Stat label="Animation videos" value={(byCourse.animation ?? 0) + (byCourse.both ?? 0)} note="including both" icon="video" tone="violet" />
+        <Stat label="Want both courses" value={byCourse.both ?? 0} icon="star" tone="green" />
       </div>
       <Panel title={`${entries.length} ${entries.length === 1 ? "sign-up" : "sign-ups"}`} action={<StatusTabs base="/admin/academy/interest" current={status} />}>
         <Table head={["Received", "Name", "Contact", "Course", "From", "Status"]} empty="No sign-ups here yet.">

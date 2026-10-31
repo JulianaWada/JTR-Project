@@ -21,4 +21,5 @@ export function envUrl(name: string) {
   return process.env[name]?.trim() || undefined;
 }
 
-export type SourceMode = "live" | "sample";
+/** "off" until the app's database URL is set: the board then shows a "not connected" notice, never made-up data. */
+export type SourceMode = "live" | "off";
