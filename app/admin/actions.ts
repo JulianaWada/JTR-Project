@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { checkPassword, endAdminSession, requireAdmin, startAdminSession } from "@/lib/admin/auth";
+import { checkLogin, endAdminSession, requireAdmin, startAdminSession } from "@/lib/admin/auth";
 import { leadStatuses, saveProjectOrder, saveProjectSettings, setInterestStatus, setLeadStatus } from "@/lib/admin/site-data";
 import { addBusiness, type AddBusinessResult } from "@/lib/admin/sources/whatsapp";
 import { getAllProjects } from "@/lib/projects";
@@ -24,12 +24,12 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
   let failures = failedLogins.get(ip);
   if (failures && failures.resetAt <= now) failures = undefined;
   if (failures && failures.count >= MAX_FAILURES) {
-    return { error: `Too many wrong passwords. Try again in ${Math.ceil((failures.resetAt - now) / 60_000)} minutes.` };
+    return { error: `Too many wrong attempts. Try again in ${Math.ceil((failures.resetAt - now) / 60_000)} minutes.` };
   }
-  if (!checkPassword(String(form.get("password") ?? ""))) {
+  if (!checkLogin({ email: String(form.get("email") ?? ""), password: String(form.get("password") ?? "") })) {
     if (failedLogins.size > 10_000) failedLogins.clear();
     failedLogins.set(ip, { count: (failures?.count ?? 0) + 1, resetAt: failures?.resetAt ?? now + FAILURE_WINDOW_MS });
-    return { error: "That password is not right." };
+    return { error: "That email or password is not right." };
   }
   failedLogins.delete(ip);
   await startAdminSession();

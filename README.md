@@ -49,6 +49,7 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 | `LEADS_TO_EMAIL` | Recommended | Inbox that receives enquiries. Defaults to `siteConfig.contact.email`. |
 | `LEADS_FROM_EMAIL` | Recommended | Sender, e.g. `JTR Website <website@julestechright.com>`. Must be on a domain you have verified in Resend. |
 | `DATABASE_URL` | Recommended | Postgres (e.g. Supabase) for leads, Academy sign-ups and project settings. Without it a built-in test database is used, which Vercel wipes now and then. See [Admin board](#admin-board). |
+| `ADMIN_EMAIL` | Optional | Email address for the admin login. When set, `/admin` asks for it as well as the password. |
 | `ADMIN_PASSWORD` | For `/admin` | Password for the admin board. Locally `demo1234` is used when it is empty; in production `/admin` stays closed until it is set. |
 | `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Sample data is shown without it. |
 | `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Sample data is shown without it. |
@@ -131,7 +132,7 @@ The rate limiter (`lib/rate-limit.ts`) keeps counts in memory, which is enough f
 
 ## Admin board
 
-`/admin` is Jules's dashboard for the whole of JTR. It is in English only, outside the language routes, and hidden from search engines. Sign in with `ADMIN_PASSWORD` (locally: `demo1234`).
+`/admin` is Jules's dashboard for the whole of JTR. It is in English only, outside the language routes, and hidden from search engines. Sign in with `ADMIN_EMAIL` (if set) and `ADMIN_PASSWORD` (locally: `demo1234`).
 
 | Page | What it shows | Where the data comes from |
 | --- | --- | --- |
@@ -146,7 +147,7 @@ Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages show
 
 **Database.** Migrations in `drizzle/` run automatically on the first connection (`lib/db/index.ts`), using their own migrations table, so the website can share a database with the academy. After changing `lib/db/schema.ts`, run `npx drizzle-kit generate`. Without `DATABASE_URL` the site uses PGlite in `.data/pglite` (on Vercel, `/tmp`, which is reset from time to time, so set `DATABASE_URL` before relying on it).
 
-**Login.** One password, checked on the server and kept in a signed, HTTP-only cookie limited to `/admin` for 12 hours. Changing `ADMIN_PASSWORD` signs out every session. After 8 wrong passwords from one address, logins pause for 15 minutes.
+**Login.** One email (optional) and password, checked on the server and kept in a signed, HTTP-only cookie limited to `/admin` for 12 hours. Changing `ADMIN_PASSWORD` signs out every session. After 8 wrong passwords from one address, logins pause for 15 minutes.
 
 **Projects.** The public projects page and the home page refresh at most a minute after a change (straight away on the server that saved it).
 
