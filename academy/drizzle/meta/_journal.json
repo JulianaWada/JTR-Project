@@ -15,6 +15,13 @@
       "when": 1793420115600,
       "tag": "0001_recorded_courses",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793500000000,
+      "tag": "0002_remove_demo_data",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { KpiCard } from "@/components/charts";
 import { CourseArt } from "@/components/course-art";
 import { Empty, PageTitle, Pill, ProgressBar } from "@/components/ui";
 import { asset } from "@/lib/assets";
@@ -18,12 +19,25 @@ export default async function LearnHome() {
   const courses = await studentOverview(db, user.id);
   const badges = await badgesFor(db, user.id);
   const firstName = user.name.split(" ")[0];
+  const active = courses.filter((c) => c.progress);
+  const done = active.reduce((n, c) => n + c.progress!.attended, 0);
+  const total = active.reduce((n, c) => n + c.progress!.totalClasses, 0);
+  const certificates = active.filter((c) => c.progress!.certificateCode).length;
 
   return (
     <>
       <PageTitle eyebrow="My learning" title={`Welcome back, ${firstName}`}>
         Your courses, next classes and progress in one place.
       </PageTitle>
+
+      {courses.length > 0 && (
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiCard label="My courses" icon="book" value={courses.length} hint={`${active.length} unlocked`} />
+          <KpiCard label="Lessons done" icon="check" tone="green" value={done} hint={`of ${total} so far`} />
+          <KpiCard label="Badges earned" icon="award" tone="amber" value={badges.length} hint={<Link href="/learn/badges" className="text-primary hover:underline">See all badges</Link>} />
+          <KpiCard label="Certificates" icon="cap" tone="violet" value={certificates} hint={certificates ? "Well done!" : "Finish a course to earn one"} />
+        </div>
+      )}
 
       {courses.length === 0 ? (
         <Empty>
@@ -37,7 +51,7 @@ export default async function LearnHome() {
           {courses.map(({ enrolment, cohort, course, nextClass, pendingPayment, progress }) => {
             const state = nextClass ? classState(nextClass) : null;
             return (
-              <article key={enrolment.id} className="overflow-hidden rounded-card border border-line bg-surface">
+              <article key={enrolment.id} className="overflow-hidden rounded-card border border-line bg-surface shadow-[var(--card-shadow)]">
                 <CourseArt slug={course.slug} accent={course.accent} className="h-28" />
                 <div className="p-6">
                   <div className="flex flex-wrap items-center gap-2">

@@ -23,6 +23,8 @@
   --warning: #9a5b00;
   --warning-soft: #fff3dc;
   --danger: #b42318;
+  --sidebar: #0a1a33;
+  --card-shadow: 0 1px 2px rgb(10 26 51 / 0.04), 0 1px 3px rgb(10 26 51 / 0.04);
   color-scheme: light;
 }
 
@@ -46,6 +48,8 @@
   --warning: #ffbf5c;
   --warning-soft: #33250c;
   --danger: #ff7a6e;
+  --sidebar: #050c18;
+  --card-shadow: none;
   color-scheme: dark;
 }
 
@@ -68,6 +72,7 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
+  --color-sidebar: var(--sidebar);
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
@@ -118,6 +123,7 @@
 @layer components {
   .card {
     @apply rounded-card border border-line bg-surface p-5 sm:p-6;
+    box-shadow: var(--card-shadow);
   }
   .btn-primary {
     @apply btn bg-primary text-primary-ink shadow-sm shadow-primary/20 hover:bg-primary/90;
