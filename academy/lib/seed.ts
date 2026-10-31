@@ -20,7 +20,7 @@ import {
 import { courseTemplates, type CourseTemplate } from "@/lib/course-content";
 import { env } from "@/lib/env";
 import { koboFromNaira } from "@/lib/money";
-import { hashPassword } from "@/lib/passwords";
+import { hashPassword, verifyPassword } from "@/lib/passwords";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { addDays, fromLagos, toLagosParts } from "@/lib/time";
 
@@ -245,6 +245,7 @@ export async function ensureDemoData(db: Database) {
 /**
  * Makes sure Jules can log in as the teacher, on every start. The account is TEACHER_EMAIL (default jules@julestechright.com).
  * Missing: it is created with TEACHER_PASSWORD (or the demo password outside production).
+ * Already the teacher: its password is kept in step with TEACHER_PASSWORD, when that is set.
  * Already there as a student (e.g. Jules signed up before TEACHER_PASSWORD was set): with TEACHER_PASSWORD set it becomes
  * the teacher and its password is reset to TEACHER_PASSWORD, so only the person who set the env var can log in to it.
  */
@@ -253,7 +254,14 @@ export async function ensureTeacherAccount(db: Database) {
   const explicitPassword = process.env.TEACHER_PASSWORD?.trim();
   const password = explicitPassword || env.demoPassword;
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
-  if (existing?.role === "teacher") return;
+  if (existing?.role === "teacher") {
+    // TEACHER_PASSWORD is the teacher's password: changing it in Vercel and redeploying changes the login.
+    if (explicitPassword && !verifyPassword(explicitPassword, existing.passwordHash)) {
+      await db.update(users).set({ passwordHash: hashPassword(explicitPassword) }).where(eq(users.id, existing.id));
+      console.info(`[seed] Updated the password of ${email} to TEACHER_PASSWORD.`);
+    }
+    return;
+  }
   if (existing) {
     if (!explicitPassword) {
       console.warn(`[seed] ${email} is a student account. Set TEACHER_PASSWORD to make it the teacher.`);

@@ -1,3 +1,4 @@
+import { BadgeIcon } from "@/components/badge-icon";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -225,7 +226,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
             <h2 className="font-display text-lg font-semibold text-ink">Your certificate</h2>
             {progress.certificateCode ? (
               <div className="mt-3">
-                <p className="text-sm text-success">🎓 Congratulations, you&apos;ve completed the course!</p>
+                <p className="flex items-center gap-3 text-sm text-success">
+                  <BadgeIcon badge="certificate" className="size-9" /> Congratulations, you&apos;ve completed the course!
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a href={asset(`/certificates/${progress.certificateCode}/pdf`)} className="btn-primary btn-sm">
                     Download certificate

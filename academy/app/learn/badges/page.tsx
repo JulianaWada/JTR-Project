@@ -32,7 +32,7 @@ export default async function BadgesPage() {
               {progress?.certificateCode ? (
                 <div className="flex gap-2">
                   <a href={asset(`/certificates/${progress.certificateCode}/pdf`)} className="btn-primary btn-sm">
-                    🎓 Download certificate
+                    Download certificate
                   </a>
                   <Link href={`/verify/${progress.certificateCode}`} className="btn-secondary btn-sm">
                     Share link

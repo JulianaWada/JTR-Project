@@ -228,6 +228,11 @@ describe("teacher account", () => {
       const { verifyPassword } = await import("@/lib/passwords");
       expect(verifyPassword("teacher-secret", user!.passwordHash)).toBe(true);
       expect(verifyPassword("password123", user!.passwordHash)).toBe(false);
+
+      process.env.TEACHER_PASSWORD = "new-secret";
+      await ensureTeacherAccount(db);
+      const again = await db.query.users.findFirst({ where: eq(schema.users.id, student.id) });
+      expect(verifyPassword("new-secret", again!.passwordHash)).toBe(true);
     } finally {
       delete process.env.TEACHER_EMAIL;
       delete process.env.TEACHER_PASSWORD;

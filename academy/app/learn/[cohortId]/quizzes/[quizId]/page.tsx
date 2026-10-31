@@ -1,3 +1,4 @@
+import { BadgeIcon } from "@/components/badge-icon";
 import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -72,8 +73,8 @@ export default async function QuizPage({ params, searchParams }: PageProps<"/lea
               {attempt.score === attempt.total ? "Perfect score!" : "Check the answers below, then try again when you're ready."}
             </p>
             {newBadges.map((b) => (
-              <p key={b} className="mt-3 text-sm font-medium text-success">
-                New badge: {BADGES[b].icon} {BADGES[b].name}
+              <p key={b} className="mt-3 flex items-center gap-2 text-sm font-medium text-success">
+                <BadgeIcon badge={b} className="size-7" /> New badge: {BADGES[b].name}
               </p>
             ))}
           </div>
