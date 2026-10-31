@@ -11,7 +11,7 @@ import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
 import { readFileSync } from "node:fs";
-import { seedCourses, seedDemoStudents } from "@/lib/seed";
+import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { askTutor } from "@/lib/tutor";
 import { hashPassword } from "@/lib/passwords";
@@ -214,6 +214,24 @@ describe("going live", () => {
     expect(next?.meetUrl).toBe("");
     const paid = await db.query.enrolments.findMany({ where: eq(schema.enrolments.userId, student.id) });
     expect(paid.map((e) => e.status)).toEqual(["active"]);
+  });
+});
+
+describe("teacher account", () => {
+  it("turns a student account with the teacher email into the teacher, with TEACHER_PASSWORD as its password", async () => {
+    process.env.TEACHER_EMAIL = "amaka@example.com";
+    process.env.TEACHER_PASSWORD = "teacher-secret";
+    try {
+      await ensureTeacherAccount(db);
+      const user = await db.query.users.findFirst({ where: eq(schema.users.id, student.id) });
+      expect(user?.role).toBe("teacher");
+      const { verifyPassword } = await import("@/lib/passwords");
+      expect(verifyPassword("teacher-secret", user!.passwordHash)).toBe(true);
+      expect(verifyPassword("password123", user!.passwordHash)).toBe(false);
+    } finally {
+      delete process.env.TEACHER_EMAIL;
+      delete process.env.TEACHER_PASSWORD;
+    }
   });
 });
 

@@ -231,27 +231,41 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
   });
 }
 
-/** First start: the starter courses, Jules's teacher account and (outside production) demo students. */
+/** First start: the starter courses and (outside production) demo students. */
 export async function ensureDemoData(db: Database) {
   if (process.env.SKIP_DEMO_SEED === "true") return;
   const [{ value }] = await db.select({ value: count() }).from(courses);
   if (value > 0) return;
 
   const seeded = await seedCourses(db, { demo: Boolean(env.demoPassword) });
-  const teacherPassword = process.env.TEACHER_PASSWORD?.trim() || env.demoPassword;
-  if (teacherPassword) {
-    await db
-      .insert(users)
-      .values({
-        email: process.env.TEACHER_EMAIL?.trim().toLowerCase() || TEACHER_EMAIL,
-        name: "Jules",
-        role: "teacher",
-        passwordHash: hashPassword(teacherPassword),
-      })
-      .onConflictDoNothing();
-  } else {
-    console.warn("[seed] TEACHER_PASSWORD is not set, so no teacher account was created.");
-  }
   if (env.demoPassword) await seedDemoStudents(db, env.demoPassword, seeded);
   console.info("[seed] Created the starter courses.");
+}
+
+/**
+ * Makes sure Jules can log in as the teacher, on every start. The account is TEACHER_EMAIL (default jules@julestechright.com).
+ * Missing: it is created with TEACHER_PASSWORD (or the demo password outside production).
+ * Already there as a student (e.g. Jules signed up before TEACHER_PASSWORD was set): with TEACHER_PASSWORD set it becomes
+ * the teacher and its password is reset to TEACHER_PASSWORD, so only the person who set the env var can log in to it.
+ */
+export async function ensureTeacherAccount(db: Database) {
+  const email = process.env.TEACHER_EMAIL?.trim().toLowerCase() || TEACHER_EMAIL;
+  const explicitPassword = process.env.TEACHER_PASSWORD?.trim();
+  const password = explicitPassword || env.demoPassword;
+  const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
+  if (existing?.role === "teacher") return;
+  if (existing) {
+    if (!explicitPassword) {
+      console.warn(`[seed] ${email} is a student account. Set TEACHER_PASSWORD to make it the teacher.`);
+      return;
+    }
+    await db.update(users).set({ role: "teacher", passwordHash: hashPassword(explicitPassword) }).where(eq(users.id, existing.id));
+    console.info(`[seed] ${email} is now the teacher account.`);
+    return;
+  }
+  if (!password) {
+    console.warn("[seed] TEACHER_PASSWORD is not set, so no teacher account was created.");
+    return;
+  }
+  await db.insert(users).values({ email, name: "Jules", role: "teacher", passwordHash: hashPassword(password) }).onConflictDoNothing();
 }
