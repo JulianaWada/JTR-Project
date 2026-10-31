@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
   turbopack: { root: import.meta.dirname },
   outputFileTracingRoot: import.meta.dirname,
   outputFileTracingIncludes: { "/**": ["./drizzle/**", "./public/brand/**"] },
+  // Visiting the academy's own address without /academy would otherwise be a 404.
+  async redirects() {
+    return [{ source: "/", destination: "/academy", basePath: false, permanent: false }];
+  },
   experimental: {
     serverActions: { allowedOrigins: ["jtr-project.vercel.app", "julestechright.com", "www.julestechright.com", ...forwardedOrigins] },
   },
