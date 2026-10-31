@@ -39,8 +39,9 @@ export async function getDb(): Promise<Database> {
       const state = env.databaseUrl ? createPostgres(env.databaseUrl) : await createPglite(env.pgliteDir);
       await state.ready;
       globalForDb.__jtrAcademyDb = state;
-      const { ensureDemoData } = await import("@/lib/seed");
+      const { ensureDemoData, ensureTeacherAccount } = await import("@/lib/seed");
       await ensureDemoData(state.db);
+      await ensureTeacherAccount(state.db);
       const { ensureSelfPacedCohorts } = await import("@/lib/self-paced");
       await ensureSelfPacedCohorts(state.db);
       return state;
