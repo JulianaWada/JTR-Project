@@ -37,8 +37,10 @@ function niceMax(max: number) {
  * (and in the screen-reader table below the chart).
  */
 export function BarChart({ data, format, label }: { data: { label: string; value: number }[]; format: (n: number) => string; label: string }) {
-  const max = niceMax(Math.max(...data.map((d) => d.value)));
-  const ticks = [0, 0.5, 1].map((t) => t * max);
+  const top = Math.max(...data.map((d) => d.value));
+  const max = niceMax(top);
+  // With nothing to show yet, only the zero line: no made-up scale.
+  const ticks = top > 0 ? [0, 0.5, 1].map((t) => t * max) : [0];
   return (
     <figure>
       <div className="ps-14" aria-hidden>
