@@ -9,21 +9,20 @@ export type Activity = { at: Date; kind: "payment" | "submission" | "certificate
 
 /** Everything the teacher overview shows, in one pass over the (small) academy tables. */
 export async function teacherDashboard(db: Database, now = new Date()) {
-  const [courseRows, cohortRows, enrolmentRows, paymentRows, submissionRows, certificateRows, questionRows, classRows, userRows, assignmentRows] = await Promise.all([
-    db.query.courses.findMany({ orderBy: asc(courses.sortOrder) }),
-    db.query.cohorts.findMany(),
-    db.query.enrolments.findMany(),
-    db.query.payments.findMany(),
-    db.query.submissions.findMany({ orderBy: desc(submissions.submittedAt) }),
-    db.query.certificates.findMany({ orderBy: desc(certificates.issuedAt) }),
-    db.query.tutorMessages.findMany({ where: eq(tutorMessages.role, "user"), orderBy: desc(tutorMessages.createdAt), limit: 10 }),
-    db.query.classes.findMany({ orderBy: asc(classes.startsAt) }),
-    db.query.users.findMany(),
-    db.query.assignments.findMany(),
-  ]);
+  // One query at a time: Supabase's pooler allows only a few connections per server instance.
+  const courseRows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
+  const cohortRows = await db.query.cohorts.findMany();
+  const enrolmentRows = await db.query.enrolments.findMany();
+  const paymentRows = await db.query.payments.findMany();
+  const submissionRows = await db.query.submissions.findMany({ orderBy: desc(submissions.submittedAt) });
+  const certificateRows = await db.query.certificates.findMany({ orderBy: desc(certificates.issuedAt) });
+  const questionRows = await db.query.tutorMessages.findMany({ where: eq(tutorMessages.role, "user"), orderBy: desc(tutorMessages.createdAt), limit: 10 });
+  const classRows = await db.query.classes.findMany({ orderBy: asc(classes.startsAt) });
+  const userRows = await db.query.users.findMany();
+  const assignmentRows = await db.query.assignments.findMany();
   const userName = (id: string) => userRows.find((u) => u.id === id)?.name ?? "A student";
-  const cohortOf = (id: string) => cohortRows.find((c) => c.id === id)!;
-  const courseOfCohort = (id: string) => courseRows.find((c) => c.id === cohortOf(id).courseId)!;
+  const cohortOf = (id: string) => cohortRows.find((c) => c.id === id);
+  const courseOfCohort = (id: string) => courseRows.find((c) => c.id === cohortOf(id)?.courseId);
   const enrolmentById = new Map(enrolmentRows.map((e) => [e.id, e]));
 
   const paid = paymentRows.filter((p) => p.status === "success" && p.paidAt);
@@ -55,23 +54,28 @@ export async function teacherDashboard(db: Database, now = new Date()) {
 
   const toMark = submissionRows.filter((s) => s.grade === null);
   const selfPacedIds = new Set(cohortRows.filter((c) => c.selfPaced).map((c) => c.id));
-  const missingVideos = classRows.filter((c) => selfPacedIds.has(c.cohortId) && !c.recordingUrl && courseOfCohort(c.cohortId).format === "recorded");
+  const missingVideos = classRows.filter((c) => selfPacedIds.has(c.cohortId) && !c.recordingUrl && courseOfCohort(c.cohortId)?.format === "recorded");
   const missingRecordings = classRows.filter(
     (c) => !selfPacedIds.has(c.cohortId) && !c.recordingUrl && addMinutes(c.startsAt, c.durationMinutes) < now && c.startsAt > new Date(now.getTime() - 21 * 86400000),
   );
   const soon = new Date(now.getTime() + 14 * 86400000);
-  const noMeetLink = classRows.filter((c) => !selfPacedIds.has(c.cohortId) && c.startsAt > now && c.startsAt < soon && !c.meetUrl && !cohortOf(c.cohortId).meetUrl);
+  const noMeetLink = classRows.filter((c) => !selfPacedIds.has(c.cohortId) && c.startsAt > now && c.startsAt < soon && !c.meetUrl && !cohortOf(c.cohortId)?.meetUrl);
   const unpaid = enrolmentRows.filter((e) => e.status === "pending");
 
   const upcoming = classRows
     .filter((c) => !selfPacedIds.has(c.cohortId) && addMinutes(c.startsAt, c.durationMinutes) > now)
-    .slice(0, 5)
-    .map((c) => ({ ...c, cohort: cohortOf(c.cohortId), course: courseOfCohort(c.cohortId) }));
+    .flatMap((c) => {
+      const cohort = cohortOf(c.cohortId);
+      const course = courseOfCohort(c.cohortId);
+      return cohort && course ? [{ ...c, cohort, course }] : [];
+    })
+    .slice(0, 5);
 
   const activity: Activity[] = [
-    ...paid.map((p) => {
-      const e = enrolmentById.get(p.enrolmentId)!;
-      return { at: p.paidAt!, kind: "payment" as const, text: `${userName(e.userId)} enrolled in ${courseOfCohort(e.cohortId).title}`, href: "/teach/payments" };
+    ...paid.flatMap((p) => {
+      const e = enrolmentById.get(p.enrolmentId);
+      if (!e) return [];
+      return [{ at: p.paidAt!, kind: "payment" as const, text: `${userName(e.userId)} enrolled in ${courseOfCohort(e.cohortId)?.title ?? "a course"}`, href: "/teach/payments" }];
     }),
     ...submissionRows.map((s) => ({
       at: s.submittedAt,
