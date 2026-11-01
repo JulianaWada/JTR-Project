@@ -55,8 +55,10 @@ export function academyMode(): SourceMode {
   return envUrl("ACADEMY_DATABASE_URL") ? "live" : "off";
 }
 
-/** The academy's own pages, for editing. It is served at /academy on this site once ACADEMY_URL is set. */
+/** The academy's own pages, for editing: on its subdomain (ACADEMY_PUBLIC_URL), or at /academy on this site (ACADEMY_URL). */
 export function academyTeachUrl(path = "") {
+  const publicUrl = envUrl("ACADEMY_PUBLIC_URL")?.replace(/\/$/, "");
+  if (publicUrl) return `${publicUrl}/academy/teach${path}`;
   return envUrl("ACADEMY_URL") ? `/academy/teach${path}` : undefined;
 }
 

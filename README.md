@@ -53,7 +53,10 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 | `ADMIN_PASSWORD` | For `/admin` | Password for the admin board. Locally `demo1234` is used when it is empty; in production `/admin` stays closed until it is set. |
 | `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Until it is set, the board says the academy is not connected. |
 | `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Until it is set, the board says the academy is not connected. |
-| `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link. |
+| `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link, e.g. `https://agent.julestechright.com`. |
+| `ADMIN_HOST` | Optional | The admin board's subdomain, e.g. `admin.julestechright.com` (no `https://`). That address opens the board, and `/admin` on the main site redirects there. See [DOMAINS.md](DOMAINS.md). |
+| `ACADEMY_PUBLIC_URL` | Optional | JTR Academy's own subdomain, e.g. `https://academy.julestechright.com`. The menu's Academy link goes there and old `/academy` links redirect to it (`/academy/interest` stays here). |
+| `ACADEMY_URL` | Optional | Only if the academy should be served at `/academy` on this site instead of on its own subdomain: the academy's Vercel address. Ignored when `ACADEMY_PUBLIC_URL` is set. |
 
 ## Editing content
 
@@ -163,7 +166,7 @@ Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages say 
 2. In Vercel, choose **Add New → Project**, import the repository and keep the detected Next.js settings.
 3. Add the environment variables listed above for the Production (and Preview, if you like) environment.
 4. Deploy. Every push to the main branch redeploys; pull requests get preview links.
-5. Add your domain under **Settings → Domains** and set `NEXT_PUBLIC_SITE_URL` to it, then redeploy so canonical links and the sitemap use it.
+5. Add your domain under **Settings → Domains** and set `NEXT_PUBLIC_SITE_URL` to it, then redeploy so canonical links and the sitemap use it. For the subdomains (academy, admin, agent) follow [DOMAINS.md](DOMAINS.md).
 6. In Resend, verify the sending domain (DNS records) and set `LEADS_FROM_EMAIL` to an address on it.
 7. Turn on **Web Analytics** in the Vercel project if you want analytics (it still only loads after consent).
 8. Submit `https://<your-domain>/sitemap.xml` in Google Search Console.
