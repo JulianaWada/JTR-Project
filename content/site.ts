@@ -44,11 +44,10 @@ export const siteConfig = {
   // TODO: replace with a real Google Maps embed URL for the Lagos office.
   mapEmbedUrl: "",
   social: [
-    // TODO: replace with real profile URLs (or delete the ones you don't use).
-    { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/company/julestechright" },
-    { id: "x", label: "X", href: "https://x.com/julestechright" },
-    { id: "github", label: "GitHub", href: "https://github.com/julestechright" },
-    { id: "instagram", label: "Instagram", href: "https://www.instagram.com/julestechright" },
+    // TODO: Facebook profile ID is cut off in the screenshot Jules sent; replace with the full link.
+    { id: "facebook", label: "Facebook", href: "https://www.facebook.com/profile.php?id=615951384957" },
+    { id: "x", label: "X", href: "https://x.com/Julesjtr" },
+    { id: "instagram", label: "Instagram", href: "https://www.instagram.com/julestrofficial/" },
   ],
 } as const;
 

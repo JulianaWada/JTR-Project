@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/SectionHeading";
 import { GeoPattern } from "@/components/visual/GeoPattern";
 import { HeroVisual } from "@/components/visual/HeroVisual";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export async function Hero() {
   const t = await getTranslations();
@@ -31,6 +32,10 @@ export async function Hero() {
             <ButtonLink href="/assistant" size="lg" variant="secondary" icon="sparkle" iconPosition="start">
               {t("common.talkToAssistant")}
             </ButtonLink>
+          </div>
+          <div className="mt-8 flex items-center gap-4">
+            <span className="text-sm font-medium text-muted">{t("home.hero.follow")}</span>
+            <SocialLinks label={t("home.hero.follow")} newTabLabel={t("a11y.opensInNewTab")} />
           </div>
         </div>
         <div className="relative mx-auto w-full max-w-[17rem] sm:max-w-sm lg:max-w-md">

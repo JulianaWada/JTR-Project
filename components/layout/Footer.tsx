@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { Container } from "@/components/ui/Container";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 import { serviceIds, siteConfig } from "@/content/site";
 import { academyNav } from "@/lib/nav";
 import { CookieSettingsButton } from "./CookieSettingsButton";
@@ -30,23 +31,11 @@ export async function Footer() {
             <Icon name="globe" size={16} className="text-primary" />
             {t("footer.hq")}
           </p>
-          <ul className="mt-6 flex gap-2" aria-label={t("footer.connect")}>
-            {siteConfig.social.map((s) => (
-              <li key={s.id}>
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-grid size-10 place-items-center rounded-full border border-line text-muted transition-colors hover:border-primary hover:text-primary"
-                >
-                  <Icon name={s.id as IconName} size={18} />
-                  <span className="sr-only">
-                    {s.label} {t("a11y.opensInNewTab")}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <SocialLinks
+            className="mt-6"
+            label={t("footer.connect")}
+            newTabLabel={t("a11y.opensInNewTab")}
+          />
         </div>
 
         <nav aria-label={t("footer.services")}>
