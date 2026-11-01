@@ -41,14 +41,14 @@ Delete `academy/.data` to start again with fresh demo data.
 
 1. **Database (Supabase).** Create a project, then copy *Project settings > Database > Connection string > Transaction pooler* (port 6543) into `DATABASE_URL`. Tables are created automatically on every build.
 2. **Vercel.** Add a new project from this repository with **Root Directory = `academy`**. Set the environment variables below. Vercel Cron sends class reminders every hour (`vercel.json`).
-3. **Connect it to the website.** In the website's Vercel project, set `ACADEMY_URL` to the academy's address (e.g. `https://jtr-academy.vercel.app`) and redeploy. The "Academy" link then appears in the website's menu and footer, and `/academy` on the website shows the academy. `/academy/interest` stays a website page.
-4. **Paystack.** Use your secret key, and set the webhook URL to `https://<website>/academy/api/paystack/webhook`.
+3. **Connect it to the website.** Recommended: give the academy its own subdomain, `academy.julestechright.com` (step-by-step in [DOMAINS.md](../DOMAINS.md)). Set `APP_URL` here to `https://academy.julestechright.com`, and in the website's Vercel project set `ACADEMY_PUBLIC_URL` to the same address. The "Academy" link then appears in the website's menu and footer and goes to the subdomain; old `/academy` links on the website redirect there. `/academy/interest` stays a website page. (Alternative: set `ACADEMY_URL` on the website instead, to serve the academy at `/academy` on the website.)
+4. **Paystack.** Use your secret key, and set the webhook URL to `<APP_URL>/academy/api/paystack/webhook`, e.g. `https://academy.julestechright.com/academy/api/paystack/webhook`.
 5. **Emails (Resend).** Verify the sending domain and set `RESEND_API_KEY`.
 
 | Variable | What it's for |
 | --- | --- |
-| `APP_URL` | The website's public address, e.g. `https://jtr-project.vercel.app` (used in emails and on certificates) |
-| `WEBSITE_URL` | The JTR website, for "back to website" links (usually the same as `APP_URL`) |
+| `APP_URL` | The address students use, e.g. `https://academy.julestechright.com` (used in emails, payment links and on certificates) |
+| `WEBSITE_URL` | The JTR website, for "back to website" links, e.g. `https://www.julestechright.com` |
 | `ALLOWED_ORIGINS` | Any other domain that forwards `/academy` here (the Vercel address and julestechright.com are already allowed) |
 | `SESSION_SECRET` | A long random string; required in production |
 | `DATABASE_URL` | Supabase connection string |

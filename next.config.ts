@@ -3,22 +3,35 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-// JTR Academy is a separate Next.js app (academy/ in this repository) served under /academy on this domain
-// (Next.js multi-zones). Set ACADEMY_URL to its deployment, e.g. https://jtr-academy.vercel.app.
+// JTR Academy is a separate Next.js app (academy/ in this repository). Two ways to connect it:
+// - ACADEMY_PUBLIC_URL (e.g. https://academy.julestechright.com): the academy has its own subdomain. The menu links
+//   there and old /academy links on this site redirect to it.
+// - ACADEMY_URL only (e.g. https://academy-six-mu.vercel.app): the academy is served under /academy on this site
+//   (Next.js multi-zones).
+// Either way /academy/interest stays a page of this site (the register-interest page printed on invite cards).
 const academyUrl = process.env.ACADEMY_URL?.trim().replace(/\/$/, "");
+const academyPublicUrl = process.env.ACADEMY_PUBLIC_URL?.trim().replace(/\/$/, "");
+const notInterest = "(?!interest(?:/|$)).*";
 
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx"],
   env: {
     // Shows the Academy link in the menus only once the academy is connected.
-    NEXT_PUBLIC_ACADEMY_ENABLED: academyUrl ? "1" : "",
+    NEXT_PUBLIC_ACADEMY_ENABLED: academyUrl || academyPublicUrl ? "1" : "",
+    NEXT_PUBLIC_ACADEMY_HREF: academyPublicUrl ? `${academyPublicUrl}/academy` : "/academy",
+  },
+  async redirects() {
+    if (!academyPublicUrl) return [];
+    return [
+      { source: "/academy", destination: `${academyPublicUrl}/academy`, permanent: false },
+      { source: `/academy/:path(${notInterest})`, destination: `${academyPublicUrl}/academy/:path`, permanent: false },
+    ];
   },
   async rewrites() {
-    if (!academyUrl) return [];
+    if (!academyUrl || academyPublicUrl) return [];
     return [
       { source: "/academy", destination: `${academyUrl}/academy` },
-      // /academy/interest stays on this site (the register-interest page printed on invite cards).
-      { source: "/academy/:path((?!interest(?:/|$)).*)", destination: `${academyUrl}/academy/:path` },
+      { source: `/academy/:path(${notInterest})`, destination: `${academyUrl}/academy/:path` },
     ];
   },
   // PGlite (the embedded Postgres used in test mode) ships WASM files that must not be bundled.
