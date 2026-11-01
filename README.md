@@ -43,19 +43,19 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Once the domain is live | The public address, e.g. `https://www.julestechright.com`. Used for canonical links, hreflang, the sitemap, Open Graph and JSON-LD. On Vercel it falls back to the project's production address (e.g. `jtr-project.vercel.app`) until you set it. |
+| `NEXT_PUBLIC_SITE_URL` | Once the domain is live | The public address, e.g. `https://www.jtechright.com`. Used for canonical links, hreflang, the sitemap, Open Graph and JSON-LD. On Vercel it falls back to the project's production address (e.g. `jtr-project.vercel.app`) until you set it. |
 | `ANTHROPIC_API_KEY` | For the assistant | Claude API key from https://console.anthropic.com. Server-side only. |
 | `RESEND_API_KEY` | Yes in production | Resend API key from https://resend.com. Server-side only. |
 | `LEADS_TO_EMAIL` | Recommended | Inbox that receives enquiries. Defaults to `siteConfig.contact.email`. |
-| `LEADS_FROM_EMAIL` | Recommended | Sender, e.g. `JTR Website <website@julestechright.com>`. Must be on a domain you have verified in Resend. |
+| `LEADS_FROM_EMAIL` | Recommended | Sender, e.g. `JTR Website <website@jtechright.com>`. Must be on a domain you have verified in Resend. |
 | `DATABASE_URL` | Recommended | Postgres (e.g. Supabase) for leads, Academy sign-ups and project settings. Without it a built-in test database is used, which Vercel wipes now and then. See [Admin board](#admin-board). |
 | `ADMIN_EMAIL` | Optional | Email address for the admin login. When set, `/admin` asks for it as well as the password. |
 | `ADMIN_PASSWORD` | For `/admin` | Password for the admin board. Locally `demo1234` is used when it is empty; in production `/admin` stays closed until it is set. |
 | `ACADEMY_DATABASE_URL` | Optional | Read access to JTR Academy's database for the admin board. Until it is set, the board says the academy is not connected. |
 | `WHATSAPP_AGENT_DATABASE_URL` | Optional | The WhatsApp sales agent's database, for the admin board's business list and "Add a business". Until it is set, the board says the academy is not connected. |
-| `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link, e.g. `https://agent.julestechright.com`. |
-| `ADMIN_HOST` | Optional | The admin board's subdomain, e.g. `admin.julestechright.com` (no `https://`). That address opens the board, and `/admin` on the main site redirects there. See [DOMAINS.md](DOMAINS.md). |
-| `ACADEMY_PUBLIC_URL` | Optional | JTR Academy's own subdomain, e.g. `https://academy.julestechright.com`. The menu's Academy link goes there and old `/academy` links redirect to it (`/academy/interest` stays here). |
+| `WHATSAPP_AGENT_URL` | Optional | The sales agent's address, shown as the owners' sign-in link, e.g. `https://agent.jtechright.com`. |
+| `ADMIN_HOST` | Optional | The admin board's subdomain, e.g. `admin.jtechright.com` (no `https://`). That address opens the board, and `/admin` on the main site redirects there. See [DOMAINS.md](DOMAINS.md). |
+| `ACADEMY_PUBLIC_URL` | Optional | JTR Academy's own subdomain, e.g. `https://academy.jtechright.com`. The menu's Academy link goes there and old `/academy` links redirect to it (`/academy/interest` stays here). |
 | `ACADEMY_URL` | Optional | Only if the academy should be served at `/academy` on this site instead of on its own subdomain: the academy's Vercel address. Ignored when `ACADEMY_PUBLIC_URL` is set. |
 
 ## Editing content

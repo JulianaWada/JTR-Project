@@ -68,7 +68,7 @@ Do these roughly in this order. Meta's business verification is the slowest step
 2. Copy the **secret key** (`sk_test_...` first, `sk_live_...` once approved) into `PAYSTACK_SECRET_KEY`.
 3. In Settings → API Keys & Webhooks, set the webhook URL to `https://<your-agent-domain>/api/paystack/webhook` (separately for test and live).
 4. So each business is paid directly, create a **subaccount** for each client business in Paystack and paste its code (`ACCT_...`) into that business's record. Without a subaccount, payments settle to JTR's account.
-5. Paystack needs an email for every payment; the agent uses `wa<phone>@customers.julestechright.com`. Change the domain with `PAYSTACK_PLACEHOLDER_EMAIL_DOMAIN` if you prefer.
+5. Paystack needs an email for every payment; the agent uses `wa<phone>@customers.jtechright.com`. Change the domain with `PAYSTACK_PLACEHOLDER_EMAIL_DOMAIN` if you prefer.
 
 ### 3. Anthropic
 
@@ -82,14 +82,14 @@ Create a free Supabase project (region: closest to Nigeria, e.g. West EU / Londo
 
 1. Create a **new Vercel project** from this repository with **Root Directory** set to `whatsapp-agent` (separate from the website project).
 2. Add the environment variables below and deploy.
-3. Point a domain at it, for example `agent.julestechright.com`, and set `APP_URL` to that address.
+3. Point a domain at it, for example `agent.jtechright.com`, and set `APP_URL` to that address.
 4. **Reminders** need `/api/cron/reminders` called every 10–15 minutes with the header `Authorization: Bearer <CRON_SECRET>`. Vercel's free plan only allows a daily cron, so either use the Pro plan with a `vercel.json` cron, or a free scheduler such as cron-job.org.
 
 ### Environment variables
 
 | Name | What it is |
 | --- | --- |
-| `APP_URL` | Public address of this app, e.g. `https://agent.julestechright.com` |
+| `APP_URL` | Public address of this app, e.g. `https://agent.jtechright.com` |
 | `SESSION_SECRET` | Long random string for dashboard sign-ins (required in production) |
 | `DATABASE_URL` | Supabase Postgres connection string |
 | `ANTHROPIC_API_KEY` | Claude API key |

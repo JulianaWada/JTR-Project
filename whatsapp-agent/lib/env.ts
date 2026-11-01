@@ -53,7 +53,7 @@ export const env = {
   },
   get paystackEmailDomain() {
     // Paystack needs an email for every payment; WhatsApp customers often have none.
-    return read("PAYSTACK_PLACEHOLDER_EMAIL_DOMAIN") ?? "customers.julestechright.com";
+    return read("PAYSTACK_PLACEHOLDER_EMAIL_DOMAIN") ?? "customers.jtechright.com";
   },
 
   // Dashboard and cron
