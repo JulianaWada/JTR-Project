@@ -12,7 +12,7 @@ export function getEmailProvider(): EmailProvider {
   const key = process.env.RESEND_API_KEY;
   if (key) {
     // TODO: use an address on your own verified Resend domain.
-    const from = process.env.LEADS_FROM_EMAIL ?? "JTR Website <website@julestechright.com>";
+    const from = process.env.LEADS_FROM_EMAIL ?? "JTR Website <website@jtechright.com>";
     return createResendProvider(key, from);
   }
   if (process.env.NODE_ENV === "production") {

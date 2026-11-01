@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     return [{ source: "/", destination: "/academy", basePath: false, permanent: false }];
   },
   experimental: {
-    serverActions: { allowedOrigins: ["jtr-project.vercel.app", "julestechright.com", "www.julestechright.com", ...forwardedOrigins] },
+    serverActions: { allowedOrigins: ["jtr-project.vercel.app", "jtechright.com", "www.jtechright.com", ...forwardedOrigins] },
   },
 };
 

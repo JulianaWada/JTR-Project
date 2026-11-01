@@ -17,7 +17,7 @@ export const siteConfig = {
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://www.julestechright.com"),
+      : "https://www.jtechright.com"),
   foundingCountry: "NG",
   headquarters: {
     // TODO: replace with the real office address.
@@ -30,14 +30,14 @@ export const siteConfig = {
   },
   contact: {
     // TODO: replace with the real contact email.
-    email: "hello@julestechright.com",
+    email: "hello@jtechright.com",
     // TODO: replace with the real phone number (E.164 format).
     phone: "+234 000 000 0000",
     phoneHref: "tel:+2340000000000",
     // TODO: replace with the real WhatsApp number (digits only, with country code).
     whatsapp: "2340000000000",
     // TODO: replace with the real careers inbox.
-    careersEmail: "careers@julestechright.com",
+    careersEmail: "careers@jtechright.com",
   },
   // TODO: replace with the real Cal.com booking link. Cal.com shows times in the visitor's time zone automatically.
   bookingUrl: "https://cal.com/julestechright/intro-call",

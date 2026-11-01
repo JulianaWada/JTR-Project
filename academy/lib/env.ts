@@ -10,7 +10,7 @@ function read(name: string): string | undefined {
 export const BASE_PATH = "/academy";
 
 export const env = {
-  /** The public origin students see, e.g. https://julestechright.com (the website forwards /academy here). */
+  /** The public origin students see, e.g. https://jtechright.com (the website forwards /academy here). */
   get appUrl() {
     return (read("APP_URL") ?? "http://localhost:3200").replace(/\/$/, "");
   },
@@ -48,7 +48,7 @@ export const env = {
     return read("RESEND_API_KEY");
   },
   get emailFrom() {
-    return read("EMAIL_FROM") ?? "JTR Academy <academy@julestechright.com>";
+    return read("EMAIL_FROM") ?? "JTR Academy <academy@jtechright.com>";
   },
 
   // Sessions and cron

@@ -4,7 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 // JTR Academy is a separate Next.js app (academy/ in this repository). Two ways to connect it:
-// - ACADEMY_PUBLIC_URL (e.g. https://academy.julestechright.com): the academy has its own subdomain. The menu links
+// - ACADEMY_PUBLIC_URL (e.g. https://academy.jtechright.com): the academy has its own subdomain. The menu links
 //   there and old /academy links on this site redirect to it.
 // - ACADEMY_URL only (e.g. https://academy-six-mu.vercel.app): the academy is served under /academy on this site
 //   (Next.js multi-zones).

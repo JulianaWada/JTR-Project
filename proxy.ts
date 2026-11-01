@@ -5,7 +5,7 @@ import { routing } from "./i18n/routing";
 const intl = createMiddleware(routing);
 
 /**
- * The admin board's own subdomain, e.g. admin.julestechright.com (optional). The board stays at /admin in this app;
+ * The admin board's own subdomain, e.g. admin.jtechright.com (optional). The board stays at /admin in this app;
  * when ADMIN_HOST is set, that host opens the board and /admin on the other addresses redirects there.
  */
 function adminHost() {
