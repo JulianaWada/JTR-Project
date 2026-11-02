@@ -54,7 +54,7 @@ export default async function LearnHome() {
             const state = nextClass ? classState(nextClass) : null;
             return (
               <article key={enrolment.id} className="overflow-hidden rounded-card border border-line bg-surface shadow-[var(--card-shadow)]">
-                <CourseArt slug={course.slug} accent={course.accent} className="h-28" />
+                <CourseArt slug={course.slug} accent={course.accent} className="h-36" />
                 <div className="p-6">
                   <div className="flex flex-wrap items-center gap-2">
                     <Pill tone={course.accent === "violet" ? "violet" : "primary"}>{cohort.selfPaced ? "Video course" : `${cohort.name} intake`}</Pill>
