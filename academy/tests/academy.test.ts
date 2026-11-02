@@ -11,6 +11,7 @@ import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
 import { readFileSync } from "node:fs";
+import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { askTutor } from "@/lib/tutor";
@@ -186,6 +187,23 @@ describe("class reminders", () => {
     await db.update(schema.classes).set({ startsAt: addMinutes(new Date(), 120) }).where(eq(schema.classes.id, first.id));
     expect((await sendClassReminders(db)).emails).toBe(1);
     expect((await sendClassReminders(db)).emails).toBe(0);
+  });
+});
+
+describe("Google Meet links", () => {
+  it("accepts a pasted Meet link, with or without https://, and rejects anything else", () => {
+    expect(cleanMeetUrl("https://meet.google.com/abc-defg-hij")).toEqual({ url: "https://meet.google.com/abc-defg-hij" });
+    expect(cleanMeetUrl("  meet.google.com/abc-defg-hij ")).toEqual({ url: "https://meet.google.com/abc-defg-hij" });
+    expect(cleanMeetUrl("")).toEqual({ url: "" });
+    expect(cleanMeetUrl("abc defg")).toHaveProperty("error");
+    expect(cleanMeetUrl("http://meet.google.com/abc")).toHaveProperty("error");
+  });
+
+  it("lists live intakes that haven't finished, not video courses or past intakes", async () => {
+    const live = await createInMemoryDb();
+    const s = await seedCourses(live, { demo: true });
+    const ids = (await liveIntakes(live)).map((i) => i.cohort.id);
+    expect(ids).toEqual([s.animationNext.cohort.id]);
   });
 });
 

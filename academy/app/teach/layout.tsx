@@ -2,11 +2,13 @@ import { count, isNull } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
 import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { liveIntakes } from "@/lib/meet-links";
 
 export default async function TeachLayout({ children }: { children: React.ReactNode }) {
   const user = await requireTeacher();
   const db = await getDb();
   const [{ value: toMark }] = await db.select({ value: count() }).from(schema.submissions).where(isNull(schema.submissions.grade));
+  const noMeetLink = (await liveIntakes(db)).filter((i) => !i.cohort.meetUrl).length;
   return (
     <AppShell
       user={user}
@@ -15,6 +17,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
       items={[
         { href: "/teach", label: "Overview", icon: "grid", exact: true },
         { href: "/teach/courses", label: "Courses & intakes", icon: "book" },
+        { href: "/teach/meet", label: "Meet links", icon: "video", badge: noMeetLink },
         { href: "/teach/marking", label: "Marking", icon: "check", badge: toMark },
         { href: "/teach/payments", label: "Payments", icon: "wallet" },
         { href: "/teach/tutor", label: "Tutor questions", icon: "sparkles" },
