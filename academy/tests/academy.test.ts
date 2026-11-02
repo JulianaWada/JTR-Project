@@ -90,8 +90,11 @@ describe("enrolment and payment", () => {
 
   it("lets students abroad pay the dollar price, with discount codes, and checks the currency", async () => {
     const cohortId = seeded.animationNext.cohort.id;
-    expect(await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null, "USD")).toEqual({ error: expect.stringContaining("naira") });
     expect(seeded.animationCourse.priceUsdCents).toBe(3500);
+    expect(seeded.salesCourse.priceUsdCents).toBe(3500);
+    // A course the teacher left without a dollar price can only be paid in naira.
+    await db.update(schema.courses).set({ priceUsdCents: null }).where(eq(schema.courses.id, seeded.salesCourse.id));
+    expect(await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null, "USD")).toEqual({ error: expect.stringContaining("naira") });
     await db.insert(schema.discountCodes).values({ code: "ANIMATE20", percentOff: 20, maxUses: 20, courseId: seeded.animationCourse.id });
     const result = await startCheckout(db, student, cohortId, "animate20", "USD");
     const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;

@@ -45,6 +45,7 @@ export const salesCourse: CourseTemplate = {
     "Leave with a written AI sales plan for your own business",
   ],
   priceNaira: 50000,
+  priceUsd: 35,
   format: "recorded",
   accent: "blue",
   outline: [

@@ -70,7 +70,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
       <section className="card mt-8">
         <h2 className="font-display text-lg font-semibold text-ink">Add a new course</h2>
         <p className="mt-1 text-sm text-muted">It starts as a draft with a 6-week outline. Publish it when it&apos;s ready.</p>
-        <form action={createCourse} className="mt-4 grid gap-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end">
+        <form action={createCourse} className="mt-4 grid gap-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
           <div>
             <label className="label" htmlFor="title">
               Title
@@ -82,6 +82,12 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
               Price (₦)
             </label>
             <input className="input" id="price" name="price" type="number" min={0} step={500} required defaultValue={50000} />
+          </div>
+          <div>
+            <label className="label" htmlFor="priceUsd">
+              Price outside Nigeria ($)
+            </label>
+            <input className="input" id="priceUsd" name="priceUsd" type="number" min={1} step={1} defaultValue={35} placeholder="Naira only" />
           </div>
           <button className="btn-primary">Create course</button>
         </form>
