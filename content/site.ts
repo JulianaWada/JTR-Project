@@ -125,6 +125,14 @@ export const projects: {
     status: "live",
     href: "https://ufedo.app/",
   },
+  {
+    id: "douceur-nuage",
+    service: "websites",
+    region: "global",
+    year: 2026,
+    status: "live",
+    href: "https://douceurnuage.com/",
+  },
 ];
 
 export const valueIds = [
