@@ -79,17 +79,6 @@ export async function Footer() {
                 {siteConfig.contact.email}
               </a>
             </li>
-            <li>
-              <a href={siteConfig.contact.phoneHref} className="transition-colors hover:text-primary" dir="ltr">
-                {siteConfig.contact.phone}
-              </a>
-            </li>
-            <li>
-              <a href={siteConfig.bookingUrl} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
-                {t("nav.bookCall")}
-                <span className="sr-only"> {t("a11y.opensInNewTab")}</span>
-              </a>
-            </li>
           </ul>
           <h2 className="mt-8 text-sm font-semibold tracking-wide text-silver uppercase">{t("footer.legal")}</h2>
           <ul className="mt-4 space-y-3 text-muted">

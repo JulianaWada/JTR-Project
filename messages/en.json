@@ -31,8 +31,7 @@
     "careers": "Careers",
     "contact": "Contact",
     "assistant": "AI Assistant",
-    "startProject": "Start a project",
-    "bookCall": "Book a call"
+    "startProject": "Start a project"
   },
   "localeSuggestion": {
     "message": "This site is also available in {language}.",
@@ -45,7 +44,6 @@
     "viewAll": "View all",
     "startProject": "Start a project",
     "talkToAssistant": "Talk to our AI assistant",
-    "bookCall": "Book a call",
     "contactUs": "Contact us",
     "placeholder": "Placeholder",
     "comingSoon": "Coming soon",
@@ -211,8 +209,7 @@
     },
     "cta": {
       "title": "Have an idea? Let's build it together.",
-      "subtitle": "Tell us what you're working on. We'll reply within one business day, wherever you are in the world.",
-      "whatsapp": "Chat on WhatsApp"
+      "subtitle": "Tell us what you're working on. We'll reply within one business day, wherever you are in the world."
     }
   },
   "about": {
@@ -365,7 +362,7 @@
   "contact": {
     "meta": {
       "title": "Contact",
-      "description": "Start a project with Jules TechRight. Contact us by form, email, phone or WhatsApp, or book a call at a time that suits you."
+      "description": "Start a project with Jules TechRight. Contact us by form or email."
     },
     "hero": {
       "eyebrow": "Contact",
@@ -375,10 +372,6 @@
     "channels": {
       "title": "Other ways to reach us",
       "email": "Email",
-      "phone": "Phone",
-      "whatsapp": "WhatsApp",
-      "book": "Book a call",
-      "bookNote": "Pick a slot in your own time zone.",
       "hq": "Headquarters",
       "mapTitle": "Map of our Lagos office",
       "mapPlaceholder": "Map coming soon"

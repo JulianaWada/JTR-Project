@@ -32,8 +32,7 @@
     "careers": "Carrières",
     "contact": "Contact",
     "assistant": "Assistant IA",
-    "startProject": "Lancer un projet",
-    "bookCall": "Réserver un appel"
+    "startProject": "Lancer un projet"
   },
   "localeSuggestion": {
     "message": "Ce site est également disponible en {language}.",
@@ -46,7 +45,6 @@
     "viewAll": "Tout voir",
     "startProject": "Lancer un projet",
     "talkToAssistant": "Parler à notre assistant IA",
-    "bookCall": "Réserver un appel",
     "contactUs": "Nous contacter",
     "placeholder": "Contenu provisoire",
     "comingSoon": "Bientôt disponible",
@@ -212,8 +210,7 @@
     },
     "cta": {
       "title": "Une idée ? Construisons-la ensemble.",
-      "subtitle": "Parlez-nous de votre projet. Nous vous répondons sous un jour ouvré, où que vous soyez dans le monde.",
-      "whatsapp": "Discuter sur WhatsApp"
+      "subtitle": "Parlez-nous de votre projet. Nous vous répondons sous un jour ouvré, où que vous soyez dans le monde."
     }
   },
   "about": {
@@ -366,7 +363,7 @@
   "contact": {
     "meta": {
       "title": "Contact",
-      "description": "Lancez un projet avec Jules TechRight. Contactez-nous via le formulaire, par e-mail, par téléphone ou sur WhatsApp, ou réservez un appel au moment qui vous convient."
+      "description": "Lancez un projet avec Jules TechRight. Contactez-nous via le formulaire ou par e-mail."
     },
     "hero": {
       "eyebrow": "Contact",
@@ -376,10 +373,6 @@
     "channels": {
       "title": "Autres moyens de nous joindre",
       "email": "E-mail",
-      "phone": "Téléphone",
-      "whatsapp": "WhatsApp",
-      "book": "Réserver un appel",
-      "bookNote": "Choisissez un créneau dans votre propre fuseau horaire.",
       "hq": "Siège",
       "mapTitle": "Carte de notre bureau de Lagos",
       "mapPlaceholder": "Carte bientôt disponible"

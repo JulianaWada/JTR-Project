@@ -29,18 +29,11 @@ export const siteConfig = {
     countryCode: "NG",
   },
   contact: {
-    // TODO: replace with the real contact email.
+    // Forwards to Jules's inbox.
     email: "hello@jtechright.com",
-    // TODO: replace with the real phone number (E.164 format).
-    phone: "+234 000 000 0000",
-    phoneHref: "tel:+2340000000000",
-    // TODO: replace with the real WhatsApp number (digits only, with country code).
-    whatsapp: "2340000000000",
     // TODO: replace with the real careers inbox.
     careersEmail: "careers@jtechright.com",
   },
-  // TODO: replace with the real Cal.com booking link. Cal.com shows times in the visitor's time zone automatically.
-  bookingUrl: "https://cal.com/julestechright/intro-call",
   // TODO: replace with a real Google Maps embed URL for the Lagos office.
   mapEmbedUrl: "",
   social: [
