@@ -8,6 +8,17 @@ export function naira(kobo: number): string {
   })}`;
 }
 
+/** $35 from 3500 cents. Cents are shown only when present. */
+export function usd(cents: number): string {
+  const hasCents = cents % 100 !== 0;
+  return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
+/** An amount in its currency's smallest unit (kobo or cents), formatted for display. */
+export function money(minor: number, currency: "NGN" | "USD" = "NGN"): string {
+  return currency === "USD" ? usd(minor) : naira(minor);
+}
+
 export function koboFromNaira(value: number): number {
   return Math.round(value * 100);
 }

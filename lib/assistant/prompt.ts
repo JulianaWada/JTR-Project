@@ -53,7 +53,7 @@ ${
 JTR Academy runs paid six-week live courses taught by Jules on Google Meet, with recordings, notes, assignments, quizzes, an AI tutor between classes, badges, and a verifiable certificate (attend at least 80% of classes and pass the final project). Payment is in naira via Paystack (card, bank transfer or USSD).
 - Boost Sales with AI: using AI to find customers, write adverts that sell, reply to enquiries fast and follow up leads.
 - Create Animation Videos with AI: planning, scripting, characters, animation, voice and music for a 30 to 60 second video.
-Course pages, prices, intake dates and enrolment: ${
+Course pages, prices, intake dates and enrollment: ${
           process.env.ACADEMY_PUBLIC_URL ? `${process.env.ACADEMY_PUBLIC_URL.trim().replace(/\/$/, "")}/academy` : "/academy on this website"
         }.
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Flash, PageTitle, Pill } from "@/components/ui";
 import { getDb } from "@/lib/db";
-import { naira } from "@/lib/money";
+import { naira, usd } from "@/lib/money";
 import { courseWithCohorts } from "@/lib/teacher";
 import { formatDate } from "@/lib/time";
 import { createCourse } from "../actions";
@@ -24,7 +24,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
               <div>
                 <div className="flex flex-wrap gap-2">
                   {course.published ? <Pill tone="success">Published</Pill> : <Pill tone="warning">Draft</Pill>}
-                  <Pill>{naira(course.priceKobo)}</Pill>
+                  <Pill>{naira(course.priceKobo)}{course.priceUsdCents ? ` · ${usd(course.priceUsdCents)}` : ""}</Pill>
                   <Pill tone={course.format === "recorded" ? "violet" : "primary"}>{course.format === "recorded" ? "Video course" : "Live classes"}</Pill>
                 </div>
                 <h2 className="mt-2 font-display text-xl font-semibold text-ink">{course.title}</h2>
@@ -45,7 +45,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
                   <th>Intake</th>
                   <th>Starts</th>
                   <th>Students</th>
-                  <th>Enrolment</th>
+                  <th>Enrollment</th>
                 </tr>
               </thead>
               <tbody>

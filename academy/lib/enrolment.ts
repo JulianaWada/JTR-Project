@@ -1,9 +1,9 @@
 import { and, count, eq, ne, sql } from "drizzle-orm";
 import type { Database } from "@/lib/db";
-import { cohorts, courses, discountCodes, enrolments, payments, users, type users as usersTable } from "@/lib/db/schema";
+import { cohorts, courses, discountCodes, enrolments, payments, users, type Currency, type users as usersTable } from "@/lib/db/schema";
 import { sendEmail } from "@/lib/email";
 import { env, url } from "@/lib/env";
-import { naira, shortCode } from "@/lib/money";
+import { money, shortCode } from "@/lib/money";
 import { initializeTransaction } from "@/lib/paystack";
 import { formatDateTime } from "@/lib/time";
 
@@ -35,11 +35,17 @@ export async function priceFor(db: Database, courseId: string, priceKobo: number
 export type CheckoutResult = { redirectTo: string } | { error: string };
 
 /** Creates the pending enrolment and payment, then hands back where the student should pay. */
-export async function startCheckout(db: Database, user: User, cohortId: string, discount: string | null): Promise<CheckoutResult> {
+export async function startCheckout(
+  db: Database,
+  user: User,
+  cohortId: string,
+  discount: string | null,
+  currency: Currency = "NGN",
+): Promise<CheckoutResult> {
   const cohort = await db.query.cohorts.findFirst({ where: eq(cohorts.id, cohortId) });
   if (!cohort) return { error: "That intake doesn't exist." };
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
-  if (!cohort.enrolmentOpen || !course.published) return { error: "Enrolment for this intake is closed." };
+  if (!cohort.enrolmentOpen || !course.published) return { error: "Enrollment for this intake is closed." };
 
   const existing = await db.query.enrolments.findFirst({
     where: and(eq(enrolments.userId, user.id), eq(enrolments.cohortId, cohortId)),
@@ -47,7 +53,10 @@ export async function startCheckout(db: Database, user: User, cohortId: string, 
   if (existing?.status === "active") return { redirectTo: `/learn/${cohortId}` };
   if ((await seatsTaken(db, cohortId)) >= cohort.capacity) return { error: "Sorry, this intake is full. Try the next one." };
 
-  const price = await priceFor(db, course.id, course.priceKobo, discount);
+  // Students abroad can pay the course's dollar price, when it has one.
+  if (currency === "USD" && !course.priceUsdCents) return { error: "This course can only be paid in naira." };
+  const listPrice = currency === "USD" ? course.priceUsdCents! : course.priceKobo;
+  const price = await priceFor(db, course.id, listPrice, discount);
   if ("error" in price) return { error: price.error ?? "Invalid code." };
 
   const enrolment =
@@ -64,7 +73,8 @@ export async function startCheckout(db: Database, user: User, cohortId: string, 
       reference,
       enrolmentId: enrolment.id,
       amountKobo: 0,
-      listPriceKobo: course.priceKobo,
+      listPriceKobo: listPrice,
+      currency,
       discountCode: price.code,
       provider: "test",
     });
@@ -83,7 +93,8 @@ export async function startCheckout(db: Database, user: User, cohortId: string, 
     reference,
     enrolmentId: enrolment.id,
     amountKobo: price.amountKobo,
-    listPriceKobo: course.priceKobo,
+    listPriceKobo: listPrice,
+    currency,
     discountCode: price.code,
     provider,
   });
@@ -93,6 +104,7 @@ export async function startCheckout(db: Database, user: User, cohortId: string, 
     const { authorizationUrl } = await initializeTransaction({
       email: user.email,
       amountKobo: price.amountKobo,
+      currency,
       reference,
       callbackUrl: url(`/pay/done?reference=${reference}`),
       metadata: { course: course.title, cohort: cohort.name, student: user.name },
@@ -105,11 +117,11 @@ export async function startCheckout(db: Database, user: User, cohortId: string, 
 }
 
 /** Activates the enrolment for a successful payment. Safe to call more than once. */
-export async function markPaymentSuccessful(db: Database, reference: string, check?: { amountKobo: number }) {
+export async function markPaymentSuccessful(db: Database, reference: string, check?: { amountKobo: number; currency: string }) {
   const payment = await db.query.payments.findFirst({ where: eq(payments.reference, reference) });
   if (!payment || payment.status === "success") return payment ?? null;
-  if (check && check.amountKobo < payment.amountKobo) {
-    console.error("[payments] amount mismatch", reference, check.amountKobo, payment.amountKobo);
+  if (check && (check.currency !== payment.currency || check.amountKobo < payment.amountKobo)) {
+    console.error("[payments] amount or currency mismatch", reference, check, payment.amountKobo, payment.currency);
     return null;
   }
   const now = new Date();
@@ -140,7 +152,7 @@ export async function markPaymentSuccessful(db: Database, reference: string, che
     where: (c, { eq }) => eq(c.cohortId, cohort.id),
     orderBy: (c, { asc }) => asc(c.startsAt),
   });
-  const intro = `Your payment of ${naira(payment.amountKobo)} was received. Reference: ${reference}.`;
+  const intro = `Your payment of ${money(payment.amountKobo, payment.currency)} was received. Reference: ${reference}.`;
   await sendEmail(db, {
     to: user.email,
     subject: `You're enrolled: ${course.title}`,

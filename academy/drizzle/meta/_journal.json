@@ -29,6 +29,13 @@
       "when": 1793647133657,
       "tag": "0003_daily_courses",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793651270293,
+      "tag": "0004_usd_prices",
+      "breakpoints": true
     }
   ]
 }

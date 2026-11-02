@@ -44,7 +44,9 @@ export type AcademyPayment = {
   student: string;
   course: string;
   cohort: string;
+  /** Smallest unit of `currency`: kobo for NGN, cents for USD. */
   amountKobo: number;
+  currency: "NGN" | "USD";
   discountCode: string | null;
   status: string;
   provider: string;
@@ -74,7 +76,8 @@ export async function listCourses(): Promise<AcademyCourse[]> {
       (select count(*) from enrolments e join cohorts h on h.id = e.cohort_id
         where h.course_id = c.id and e.status = 'active')::int as active_students,
       (select coalesce(sum(p.amount_kobo), 0) from payments p join enrolments e on e.id = p.enrolment_id
-        join cohorts h on h.id = e.cohort_id where h.course_id = c.id and p.status = 'success')::bigint as revenue_kobo
+        join cohorts h on h.id = e.cohort_id where h.course_id = c.id and p.status = 'success'
+          and coalesce(to_jsonb(p)->>'currency', 'NGN') = 'NGN')::bigint as revenue_kobo
     from courses c order by c.sort_order, c.created_at`;
   return rows.map((r) => ({
     id: r.id,
@@ -133,7 +136,7 @@ export async function listPayments(limit = 50): Promise<AcademyPayment[]> {
   if (academyMode() === "off") return [];
   const rows = await db()`
     select p.id, p.reference, u.name as student, c.title as course, h.name as cohort,
-      p.amount_kobo, p.discount_code, p.status, p.provider, p.created_at
+      p.amount_kobo, coalesce(to_jsonb(p)->>'currency', 'NGN') as currency, p.discount_code, p.status, p.provider, p.created_at
     from payments p join enrolments e on e.id = p.enrolment_id join users u on u.id = e.user_id
       join cohorts h on h.id = e.cohort_id join courses c on c.id = h.course_id
     order by p.created_at desc limit ${limit}`;
@@ -144,6 +147,7 @@ export async function listPayments(limit = 50): Promise<AcademyPayment[]> {
     course: r.course,
     cohort: r.cohort,
     amountKobo: r.amount_kobo,
+    currency: r.currency === "USD" ? "USD" : "NGN",
     discountCode: r.discount_code,
     status: r.status,
     provider: r.provider,

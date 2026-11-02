@@ -39,7 +39,7 @@ export async function SiteHeader() {
                 Log in
               </Link>
               <Link href="/#courses" className="btn-primary ms-1">
-                Enrol
+                Enroll
               </Link>
             </>
           )}

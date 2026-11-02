@@ -22,6 +22,8 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
 export async function initializeTransaction(input: {
   email: string;
   amountKobo: number;
+  /** NGN by default. USD needs USD payments turned on in the Paystack dashboard. */
+  currency?: "NGN" | "USD";
   reference: string;
   callbackUrl: string;
   subaccount?: string | null;
@@ -32,7 +34,7 @@ export async function initializeTransaction(input: {
     body: JSON.stringify({
       email: input.email,
       amount: input.amountKobo,
-      currency: "NGN",
+      currency: input.currency ?? "NGN",
       reference: input.reference,
       callback_url: input.callbackUrl,
       metadata: input.metadata,

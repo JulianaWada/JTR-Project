@@ -7,7 +7,7 @@ import { Flash, PageTitle, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
 import { getDb, schema } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
-import { naira } from "@/lib/money";
+import { money } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { issueCertificateAction, revokeCertificateAction, saveAttendance, sendAnnouncement, updateCohort } from "../../actions";
@@ -66,8 +66,8 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
       </Link>
       <PageTitle title={selfPaced ? `${course.title}: video lessons` : `${course.title}: ${cohort.name}`}>
         {selfPaced
-          ? `Self-paced · ${active.length} students · ${cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}`
-          : `Starts ${formatDate(cohort.startsAt)} · ${active.length}/${cohort.capacity} students · ${cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}`}
+          ? `Self-paced · ${active.length} students · ${cohort.enrolmentOpen ? "enrollment open" : "enrollment closed"}`
+          : `Starts ${formatDate(cohort.startsAt)} · ${active.length}/${cohort.capacity} students · ${cohort.enrolmentOpen ? "enrollment open" : "enrollment closed"}`}
       </PageTitle>
       <Flash searchParams={searchParams} />
       {meetIntake && (
@@ -148,7 +148,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                         {user.email}
                         {user.phone ? ` · ${user.phone}` : ""}
                       </p>
-                      <p className="text-xs text-muted">{paid ? `Paid ${naira(paid.amountKobo)}` : "Added without payment"}</p>
+                      <p className="text-xs text-muted">{paid ? `Paid ${money(paid.amountKobo, paid.currency)}` : "Added without payment"}</p>
                     </td>
                     {lessons.map((l) => (
                       <td key={l.id} className="text-center">
@@ -208,7 +208,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
           </form>
         </section>
         <section className="card">
-          <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Enrolment" : "Intake settings"}</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{selfPaced ? "Enrollment" : "Intake settings"}</h2>
           <form action={updateCohort.bind(null, cohortId)} className="mt-4 space-y-3">
             {selfPaced ? (
               <>
@@ -234,7 +234,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
               </>
             )}
             <label className="flex items-center gap-2 text-sm text-ink">
-              <input type="checkbox" name="enrolmentOpen" defaultChecked={cohort.enrolmentOpen} /> Enrolment open
+              <input type="checkbox" name="enrolmentOpen" defaultChecked={cohort.enrolmentOpen} /> Enrollment open
             </label>
             <button className="btn-primary btn-sm">Save settings</button>
           </form>

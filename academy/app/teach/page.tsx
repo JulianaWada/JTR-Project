@@ -8,7 +8,7 @@ import { asset } from "@/lib/assets";
 import { getDb } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
 import { classState, untilText } from "@/lib/learn";
-import { naira } from "@/lib/money";
+import { naira, usd } from "@/lib/money";
 import { teacherDashboard, type Activity } from "@/lib/teacher";
 import { formatDateTime } from "@/lib/time";
 import { lessonLabel } from "@/lib/lesson-unit";
@@ -102,7 +102,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
           icon="wallet"
           tone="green"
           value={naira(d.incomeThisMonthKobo)}
-          hint={change === null ? `${naira(d.totalIncomeKobo)} in total` : `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}% on last month · ${naira(d.totalIncomeKobo)} in total`}
+          hint={`${change === null ? "" : `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}% on last month · `}${naira(d.totalIncomeKobo)} in total${d.totalIncomeUsdCents ? ` · plus ${usd(d.totalIncomeUsdCents)} in dollars` : ""}`}
         />
         <KpiCard label="Active students" icon="users" value={d.activeStudents} hint={`${d.newStudents} joined in the last 30 days`} />
         <KpiCard
@@ -213,7 +213,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
           <h2 className="font-display text-lg font-semibold text-ink">Recent activity</h2>
           {d.activity.length === 0 ? (
             <div className="mt-4">
-              <Empty>Enrolments, handed-in work and certificates will show up here.</Empty>
+              <Empty>Enrollments, handed-in work and certificates will show up here.</Empty>
             </div>
           ) : (
             <ul className="mt-4 space-y-3">

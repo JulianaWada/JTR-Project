@@ -32,7 +32,7 @@ export default async function InterestPage({ searchParams }: { searchParams: Pro
             <Link href="/en/academy/interest" className="font-semibold text-primary">
               /academy/interest
             </Link>
-            . Message them on WhatsApp when enrolment opens.
+            . Message them on WhatsApp when enrollment opens.
           </>
         }
         actions={

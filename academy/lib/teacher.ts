@@ -25,7 +25,9 @@ export async function teacherDashboard(db: Database, now = new Date()) {
   const courseOfCohort = (id: string) => courseRows.find((c) => c.id === cohortOf(id)?.courseId);
   const enrolmentById = new Map(enrolmentRows.map((e) => [e.id, e]));
 
-  const paid = paymentRows.filter((p) => p.status === "success" && p.paidAt);
+  // Naira and dollar payments can't be added together: the income figures are naira, dollars are totalled separately.
+  const paidAny = paymentRows.filter((p) => p.status === "success" && p.paidAt);
+  const paid = paidAny.filter((p) => p.currency === "NGN");
   const monthKey = (d: Date) => d.getUTCFullYear() * 12 + d.getUTCMonth();
   const thisMonth = monthKey(now);
   const incomeByMonth = Array.from({ length: 6 }, (_, i) => {
@@ -72,7 +74,7 @@ export async function teacherDashboard(db: Database, now = new Date()) {
     .slice(0, 5);
 
   const activity: Activity[] = [
-    ...paid.flatMap((p) => {
+    ...paidAny.flatMap((p) => {
       const e = enrolmentById.get(p.enrolmentId);
       if (!e) return [];
       return [{ at: p.paidAt!, kind: "payment" as const, text: `${userName(e.userId)} enrolled in ${courseOfCohort(e.cohortId)?.title ?? "a course"}`, href: "/teach/payments" }];
@@ -93,6 +95,7 @@ export async function teacherDashboard(db: Database, now = new Date()) {
     incomeThisMonthKobo: incomeByMonth[5].kobo,
     incomeLastMonthKobo: incomeByMonth[4].kobo,
     totalIncomeKobo: paid.reduce((sum, p) => sum + p.amountKobo, 0),
+    totalIncomeUsdCents: paidAny.filter((p) => p.currency === "USD").reduce((sum, p) => sum + p.amountKobo, 0),
     incomeByMonth,
     activeStudents: new Set(active.map((e) => e.userId)).size,
     newStudents,
