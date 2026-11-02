@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BarChart, BarList, KpiCard } from "@/components/charts";
 import { Icon, type IconName } from "@/components/icons";
-import { Empty, Pill } from "@/components/ui";
+import { MeetLinkCard } from "@/components/meet-link-card";
+import { Empty, Flash, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
 import { getDb } from "@/lib/db";
+import { liveIntakes } from "@/lib/meet-links";
 import { classState, untilText } from "@/lib/learn";
 import { naira } from "@/lib/money";
 import { teacherDashboard, type Activity } from "@/lib/teacher";
@@ -37,8 +39,10 @@ const activityIcon: Record<Activity["kind"], { icon: IconName; chip: string }> =
   question: { icon: "sparkles", chip: "bg-warning-soft text-warning" },
 };
 
-export default async function TeachHome() {
-  const d = await teacherDashboard(await getDb());
+export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
+  const db = await getDb();
+  const d = await teacherDashboard(db);
+  const needLink = (await liveIntakes(db)).filter((i) => !i.cohort.meetUrl);
   const change = d.incomeLastMonthKobo ? Math.round(((d.incomeThisMonthKobo - d.incomeLastMonthKobo) / d.incomeLastMonthKobo) * 100) : null;
   const todo = [
     d.toMark.length > 0 && { href: "/teach/marking", icon: "check" as const, text: `${d.toMark.length} ${d.toMark.length === 1 ? "piece" : "pieces"} of work to mark` },
@@ -53,7 +57,7 @@ export default async function TeachHome() {
       text: `${d.missingRecordings.length} recent live ${d.missingRecordings.length === 1 ? "class has" : "classes have"} no recording`,
     },
     d.noMeetLink.length > 0 && {
-      href: `/teach/cohorts/${d.noMeetLink[0].cohortId}`,
+      href: "/teach/meet",
       icon: "alert" as const,
       text: `${d.noMeetLink.length} ${d.noMeetLink.length === 1 ? "class" : "classes"} in the next 2 weeks without a Meet link`,
     },
@@ -77,6 +81,20 @@ export default async function TeachHome() {
           </Link>
         </div>
       </div>
+
+      <Flash searchParams={searchParams} />
+      {needLink.length > 0 && (
+        <div className="mb-6 space-y-4">
+          {needLink.slice(0, 2).map((intake) => (
+            <MeetLinkCard key={intake.cohort.id} intake={intake} returnTo="/teach" />
+          ))}
+          {needLink.length > 2 && (
+            <Link href="/teach/meet" className="text-sm font-medium text-primary hover:underline">
+              {needLink.length - 2} more {needLink.length - 2 === 1 ? "intake needs" : "intakes need"} a Meet link →
+            </Link>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard

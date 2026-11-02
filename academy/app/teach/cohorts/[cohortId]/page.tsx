@@ -2,9 +2,11 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MeetLinkCard } from "@/components/meet-link-card";
 import { Flash, PageTitle, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
 import { getDb, schema } from "@/lib/db";
+import { liveIntakes } from "@/lib/meet-links";
 import { naira } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
@@ -55,6 +57,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
   const pending = enrolled.filter((e) => e.status === "pending").map((e) => people.find((p) => p.id === e.userId)!);
   const now = new Date();
   const selfPaced = cohort.selfPaced;
+  const meetIntake = selfPaced ? undefined : (await liveIntakes(db, now)).find((i) => i.cohort.id === cohortId);
 
   return (
     <>
@@ -67,6 +70,11 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
           : `Starts ${formatDate(cohort.startsAt)} · ${active.length}/${cohort.capacity} students · ${cohort.enrolmentOpen ? "enrolment open" : "enrolment closed"}`}
       </PageTitle>
       <Flash searchParams={searchParams} />
+      {meetIntake && (
+        <div className="mb-6">
+          <MeetLinkCard intake={meetIntake} returnTo={`/teach/cohorts/${cohortId}`} />
+        </div>
+      )}
 
       <section className="card">
         <div className="flex items-center justify-between gap-2">
@@ -222,12 +230,6 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                     </label>
                     <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={cohort.capacity} />
                   </div>
-                </div>
-                <div>
-                  <label className="label" htmlFor="meetUrl">
-                    Google Meet link for all classes
-                  </label>
-                  <input className="input" id="meetUrl" name="meetUrl" type="url" defaultValue={cohort.meetUrl} placeholder="https://meet.google.com/…" />
                 </div>
               </>
             )}

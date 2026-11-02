@@ -8,6 +8,7 @@ import { checkCompletion, issueCertificate, revokeCertificate } from "@/lib/cert
 import { getDb, schema } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { url } from "@/lib/env";
+import { cleanMeetUrl } from "@/lib/meet-links";
 import { koboFromNaira } from "@/lib/money";
 import { parseQuiz, parseResources } from "@/lib/quiz-format";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
@@ -194,15 +195,32 @@ export async function createCohort(courseId: string, form: FormData) {
   redirect(`/teach/cohorts/${cohort.id}?saved=${encodeURIComponent(daily ? "Intake created with a class on each day of the outline." : "Intake created with a weekly class for each week of the outline.")}`);
 }
 
+/** The Meet links page (and the overview): set the one link every class of an intake uses. */
+export async function saveMeetLink(cohortId: string, returnTo: string, form: FormData) {
+  await requireTeacher();
+  const db = await getDb();
+  const path = returnTo.startsWith("/teach") ? returnTo : "/teach/meet";
+  const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
+  if (!cohort) back(path, { error: "Intake not found." });
+  const cleaned = cleanMeetUrl(str(form, "meetUrl"));
+  if ("error" in cleaned) back(path, { error: cleaned.error });
+  await db.update(schema.cohorts).set({ meetUrl: cleaned.url }).where(eq(schema.cohorts.id, cohortId));
+  revalidatePath("/", "layout");
+  back(path, { saved: cleaned.url ? `Meet link saved for ${cohort.name}. Students join with it from their dashboard.` : `Meet link removed from ${cohort.name}.` });
+}
+
 export async function updateCohort(cohortId: string, form: FormData) {
   await requireTeacher();
   const db = await getDb();
   const path = `/teach/cohorts/${cohortId}`;
   const capacity = Number(str(form, "capacity"));
   if (!str(form, "name") || !Number.isInteger(capacity) || capacity < 1) back(path, { error: "Name and a whole-number capacity are required." });
+  // The Meet link has its own box now (MeetLinkCard); only change it if this form sent one.
+  const meet = form.has("meetUrl") ? cleanMeetUrl(str(form, "meetUrl")) : { url: undefined };
+  if ("error" in meet) back(path, { error: meet.error });
   await db
     .update(schema.cohorts)
-    .set({ name: str(form, "name"), capacity, meetUrl: str(form, "meetUrl"), enrolmentOpen: form.get("enrolmentOpen") === "on" })
+    .set({ name: str(form, "name"), capacity, meetUrl: meet.url, enrolmentOpen: form.get("enrolmentOpen") === "on" })
     .where(eq(schema.cohorts.id, cohortId));
   revalidatePath("/", "layout");
   back(path, { saved: "Intake saved." });
