@@ -9,6 +9,7 @@ import { schema } from "@/lib/db";
 import { classState, requireCohortAccess, untilText } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
 import { formatDateTime } from "@/lib/time";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Course" };
 
@@ -79,7 +80,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
             <section className="card border-primary/40">
               <p className="eyebrow">{nextState === "live" ? "Live now" : `Next class · ${untilText(next.startsAt)}`}</p>
               <h2 className="mt-2 font-display text-xl font-semibold text-ink">
-                Week {next.week}: {next.title}
+                {lessonLabel(course)} {next.week}: {next.title}
               </h2>
               <p className="mt-1 text-muted">{formatDateTime(next.startsAt)} Lagos time · {next.durationMinutes} minutes on Google Meet</p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -173,7 +174,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {t.title}
                       </Link>
                       <p className="text-xs text-muted">
-                        {selfPaced ? "Lesson" : "Week"} {t.week}
+                        {lessonLabel(course, selfPaced)} {t.week}
                         {t.isFinalProject ? " · Final project" : ""}
                       </p>
                     </div>
@@ -204,7 +205,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {q.title}
                       </Link>
                       <p className="text-xs text-muted">
-                        {selfPaced ? "Lesson" : "Week"} {q.week} · {q.questions.length} questions
+                        {lessonLabel(course, selfPaced)} {q.week} · {q.questions.length} questions
                       </p>
                     </div>
                     {best ? (

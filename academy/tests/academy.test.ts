@@ -95,8 +95,8 @@ describe("progress, badges and certificates", () => {
     await enrolAndPay(cohortId);
     const lessons = seeded.animationDone!.classes;
 
-    // 4 of 6 classes is 67%, below the 80% rule.
-    await db.insert(schema.attendance).values(lessons.slice(0, 4).map((l) => ({ classId: l.id, userId: student.id, source: "join" as const })));
+    // 3 of 5 classes is 60%, below the 80% rule.
+    await db.insert(schema.attendance).values(lessons.slice(0, 3).map((l) => ({ classId: l.id, userId: student.id, source: "join" as const })));
     const final = await db.query.assignments.findFirst({
       where: and(eq(schema.assignments.courseId, seeded.animationCourse.id), eq(schema.assignments.isFinalProject, true)),
     });
@@ -104,8 +104,8 @@ describe("progress, badges and certificates", () => {
     await checkCompletion(db, student.id, cohortId);
     expect((await getProgress(db, student.id, cohortId)).certificateCode).toBeNull();
 
-    // 5 of 6 is 83%: certificate issued, emailed, and the graduate badge awarded.
-    await db.insert(schema.attendance).values({ classId: lessons[4].id, userId: student.id, source: "teacher" });
+    // 4 of 5 is 80%: certificate issued, emailed, and the graduate badge awarded.
+    await db.insert(schema.attendance).values({ classId: lessons[3].id, userId: student.id, source: "teacher" });
     await checkCompletion(db, student.id, cohortId);
     const progress = await getProgress(db, student.id, cohortId);
     expect(progress.certificateCode).toMatch(/^JTR-/);
@@ -197,6 +197,16 @@ describe("going live", () => {
     expect(s.animationNext.cohort.meetUrl).toBe("");
     expect(await live.query.discountCodes.findMany()).toEqual([]);
     expect(await live.query.users.findMany()).toEqual([]);
+  });
+
+  it("runs Animation as a five-day course, one two-hour class a day", async () => {
+    const live = await createInMemoryDb();
+    const s = await seedCourses(live, {}, new Date("2026-11-02T12:00:00Z"));
+    expect(s.animationCourse.lessonUnit).toBe("day");
+    expect(s.animationNext.cohort.name).toBe("December 2026");
+    expect(s.animationNext.classes.map((c) => [c.week, c.startsAt.toISOString(), c.durationMinutes])).toEqual(
+      [1, 2, 3, 4, 5].map((day) => [day, `2026-12-0${day}T15:00:00.000Z`, 120]),
+    );
   });
 
   it("removes the sample students and links but keeps real signups and courses", async () => {

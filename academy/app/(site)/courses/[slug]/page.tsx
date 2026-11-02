@@ -9,6 +9,7 @@ import { getDb, schema } from "@/lib/db";
 import { env } from "@/lib/env";
 import { naira } from "@/lib/money";
 import { formatDate, formatTime } from "@/lib/time";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             </Link>
             <div className="mt-4 flex flex-wrap gap-2">
               <Pill tone={violet ? "violet" : "primary"}>{recorded ? "Video course" : "Live online course"}</Pill>
-              <Pill>{recorded ? `${course.outline.length} lessons · learn at your own pace` : `${course.outline.length} weeks · 1 class a week`}</Pill>
+              <Pill>{recorded ? `${course.outline.length} lessons · learn at your own pace` : course.lessonUnit === "day" ? `${course.outline.length} days · 1 class a day` : `${course.outline.length} weeks · 1 class a week`}</Pill>
               <Pill>Certificate</Pill>
             </div>
             <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-ink sm:text-5xl">{course.title}</h1>
@@ -72,7 +73,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-semibold text-ink">{recorded ? "Lesson by lesson" : "Week by week"}</h2>
+            <h2 className="font-display text-2xl font-semibold text-ink">{recorded ? "Lesson by lesson" : `${lessonLabel(course)} by ${lessonLabel(course).toLowerCase()}`}</h2>
             <ol className="mt-4 divide-y divide-line rounded-card border border-line bg-surface">
               {course.outline.map((w) => (
                 <li key={w.week} className="flex gap-4 p-5">
@@ -150,7 +151,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                               Starts {formatDate(intake.startsAt)}
                               {intake.classes[0] ? `, ${formatTime(intake.classes[0].startsAt)} Lagos time` : ""}
                             </p>
-                            <p className="text-sm text-muted">{intake.classes.length} weekly live classes</p>
+                            <p className="text-sm text-muted">{intake.classes.length} {course.lessonUnit === "day" ? "daily" : "weekly"} live classes</p>
                           </div>
                           <Pill tone={intake.seatsLeft <= 5 ? "warning" : "success"}>{intake.seatsLeft === 0 ? "Full" : `${intake.seatsLeft} seats left`}</Pill>
                         </div>

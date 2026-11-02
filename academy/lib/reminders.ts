@@ -4,6 +4,7 @@ import { classes, cohorts, courses, enrolments, users } from "@/lib/db/schema";
 import { sendEmail } from "@/lib/email";
 import { url } from "@/lib/env";
 import { formatDateTime } from "@/lib/time";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 /** Emails every enrolled student about classes starting in the next 24 hours. Run hourly. */
 export async function sendClassReminders(db: Database, now = new Date()) {
@@ -35,7 +36,7 @@ export async function sendClassReminders(db: Database, now = new Date()) {
         body: [
           `Hi ${student.name},`,
           "",
-          `Your ${course.title} class "${lesson.title}" (week ${lesson.week}) starts ${formatDateTime(lesson.startsAt)} Lagos time.`,
+          `Your ${course.title} class "${lesson.title}" (${lessonLabel(course).toLowerCase()} ${lesson.week}) starts ${formatDateTime(lesson.startsAt)} Lagos time.`,
           `Join from your dashboard so your attendance is recorded: ${url(`/learn/${cohort.id}/classes/${lesson.id}`)}`,
           "",
           "See you there,",

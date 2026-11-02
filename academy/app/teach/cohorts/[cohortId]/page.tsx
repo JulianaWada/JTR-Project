@@ -9,6 +9,7 @@ import { naira } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { issueCertificateAction, revokeCertificateAction, saveAttendance, sendAnnouncement, updateCohort } from "../../actions";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Intake" };
 
@@ -123,7 +124,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                   <th>Student</th>
                   {lessons.map((l) => (
                     <th key={l.id} className="text-center" title={l.title}>
-                      W{l.week}
+                      {lessonLabel(course, selfPaced)[0]}{l.week}
                     </th>
                   ))}
                   <th>Progress</th>
@@ -148,7 +149,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                           name="present"
                           value={`${user.id}:${l.id}`}
                           defaultChecked={present.has(`${user.id}:${l.id}`)}
-                          aria-label={`${user.name} attended week ${l.week}`}
+                          aria-label={`${user.name} attended ${lessonLabel(course, selfPaced).toLowerCase()} ${l.week}`}
                           className="size-4 accent-[var(--primary)]"
                         />
                       </td>

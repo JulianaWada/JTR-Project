@@ -7,6 +7,7 @@ import { schema } from "@/lib/db";
 import { requireCohortAccess } from "@/lib/learn";
 import { formatDateTime } from "@/lib/time";
 import { SubmitForm } from "./submit-form";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Assignment" };
 
@@ -25,7 +26,7 @@ export default async function AssignmentPage({ params }: PageProps<"/learn/[coho
         ← {course.title}
       </Link>
       <div className="mt-4 flex flex-wrap gap-2">
-        <Pill>Week {task.week}</Pill>
+        <Pill>{lessonLabel(course)} {task.week}</Pill>
         {task.isFinalProject && <Pill tone="violet">Final project · counts for your certificate</Pill>}
       </div>
       <h1 className="mt-3 font-display text-3xl font-semibold text-ink">{task.title}</h1>

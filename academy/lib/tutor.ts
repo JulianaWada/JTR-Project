@@ -8,23 +8,24 @@ import { addDays } from "@/lib/time";
 export const DAILY_QUESTION_LIMIT = 40;
 const HISTORY_MESSAGES = 20;
 
-type Material = { courseTitle: string; recorded?: boolean; lessons: { week: number; title: string; notes: string }[]; assignments: { week: number; title: string; brief: string }[] };
+type Material = { courseTitle: string; recorded?: boolean; daily?: boolean; lessons: { week: number; title: string; notes: string }[]; assignments: { week: number; title: string; brief: string }[] };
 
 async function loadMaterial(db: Database, cohortId: string): Promise<Material> {
   const cohort = (await db.query.cohorts.findFirst({ where: eq(cohorts.id, cohortId) }))!;
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
   const lessons = await db.query.classes.findMany({ where: eq(classes.cohortId, cohortId), orderBy: asc(classes.week) });
   const tasks = await db.query.assignments.findMany({ where: eq(assignments.courseId, course.id), orderBy: asc(assignments.week) });
-  return { courseTitle: course.title, recorded: course.format === "recorded", lessons, assignments: tasks };
+  return { courseTitle: course.title, recorded: course.format === "recorded", daily: course.format === "live" && course.lessonUnit === "day", lessons, assignments: tasks };
 }
 
 export function tutorSystemPrompt(m: Material) {
-  const lessons = m.lessons.map((l) => `<lesson week="${l.week}" title="${l.title}">\n${l.notes.trim()}\n</lesson>`).join("\n\n");
-  const tasks = m.assignments.map((a) => `<assignment week="${a.week}" title="${a.title}">${a.brief}</assignment>`).join("\n");
-  return `You are the AI tutor for "${m.courseTitle}", ${m.recorded ? "a self-paced video course" : "a live online course"} at JTR Academy taught by Jules (Jules TechRight, Nigeria). Students are mostly Nigerian business owners and creators, many new to AI.
+  const unit = m.daily ? "day" : "week";
+  const lessons = m.lessons.map((l) => `<lesson ${unit}="${l.week}" title="${l.title}">\n${l.notes.trim()}\n</lesson>`).join("\n\n");
+  const tasks = m.assignments.map((a) => `<assignment ${unit}="${a.week}" title="${a.title}">${a.brief}</assignment>`).join("\n");
+  return `You are the AI tutor for "${m.courseTitle}", ${m.recorded ? "a self-paced video course" : m.daily ? "a short live online course with one class a day" : "a live online course"} at JTR Academy taught by Jules (Jules TechRight, Nigeria). Students are mostly Nigerian business owners and creators, many new to AI.
 
 How to help:
-- Answer from the course material below first, and say which week covers it so students can revisit the notes and recording.
+- Answer from the course material below first, and say which ${unit} covers it so students can revisit the notes and recording.
 - You may add practical general knowledge when the notes don't cover something, and say so.
 - Use plain, friendly English, short paragraphs and Nigerian examples (naira prices, WhatsApp, Instagram, Lagos and Abuja businesses).
 - For assignments, coach: ask questions, give examples and feedback on drafts, but don't write the whole submission for the student.
@@ -89,10 +90,10 @@ export function mockAnswer(m: Material, question: string) {
     }
   }
   if (!best || best.score === 0) {
-    return `(Test mode: the AI tutor answers properly once the Claude API key is added.)\n\nI couldn't find that in the ${m.courseTitle} notes yet. Try asking about a topic from one of the weeks, or send the question to Jules.`;
+    return `(Test mode: the AI tutor answers properly once the Claude API key is added.)\n\nI couldn't find that in the ${m.courseTitle} notes yet. Try asking about a topic from one of the ${m.daily ? "days" : "weeks"}, or send the question to Jules.`;
   }
   const excerpt = best.body.replace(/\*\*/g, "").split("\n").slice(0, 6).join("\n");
-  return `(Test mode: this answer is taken straight from the notes. With the Claude API key added, the tutor explains in its own words.)\n\nWeek ${best.week} covers this under "${best.heading}":\n\n${excerpt}`;
+  return `(Test mode: this answer is taken straight from the notes. With the Claude API key added, the tutor explains in its own words.)\n\n${m.daily ? "Day" : "Week"} ${best.week} covers this under "${best.heading}":\n\n${excerpt}`;
 }
 
 export async function questionsToday(db: Database, userId: string, now = new Date()) {

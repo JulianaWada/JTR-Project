@@ -1,8 +1,8 @@
 # JTR Academy
 
-The online school on the JTR website: paid courses taught by Jules, with lesson notes, assignments, quizzes, an AI tutor (Claude), badges and verifiable certificates. It starts with two courses: **Boost Sales with AI**, a recorded video course students take at their own pace, and **Create Animation Videos with AI**, six weeks of live classes.
+The online school on the JTR website: paid courses taught by Jules, with lesson notes, assignments, quizzes, an AI tutor (Claude), badges and verifiable certificates. It starts with two courses: **Boost Sales with AI**, a recorded video course students take at their own pace, and **Create Animation Videos with AI**, a five-day live course (one two-hour class a day).
 
-**Two formats** (set per course in the teacher dashboard): *live* courses run in dated intakes with weekly Google Meet classes; *recorded* courses have one always-open self-paced intake whose lessons are videos (paste a YouTube unlisted, Vimeo, Loom or Google Drive link and it plays inside the lesson page). Students mark each video lesson done, and the certificate needs every lesson watched plus the final project.
+**Two formats** (set per course in the teacher dashboard): *live* courses run in dated intakes with Google Meet classes, either one a week or one a day ("How often live classes meet" on the course page; daily courses show Day 1, Day 2… instead of Week 1, Week 2…); *recorded* courses have one always-open self-paced intake whose lessons are videos (paste a YouTube unlisted, Vimeo, Loom or Google Drive link and it plays inside the lesson page). Students mark each video lesson done, and the certificate needs every lesson watched plus the final project.
 
 It is a separate Next.js app in this folder, served under `/academy` on the website's own address (Next.js [multi-zones](https://nextjs.org/docs/app/guides/multi-zones)). Visitors see one site; work on the academy can't break the website.
 
@@ -35,7 +35,7 @@ With no keys everything runs in **test mode**: an embedded database (`.data/`), 
 
 Delete `academy/.data` to start again with fresh demo data.
 
-**In production there is no sample data.** Without `DEMO_PASSWORD` the first start adds only the two courses (the recorded Sales course and one January intake of Animation, with no Meet link yet) and Jules's teacher account. Students, payments and certificates come only from real signups. Migration `0002_remove_demo_data` also clears any demo students, sample intake, demo Meet link, demo recordings and the unused `EARLYBIRD` code from a database that already had them; real signups and courses are kept.
+**In production there is no sample data.** Without `DEMO_PASSWORD` the first start adds only the two courses (the recorded Sales course and one December 2026 intake of Animation, 1 to 5 December at 4pm Lagos time, with no Meet link yet) and Jules's teacher account. Students, payments and certificates come only from real signups. Migration `0002_remove_demo_data` also clears any demo students, sample intake, demo Meet link, demo recordings and the unused `EARLYBIRD` code from a database that already had them; real signups and courses are kept. Migration `0003_daily_courses` turns an existing Animation course into the five-day version and moves its untouched, empty January 2027 intake to 1 to 5 December 2026, 4pm to 6pm.
 
 ## Going live
 

@@ -10,6 +10,7 @@ import { Markdown } from "@/lib/markdown";
 import { formatDateTime } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
 import { setLessonWatched } from "./actions";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Class" };
 
@@ -46,7 +47,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
         <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
           ← {course.title}
         </Link>
-        <p className="eyebrow mt-4">{selfPaced ? `Lesson ${lesson.week}` : `Week ${lesson.week}`}</p>
+        <p className="eyebrow mt-4">{`${lessonLabel(course, selfPaced)} ${lesson.week}`}</p>
         <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{lesson.title}</h1>
         {!selfPaced && (
           <p className="mt-2 text-muted">
@@ -167,7 +168,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
         <section className="card">
           <h2 className="font-semibold text-ink">Questions about this {selfPaced ? "lesson" : "class"}?</h2>
           <Link
-            href={`/learn/${cohortId}/tutor?q=${encodeURIComponent(`Can you explain the main idea of week ${lesson.week}, "${lesson.title}", with an example?`)}`}
+            href={`/learn/${cohortId}/tutor?q=${encodeURIComponent(`Can you explain the main idea of ${lessonLabel(course, selfPaced).toLowerCase()} ${lesson.week}, "${lesson.title}", with an example?`)}`}
             className="btn-primary btn-sm mt-3"
           >
             ✨ Ask the AI tutor
