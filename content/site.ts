@@ -131,6 +131,7 @@ export const projects: {
     region: "global",
     year: 2026,
     status: "live",
+    image: "/projects/douceur-nuage.webp",
     href: "https://douceurnuage.com/",
   },
 ];
