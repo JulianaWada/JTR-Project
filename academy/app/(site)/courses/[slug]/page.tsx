@@ -54,7 +54,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             <p className="mt-6 max-w-2xl leading-relaxed text-ink">{course.description}</p>
           </div>
           <div className="cut-corner overflow-hidden rounded-card border border-line">
-            <CourseArt slug={course.slug} accent={course.accent} className="h-56" />
+            <CourseArt slug={course.slug} accent={course.accent} className="h-full min-h-56" />
           </div>
         </div>
       </section>
