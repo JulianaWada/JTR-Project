@@ -1,6 +1,7 @@
 import { BadgeIcon } from "@/components/badge-icon";
 import Link from "next/link";
 import { CourseCard } from "@/components/course-card";
+import { currencyFor, visitorCountry } from "@/lib/location";
 import { BADGES, BADGE_ORDER } from "@/lib/badges";
 import { publishedCourses } from "@/lib/catalog";
 import { getDb } from "@/lib/db";
@@ -31,6 +32,7 @@ const faqs = [
 
 export default async function AcademyHome() {
   const courses = await publishedCourses(await getDb());
+  const country = await visitorCountry();
   return (
     <>
       <section className="relative overflow-hidden border-b border-line">
@@ -94,7 +96,7 @@ export default async function AcademyHome() {
         <h2 className="mt-2 font-display text-3xl font-semibold text-ink">Start with one of our first two courses</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {courses.map((course) => (
-            <CourseCard key={course.id} course={course} nextCohort={course.nextCohort} />
+            <CourseCard key={course.id} course={course} nextCohort={course.nextCohort} currency={currencyFor(country, course)} />
           ))}
         </div>
       </section>

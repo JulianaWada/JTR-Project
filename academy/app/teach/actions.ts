@@ -68,6 +68,8 @@ export async function updateCourse(courseId: string, form: FormData) {
   const pct = Number(str(form, "attendance"));
   if (!str(form, "title") || !Number.isFinite(price) || price < 0) back(path, { error: "Title and price are required." });
   if (!Number.isInteger(pct) || pct < 0 || pct > 100) back(path, { error: "The share needed for the certificate must be a whole number from 0 to 100." });
+  const priceUsd = str(form, "priceUsd") ? Number(str(form, "priceUsd")) : null;
+  if (priceUsd !== null && (!Number.isFinite(priceUsd) || priceUsd < 1)) back(path, { error: "The dollar price must be at least $1, or leave it empty for naira only." });
   const format = form.get("format") === "recorded" ? "recorded" : "live";
   const before = await db.query.courses.findFirst({ where: eq(schema.courses.id, courseId) });
   const outline = str(form, "outline")
@@ -88,6 +90,7 @@ export async function updateCourse(courseId: string, form: FormData) {
       outcomes: str(form, "outcomes"),
       outline,
       priceKobo: koboFromNaira(price),
+      ...(form.has("priceUsd") ? { priceUsdCents: priceUsd === null ? null : Math.round(priceUsd * 100) } : {}),
       format,
       ...(form.has("lessonUnit") ? { lessonUnit: form.get("lessonUnit") === "day" ? ("day" as const) : ("week" as const) } : {}),
       completionAttendancePercent: pct,

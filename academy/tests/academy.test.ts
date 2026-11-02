@@ -11,6 +11,7 @@ import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
 import { readFileSync } from "node:fs";
+import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
@@ -82,9 +83,28 @@ describe("enrolment and payment", () => {
   it("does not activate a payment for less than the amount due", async () => {
     const result = await startCheckout(db, student, seeded.animationNext.cohort.id, null);
     const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;
-    expect(await markPaymentSuccessful(db, reference, { amountKobo: 100 })).toBeNull();
+    expect(await markPaymentSuccessful(db, reference, { amountKobo: 100, currency: "NGN" })).toBeNull();
     const enrolment = await db.query.enrolments.findFirst({ where: eq(schema.enrolments.userId, student.id) });
     expect(enrolment?.status).toBe("pending");
+  });
+
+  it("lets students abroad pay the dollar price, with discount codes, and checks the currency", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    expect(await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null, "USD")).toEqual({ error: expect.stringContaining("naira") });
+    expect(seeded.animationCourse.priceUsdCents).toBe(3500);
+    await db.insert(schema.discountCodes).values({ code: "ANIMATE20", percentOff: 20, maxUses: 20, courseId: seeded.animationCourse.id });
+    const result = await startCheckout(db, student, cohortId, "animate20", "USD");
+    const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;
+    const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    expect(payment).toMatchObject({ amountKobo: 2800, listPriceKobo: 3500, currency: "USD", discountCode: "ANIMATE20" });
+
+    // 2800 kobo is not $28: a payment in the wrong currency never activates the enrolment.
+    expect(await markPaymentSuccessful(db, reference, { amountKobo: 2800, currency: "NGN" })).toBeNull();
+    expect((await markPaymentSuccessful(db, reference, { amountKobo: 2800, currency: "USD" }))?.reference).toBe(reference);
+    const enrolment = await db.query.enrolments.findFirst({ where: eq(schema.enrolments.userId, student.id) });
+    expect(enrolment?.status).toBe("active");
+    const receipt = (await db.query.emails.findMany({ where: eq(schema.emails.to, student.email) })).find((e) => e.body.includes(reference));
+    expect(receipt?.body).toContain("$28");
   });
 });
 
@@ -187,6 +207,17 @@ describe("class reminders", () => {
     await db.update(schema.classes).set({ startsAt: addMinutes(new Date(), 120) }).where(eq(schema.classes.id, first.id));
     expect((await sendClassReminders(db)).emails).toBe(1);
     expect((await sendClassReminders(db)).emails).toBe(0);
+  });
+});
+
+describe("prices by location", () => {
+  it("shows naira in Nigeria or when unknown, and dollars elsewhere for courses with a dollar price", () => {
+    const both = { priceKobo: 5000000, priceUsdCents: 3500 };
+    expect(localPrice("NG", both)).toEqual({ currency: "NGN", minor: 5000000 });
+    expect(localPrice(null, both)).toEqual({ currency: "NGN", minor: 5000000 });
+    expect(localPrice("GB", both)).toEqual({ currency: "USD", minor: 3500 });
+    expect(localPrice("US", both)).toEqual({ currency: "USD", minor: 3500 });
+    expect(currencyFor("GB", { priceUsdCents: null })).toBe("NGN");
   });
 });
 

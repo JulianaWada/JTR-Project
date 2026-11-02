@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Flash, PageTitle, Pill, Stat } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
 import { modes } from "@/lib/env";
-import { naira } from "@/lib/money";
+import { money, naira, usd } from "@/lib/money";
 import { formatDateTime } from "@/lib/time";
 import { createDiscount, toggleDiscount } from "../actions";
 
@@ -17,7 +17,9 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
   const cohorts = await db.query.cohorts.findMany();
   const courses = await db.query.courses.findMany();
   const codes = await db.query.discountCodes.findMany({ orderBy: desc(schema.discountCodes.createdAt) });
-  const paid = rows.filter((r) => r.status === "success");
+  const paid = rows.filter((r) => r.status === "success" && r.currency === "NGN");
+  const paidUsd = rows.filter((r) => r.status === "success" && r.currency === "USD");
+  const usdTotal = paidUsd.reduce((s, p) => s + p.amountKobo, 0);
   const byCourse = courses.map((c) => ({
     course: c,
     total: paid
@@ -37,7 +39,11 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
       </PageTitle>
       <Flash searchParams={searchParams} />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Total received" value={naira(paid.reduce((s, p) => s + p.amountKobo, 0))} hint={`${paid.length} payments`} />
+        <Stat
+          label="Total received"
+          value={naira(paid.reduce((s, p) => s + p.amountKobo, 0))}
+          hint={`${paid.length} naira payments${paidUsd.length ? ` · plus ${usd(usdTotal)} from ${paidUsd.length} dollar ${paidUsd.length === 1 ? "payment" : "payments"}` : ""}`}
+        />
         {byCourse.map(({ course, total }) => (
           <Stat key={course.id} label={course.title} value={naira(total)} />
         ))}
@@ -75,7 +81,7 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
                     <span className="text-xs">{cohort?.name}</span>
                   </td>
                   <td className="whitespace-nowrap">
-                    {naira(p.amountKobo)}
+                    {money(p.amountKobo, p.currency)}
                     {p.discountCode && <span className="block text-xs text-muted">{p.discountCode}</span>}
                   </td>
                   <td>

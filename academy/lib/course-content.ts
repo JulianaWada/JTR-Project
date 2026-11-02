@@ -13,6 +13,8 @@ export type CourseTemplate = {
   audience: string[];
   outcomes: string[];
   priceNaira: number;
+  /** Optional dollar price for students paying from outside Nigeria. */
+  priceUsd?: number;
   format: CourseFormat;
   /** Live courses only: "week" for one class a week, "day" for a short daily course. Defaults to week. */
   lessonUnit?: LessonUnit;
@@ -218,6 +220,7 @@ export const animationCourse: CourseTemplate = {
     "Finish and export your own 30 to 60 second animated video",
   ],
   priceNaira: 50000,
+  priceUsd: 35,
   format: "live",
   lessonUnit: "day",
   accent: "violet",

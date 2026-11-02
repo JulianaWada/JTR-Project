@@ -19,8 +19,8 @@ export async function POST(request: Request) {
   try {
     // Confirm with Paystack directly rather than trusting the webhook body alone.
     const tx = await verifyTransaction(event.data.reference);
-    if (tx.status === "success" && tx.currency === "NGN") {
-      await markPaymentSuccessful(await getDb(), event.data.reference, { amountKobo: tx.amountKobo });
+    if (tx.status === "success") {
+      await markPaymentSuccessful(await getDb(), event.data.reference, { amountKobo: tx.amountKobo, currency: tx.currency });
     }
   } catch (err) {
     console.error("[paystack] webhook handling failed", err);

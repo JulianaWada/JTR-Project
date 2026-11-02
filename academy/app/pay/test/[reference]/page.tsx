@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getDb, schema } from "@/lib/db";
 import { markPaymentSuccessful } from "@/lib/enrolment";
-import { naira } from "@/lib/money";
+import { money } from "@/lib/money";
 import { asset } from "@/lib/assets";
 
 export const metadata: Metadata = { title: "Test payment", robots: { index: false } };
@@ -37,10 +37,10 @@ export default async function TestCheckout({ params }: PageProps<"/pay/test/[ref
         <p className="mt-4 text-sm text-muted">
           {course.title} · {cohort.name}
         </p>
-        <p className="font-display text-4xl font-semibold text-ink">{naira(payment.amountKobo)}</p>
+        <p className="font-display text-4xl font-semibold text-ink">{money(payment.amountKobo, payment.currency)}</p>
         {payment.discountCode && (
           <p className="mt-1 text-xs text-success">
-            Code {payment.discountCode} applied (was {naira(payment.listPriceKobo)})
+            Code {payment.discountCode} applied (was {money(payment.listPriceKobo, payment.currency)})
           </p>
         )}
         <p className="mt-1 text-xs text-muted">Ref {payment.reference}</p>
@@ -48,7 +48,7 @@ export default async function TestCheckout({ params }: PageProps<"/pay/test/[ref
           <p className="mt-6 rounded-xl bg-success-soft p-3 text-sm text-success">Paid. You&apos;re enrolled.</p>
         ) : payment.status === "pending" ? (
           <form action={payNow.bind(null, reference)} className="mt-6">
-            <button className="btn-primary w-full">Pay {naira(payment.amountKobo)} (test)</button>
+            <button className="btn-primary w-full">Pay {money(payment.amountKobo, payment.currency)} (test)</button>
             <p className="mt-3 text-xs text-muted">With a Paystack key set, students see Paystack&apos;s real checkout here instead.</p>
           </form>
         ) : (

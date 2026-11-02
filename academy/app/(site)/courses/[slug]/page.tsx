@@ -7,7 +7,8 @@ import { Pill } from "@/components/ui";
 import { lines, openCohorts } from "@/lib/catalog";
 import { getDb, schema } from "@/lib/db";
 import { env } from "@/lib/env";
-import { naira } from "@/lib/money";
+import { localPrice, visitorCountry } from "@/lib/location";
+import { money } from "@/lib/money";
 import { formatDate, formatTime } from "@/lib/time";
 import { lessonLabel } from "@/lib/lesson-unit";
 
@@ -29,6 +30,8 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
   const data = await load((await params).slug);
   if (!data) notFound();
   const { course, intakes } = data;
+  const local = localPrice(await visitorCountry(), course);
+  const price = money(local.minor, local.currency);
   const violet = course.accent === "violet";
   const recorded = course.format === "recorded";
   const selfPaced = recorded ? intakes.find((i) => i.selfPaced) : undefined;
@@ -115,15 +118,17 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card">
             <p className="text-sm text-muted">Course fee</p>
-            <p className="font-display text-4xl font-semibold text-ink">{naira(course.priceKobo)}</p>
-            <p className="mt-1 text-xs text-muted">Pay with card, bank transfer or USSD via Paystack.</p>
+            <p className="font-display text-4xl font-semibold text-ink">{price}</p>
+            <p className="mt-1 text-xs text-muted">
+              {local.currency === "USD" ? "Pay by card in US dollars via Paystack." : "Pay with card, bank transfer or USSD via Paystack."}
+            </p>
 
             {recorded ? (
               selfPaced ? (
                 <>
                   <p className="mt-6 text-sm text-muted">Start straight after paying. Your lessons stay in your dashboard to rewatch any time.</p>
                   <Link href={`/enrol/${selfPaced.id}`} className="btn-primary mt-4 w-full">
-                    Enrol for {naira(course.priceKobo)}
+                    Enrol for {price}
                   </Link>
                 </>
               ) : (
@@ -157,7 +162,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                         </div>
                         {intake.seatsLeft > 0 && (
                           <Link href={`/enrol/${intake.id}`} className="btn-primary mt-4 w-full">
-                            Enrol for {naira(course.priceKobo)}
+                            Enrol for {price}
                           </Link>
                         )}
                       </li>

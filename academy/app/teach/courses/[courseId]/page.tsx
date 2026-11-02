@@ -55,6 +55,13 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             </label>
             <input className="input" id="price" name="price" type="number" min={0} step={500} defaultValue={course.priceKobo / 100} required />
           </div>
+          <div>
+            <label className="label" htmlFor="priceUsd">
+              Price in US dollars ($) <span className="font-normal text-muted">(optional, for students outside Nigeria)</span>
+            </label>
+            <input className="input" id="priceUsd" name="priceUsd" type="number" min={1} step={1} defaultValue={course.priceUsdCents ? course.priceUsdCents / 100 : ""} placeholder="Naira only" />
+            <p className="mt-1 text-xs text-muted">Students choose naira or dollars at checkout. Dollar payments need USD turned on in your Paystack account.</p>
+          </div>
         </div>
         <div>
           <label className="label" htmlFor="tagline">

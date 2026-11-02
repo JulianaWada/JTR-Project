@@ -45,6 +45,8 @@ export const courses = pgTable("courses", {
   outcomes: text("outcomes").notNull().default(""),
   outline: jsonb("outline").$type<CourseWeek[]>().notNull().default([]),
   priceKobo: integer("price_kobo").notNull(),
+  /** Optional price in US cents for students paying from abroad (Paystack USD). Null: naira only. */
+  priceUsdCents: integer("price_usd_cents"),
   format: text("format").$type<CourseFormat>().notNull().default("live"),
   lessonUnit: text("lesson_unit").$type<LessonUnit>().notNull().default("week"),
   /** Share of classes a student must attend (live) or watch (recorded) to earn the certificate. */
@@ -123,6 +125,7 @@ export const enrolments = pgTable(
 );
 
 export type PaymentStatus = "pending" | "success" | "failed";
+export type Currency = "NGN" | "USD";
 
 export const payments = pgTable(
   "payments",
@@ -132,8 +135,10 @@ export const payments = pgTable(
     enrolmentId: uuid("enrolment_id")
       .notNull()
       .references(() => enrolments.id, { onDelete: "cascade" }),
+    /** In the payment's currency's smallest unit: kobo for NGN, cents for USD. */
     amountKobo: integer("amount_kobo").notNull(),
     listPriceKobo: integer("list_price_kobo").notNull(),
+    currency: text("currency").$type<Currency>().notNull().default("NGN"),
     discountCode: text("discount_code"),
     status: text("status").$type<PaymentStatus>().notNull().default("pending"),
     /** "paystack" for real payments, "test" for the simulated checkout. */

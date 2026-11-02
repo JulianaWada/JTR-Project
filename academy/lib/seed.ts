@@ -44,6 +44,7 @@ async function insertCourse(db: Database, t: CourseTemplate, sortOrder: number) 
       outcomes: t.outcomes.join("\n"),
       outline: t.outline,
       priceKobo: koboFromNaira(t.priceNaira),
+      priceUsdCents: t.priceUsd ? Math.round(t.priceUsd * 100) : null,
       format: t.format,
       lessonUnit: t.lessonUnit ?? "week",
       // A recorded course is complete once every lesson is watched.

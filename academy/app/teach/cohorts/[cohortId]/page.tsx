@@ -7,7 +7,7 @@ import { Flash, PageTitle, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
 import { getDb, schema } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
-import { naira } from "@/lib/money";
+import { money } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { issueCertificateAction, revokeCertificateAction, saveAttendance, sendAnnouncement, updateCohort } from "../../actions";
@@ -148,7 +148,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
                         {user.email}
                         {user.phone ? ` · ${user.phone}` : ""}
                       </p>
-                      <p className="text-xs text-muted">{paid ? `Paid ${naira(paid.amountKobo)}` : "Added without payment"}</p>
+                      <p className="text-xs text-muted">{paid ? `Paid ${money(paid.amountKobo, paid.currency)}` : "Added without payment"}</p>
                     </td>
                     {lessons.map((l) => (
                       <td key={l.id} className="text-center">

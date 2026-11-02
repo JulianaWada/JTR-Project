@@ -17,8 +17,8 @@ export default async function PaymentDone({ searchParams }: PageProps<"/pay/done
   if (payment && payment.status === "pending" && payment.provider === "paystack") {
     try {
       const tx = await verifyTransaction(ref);
-      if (tx.status === "success" && tx.currency === "NGN") {
-        await markPaymentSuccessful(db, ref, { amountKobo: tx.amountKobo });
+      if (tx.status === "success") {
+        await markPaymentSuccessful(db, ref, { amountKobo: tx.amountKobo, currency: tx.currency });
         payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, ref) });
       }
     } catch (err) {
