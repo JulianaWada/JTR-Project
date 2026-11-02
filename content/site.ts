@@ -123,6 +123,7 @@ export const projects: {
     region: "africa",
     year: 2026,
     status: "live",
+    image: "/projects/ufedo.webp",
     href: "https://ufedo.app/",
   },
   {
