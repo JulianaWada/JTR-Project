@@ -42,6 +42,8 @@ export async function createCourse(form: FormData) {
   const title = str(form, "title");
   const price = Number(str(form, "price"));
   if (title.length < 3 || !Number.isFinite(price) || price < 0) back("/teach/courses", { error: "Add a title and a price." });
+  const priceUsd = str(form, "priceUsd") ? Number(str(form, "priceUsd")) : null;
+  if (priceUsd !== null && (!Number.isFinite(priceUsd) || priceUsd < 1)) back("/teach/courses", { error: "The dollar price must be at least $1, or leave it empty for naira only." });
   let slug = slugify(title) || "course";
   if (await db.query.courses.findFirst({ where: eq(schema.courses.slug, slug) })) slug = `${slug}-${Date.now().toString(36)}`;
   const [course] = await db
@@ -52,6 +54,7 @@ export async function createCourse(form: FormData) {
       tagline: str(form, "tagline") || title,
       description: "",
       priceKobo: koboFromNaira(price),
+      priceUsdCents: priceUsd === null ? null : Math.round(priceUsd * 100),
       published: false,
       outline: [1, 2, 3, 4, 5, 6].map((week) => ({ week, title: `Week ${week}`, summary: "" })),
       sortOrder: 100,
