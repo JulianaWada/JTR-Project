@@ -213,7 +213,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
           <h2 className="font-display text-lg font-semibold text-ink">Recent activity</h2>
           {d.activity.length === 0 ? (
             <div className="mt-4">
-              <Empty>Enrolments, handed-in work and certificates will show up here.</Empty>
+              <Empty>Enrollments, handed-in work and certificates will show up here.</Empty>
             </div>
           ) : (
             <ul className="mt-4 space-y-3">

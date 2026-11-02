@@ -128,11 +128,11 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                 <>
                   <p className="mt-6 text-sm text-muted">Start straight after paying. Your lessons stay in your dashboard to rewatch any time.</p>
                   <Link href={`/enrol/${selfPaced.id}`} className="btn-primary mt-4 w-full">
-                    Enrol for {price}
+                    Enroll for {price}
                   </Link>
                 </>
               ) : (
-                <p className="mt-6 rounded-xl bg-surface-2 p-4 text-sm text-muted">Enrolment opens soon.</p>
+                <p className="mt-6 rounded-xl bg-surface-2 p-4 text-sm text-muted">Enrollment opens soon.</p>
               )
             ) : (
               <>
@@ -162,7 +162,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                         </div>
                         {intake.seatsLeft > 0 && (
                           <Link href={`/enrol/${intake.id}`} className="btn-primary mt-4 w-full">
-                            Enrol for {price}
+                            Enroll for {price}
                           </Link>
                         )}
                       </li>

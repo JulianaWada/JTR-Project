@@ -60,7 +60,7 @@ export const courses = pgTable("courses", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-/** One intake of a course, e.g. "January 2027". Students enrol in a cohort, not a course. */
+/** One intake of a course, e.g. "January 2027". Students enroll in a cohort, not a course. */
 export const cohorts = pgTable(
   "cohorts",
   {

@@ -5,6 +5,13 @@ export function formatNaira(kobo: number) {
   return naira.format(Math.round(kobo / 100));
 }
 
+const dollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2, minimumFractionDigits: 0 });
+
+/** An amount in its currency's smallest unit (kobo or cents). Academy payments can be in US dollars. */
+export function formatMoney(minor: number, currency: "NGN" | "USD" = "NGN") {
+  return currency === "USD" ? dollars.format(minor / 100) : formatNaira(minor);
+}
+
 const dateTime = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",

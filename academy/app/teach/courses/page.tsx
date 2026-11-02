@@ -45,7 +45,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
                   <th>Intake</th>
                   <th>Starts</th>
                   <th>Students</th>
-                  <th>Enrolment</th>
+                  <th>Enrollment</th>
                 </tr>
               </thead>
               <tbody>

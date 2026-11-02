@@ -45,7 +45,7 @@ export async function startCheckout(
   const cohort = await db.query.cohorts.findFirst({ where: eq(cohorts.id, cohortId) });
   if (!cohort) return { error: "That intake doesn't exist." };
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
-  if (!cohort.enrolmentOpen || !course.published) return { error: "Enrolment for this intake is closed." };
+  if (!cohort.enrolmentOpen || !course.published) return { error: "Enrollment for this intake is closed." };
 
   const existing = await db.query.enrolments.findFirst({
     where: and(eq(enrolments.userId, user.id), eq(enrolments.cohortId, cohortId)),

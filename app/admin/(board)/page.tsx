@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BarList, DailyBars } from "@/components/admin/charts";
 import { PageTitle, Panel, Stat, buttonClass, secondaryButtonClass } from "@/components/admin/ui";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { formatDateTime, formatNaira } from "@/lib/admin/money";
+import { formatDateTime, formatMoney, formatNaira } from "@/lib/admin/money";
 import { dailyCounts, interestByCourse, listInterest, listLeads, siteCounts } from "@/lib/admin/site-data";
 import { academyMode, listCourses, listPayments } from "@/lib/admin/sources/academy";
 import { listBusinesses, recentPayments, whatsappMode } from "@/lib/admin/sources/whatsapp";
@@ -29,7 +29,7 @@ export default async function AdminOverview() {
     recentPayments(10).catch(() => null),
   ]);
   const students = courses?.reduce((n, c) => n + c.activeStudents, 0) ?? 0;
-  const academyRevenue = academyPayments?.filter((p) => p.status === "success").reduce((n, p) => n + p.amountKobo, 0) ?? 0;
+  const academyRevenue = academyPayments?.filter((p) => p.status === "success" && p.currency === "NGN").reduce((n, p) => n + p.amountKobo, 0) ?? 0;
   const agentRevenue = businesses?.reduce((n, b) => n + b.paidKobo, 0) ?? 0;
   const attention = businesses?.reduce((n, b) => n + b.needsAttention, 0) ?? 0;
   const academyOn = academyMode() === "live";
@@ -59,7 +59,7 @@ export default async function AdminOverview() {
         at: p.createdAt,
         icon: "check" as const,
         tone: "bg-[#e3f5ec] text-[#0f7b4a]",
-        title: `${p.student} paid ${formatNaira(p.amountKobo)}`,
+        title: `${p.student} paid ${formatMoney(p.amountKobo, p.currency)}`,
         detail: `${p.course} · academy`,
         href: "/admin/academy",
       })),

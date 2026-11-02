@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { NotConnected, PageTitle, Panel, Pill, Stat, Table, Td, humanise, statusTone } from "@/components/admin/ui";
-import { formatDate, formatDateTime, formatNaira } from "@/lib/admin/money";
+import { formatDate, formatDateTime, formatMoney, formatNaira } from "@/lib/admin/money";
 import { siteCounts } from "@/lib/admin/site-data";
 import { academyMode, academyTeachUrl, listCohorts, listCourses, listPayments, listStudents } from "@/lib/admin/sources/academy";
 
@@ -24,7 +24,8 @@ export default async function AcademyPage() {
     console.error("[admin] academy database", err);
   }
   const counts = await siteCounts();
-  const paid = data?.payments.filter((p) => p.status === "success") ?? [];
+  const paid = data?.payments.filter((p) => p.status === "success" && p.currency === "NGN") ?? [];
+  const paidUsd = data?.payments.filter((p) => p.status === "success" && p.currency === "USD") ?? [];
 
   return (
     <>
@@ -50,9 +51,9 @@ export default async function AcademyPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Interest sign-ups" value={counts.allInterest} note={`${counts.newInterest} new`} href="/admin/academy/interest" icon="edtech" tone="violet" />
-            <Stat label="Students" value={data.students.length} note={`${data.courses.reduce((n, c) => n + c.activeStudents, 0)} active enrolments`} icon="users" tone="blue" />
-            <Stat label="Paid" value={formatNaira(paid.reduce((n, p) => n + p.amountKobo, 0))} note={`${paid.length} payments`} icon="trendingUp" tone="green" />
-            <Stat label="Open for enrolment" value={data.cohorts.filter((c) => c.enrolmentOpen).length} note="intakes" icon="calendar" tone="amber" />
+            <Stat label="Students" value={data.students.length} note={`${data.courses.reduce((n, c) => n + c.activeStudents, 0)} active enrollments`} icon="users" tone="blue" />
+            <Stat label="Paid" value={formatNaira(paid.reduce((n, p) => n + p.amountKobo, 0))} note={`${paid.length} payments${paidUsd.length ? ` · plus ${formatMoney(paidUsd.reduce((n, p) => n + p.amountKobo, 0), "USD")}` : ""}`} icon="trendingUp" tone="green" />
+            <Stat label="Open for enrollment" value={data.cohorts.filter((c) => c.enrolmentOpen).length} note="intakes" icon="calendar" tone="amber" />
           </div>
 
           <Panel title="Courses">
@@ -77,7 +78,7 @@ export default async function AcademyPage() {
           </Panel>
 
           <Panel title="Intakes">
-            <Table head={["Intake", "Starts", "Places", "Enrolment", ""]}>
+            <Table head={["Intake", "Starts", "Places", "Enrollment", ""]}>
               {data.cohorts.map((c) => (
                 <tr key={c.id}>
                   <Td>
@@ -135,7 +136,7 @@ export default async function AcademyPage() {
                       </p>
                     </Td>
                     <Td className="whitespace-nowrap">
-                      {formatNaira(p.amountKobo)}
+                      {formatMoney(p.amountKobo, p.currency)}
                       {p.discountCode && <p className="text-muted">Code {p.discountCode}</p>}
                     </Td>
                     <Td>

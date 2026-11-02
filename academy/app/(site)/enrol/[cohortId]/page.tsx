@@ -12,7 +12,7 @@ import { formatDate, formatDateTime } from "@/lib/time";
 import { CheckoutForm } from "./checkout-form";
 import { lessonLabel } from "@/lib/lesson-unit";
 
-export const metadata: Metadata = { title: "Enrol" };
+export const metadata: Metadata = { title: "Enroll" };
 
 export default async function EnrolPage({ params }: PageProps<"/enrol/[cohortId]">) {
   const { cohortId } = await params;
@@ -36,7 +36,7 @@ export default async function EnrolPage({ params }: PageProps<"/enrol/[cohortId]
         <Link href={`/courses/${course.slug}`} className="text-sm text-muted hover:text-primary">
           ← {course.title}
         </Link>
-        <h1 className="mt-3 font-display text-3xl font-semibold text-ink">Enrol in {course.title}</h1>
+        <h1 className="mt-3 font-display text-3xl font-semibold text-ink">Enroll in {course.title}</h1>
         <p className="mt-2 text-muted">
           {cohort.selfPaced ? "Video course: start straight after paying and learn at your own pace." : `${cohort.name} intake, starting ${formatDate(cohort.startsAt)}.`}{" "}
           You&apos;re enrolling as <strong className="text-ink">{user.name}</strong> (
@@ -65,7 +65,7 @@ export default async function EnrolPage({ params }: PageProps<"/enrol/[cohortId]
         {open ? (
           <CheckoutForm cohortId={cohortId} price={naira(course.priceKobo)} usdPrice={course.priceUsdCents ? usd(course.priceUsdCents) : null} defaultCurrency={local.currency} testMode={modes().paystack === "test"} />
         ) : (
-          <p className="rounded-xl bg-surface-2 p-4 text-sm text-muted">{full ? "This intake is full." : "Enrolment for this intake is closed."}</p>
+          <p className="rounded-xl bg-surface-2 p-4 text-sm text-muted">{full ? "This intake is full." : "Enrollment for this intake is closed."}</p>
         )}
       </aside>
     </div>

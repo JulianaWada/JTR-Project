@@ -104,7 +104,7 @@ export async function updateCourse(courseId: string, form: FormData) {
   back(path, { saved: format === "recorded" && before?.format !== format ? "Saved. This is now a video course: add a video to each lesson below." : "Course saved." });
 }
 
-/** Recorded: students enrol in the self-paced intake (created if needed). Live: they choose a dated intake again. */
+/** Recorded: students enroll in the self-paced intake (created if needed). Live: they choose a dated intake again. */
 async function switchFormat(courseId: string, format: "live" | "recorded") {
   const db = await getDb();
   if (format === "recorded") {
