@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { siteConfig } from "@/content/site";
 import { Container } from "@/components/ui/Container";
-import { ButtonAnchor, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { GeoPattern } from "@/components/visual/GeoPattern";
 
 export async function CTABand() {
@@ -20,19 +19,6 @@ export async function CTABand() {
             <ButtonLink href="/contact" size="lg" icon="arrowRight">
               {t("common.startProject")}
             </ButtonLink>
-            <ButtonAnchor href={siteConfig.bookingUrl} size="lg" variant="secondary" icon="calendar" iconPosition="start" newTabLabel={t("a11y.opensInNewTab")}>
-              {t("common.bookCall")}
-            </ButtonAnchor>
-            <ButtonAnchor
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
-              size="lg"
-              variant="ghost"
-              icon="whatsapp"
-              iconPosition="start"
-              newTabLabel={t("a11y.opensInNewTab")}
-            >
-              {t("home.cta.whatsapp")}
-            </ButtonAnchor>
           </div>
         </Container>
       </div>

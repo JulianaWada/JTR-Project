@@ -4,7 +4,6 @@ import { PageHero } from "@/components/sections/PageHero";
 import { Section } from "@/components/ui/Section";
 import { Card } from "@/components/ui/Card";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { ButtonAnchor } from "@/components/ui/Button";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { pageMetadata } from "@/lib/seo";
 
@@ -22,8 +21,6 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
 
   const channels: { icon: IconName; label: string; value: string; href: string; ltr?: boolean; external?: boolean }[] = [
     { icon: "mail", label: t("contact.channels.email"), value: contact.email, href: `mailto:${contact.email}`, ltr: true },
-    { icon: "phone", label: t("contact.channels.phone"), value: contact.phone, href: contact.phoneHref, ltr: true },
-    { icon: "whatsapp", label: t("contact.channels.whatsapp"), value: `+${contact.whatsapp}`, href: `https://wa.me/${contact.whatsapp}`, ltr: true, external: true },
   ];
 
   return (
@@ -42,18 +39,6 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
             <h2 id="channels-title" className="font-display text-xl font-semibold text-ink">
               {t("contact.channels.title")}
             </h2>
-
-            <div className="cut-corner rounded-ss-card bg-navy p-7 text-white dark:bg-surface-2">
-              <p className="flex items-center gap-2 font-display text-lg font-semibold">
-                <Icon name="calendar" size={20} className="text-[#6bb4ff]" />
-                {t("contact.channels.book")}
-              </p>
-              <p className="mt-2 text-sm text-white/75">{t("contact.channels.bookNote")}</p>
-              {/* TODO: siteConfig.bookingUrl is a placeholder Cal.com link. */}
-              <ButtonAnchor href={siteConfig.bookingUrl} variant="light" className="mt-5" icon="arrowUpRight" newTabLabel={t("a11y.opensInNewTab")}>
-                {t("nav.bookCall")}
-              </ButtonAnchor>
-            </div>
 
             <ul className="flex flex-col gap-3">
               {channels.map((c) => (

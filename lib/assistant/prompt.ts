@@ -65,8 +65,6 @@ ${en.careers.hero.subtitle} ${en.careers.openings.none} ${en.careers.openings.se
 ## Contact options
 - Contact form: /contact on this website
 - Email: ${siteConfig.contact.email}
-- WhatsApp and phone numbers are listed on the contact page
-- Book a call: ${siteConfig.bookingUrl} (times shown in the visitor's own time zone)
 - Headquarters: Lagos, Nigeria`;
 }
 

@@ -60,7 +60,6 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     logo: `${siteConfig.url}/brand/jtr-emblem.png`,
     description: meta("description"),
     email: siteConfig.contact.email,
-    telephone: siteConfig.contact.phone,
     address: {
       "@type": "PostalAddress",
       addressLocality: siteConfig.headquarters.city,

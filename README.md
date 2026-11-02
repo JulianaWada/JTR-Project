@@ -63,14 +63,13 @@ Put these in `.env.local` for local work, and in Vercel under **Settings → Env
 Content is split in two so that every language stays in sync:
 
 - **Words visitors read** live in `messages/<locale>.json` (`en`, `fr`, `ar`, `pt`). Headings, paragraphs, button labels, service descriptions, project text, form labels and error messages are all there.
-- **Facts and structure** live in `content/site.ts`: company details, contact details, booking link, social links, which services and regions exist, project list (service, region, year, featured), reach figures, time zones, budget ranges and currencies.
+- **Facts and structure** live in `content/site.ts`: company details, contact details, social links, which services and regions exist, project list (service, region, year, featured), reach figures, time zones, budget ranges and currencies.
 
 Common edits:
 
 | To change | Edit |
 | --- | --- |
-| Email, phone, WhatsApp, address | `siteConfig` in `content/site.ts` |
-| Booking link (Cal.com) | `siteConfig.bookingUrl` |
+| Email, address | `siteConfig` in `content/site.ts` |
 | Map on the contact page | `siteConfig.mapEmbedUrl` (a Google Maps embed URL; a styled placeholder shows while it is empty) |
 | Social links | `siteConfig.social` |
 | Reach figures (countries, time zones…) | `reachFigures` in `content/site.ts` |
@@ -179,9 +178,8 @@ Search the code for `TODO` to find each one.
 
 - [ ] Production domain (`siteConfig.url`, or set `NEXT_PUBLIC_SITE_URL`)
 - [ ] Office street address and postal code (`siteConfig.headquarters`)
-- [ ] Contact email, phone and WhatsApp number (`siteConfig.contact`)
+- [x] Contact email (`siteConfig.contact`): hello@jtechright.com
 - [ ] Careers inbox (`siteConfig.contact.careersEmail`)
-- [ ] Cal.com booking link (`siteConfig.bookingUrl`)
 - [ ] Google Maps embed URL for the Lagos office (`siteConfig.mapEmbedUrl`)
 - [ ] Social profile URLs, or remove the ones you don't use (`siteConfig.social`)
 
