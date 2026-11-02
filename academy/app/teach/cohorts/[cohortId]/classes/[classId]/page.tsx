@@ -6,6 +6,7 @@ import { ClassForm } from "@/components/class-form";
 import { Flash, PageTitle } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
 import { deleteClass } from "../../../../actions";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Edit class" };
 
@@ -15,13 +16,14 @@ export default async function EditClass({ params, searchParams }: PageProps<"/te
   const lesson = await db.query.classes.findFirst({ where: and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)) });
   if (!lesson) notFound();
   const cohort = (await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) }))!;
+  const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId) });
   return (
     <div className="mx-auto max-w-4xl">
       <Link href={`/teach/cohorts/${cohortId}`} className="text-sm text-muted hover:text-primary">
         ← {cohort.selfPaced ? "Video lessons" : `${cohort.name} intake`}
       </Link>
       <PageTitle
-        title={`${cohort.selfPaced ? "Lesson" : "Week"} ${lesson.week}: ${lesson.title}`}
+        title={`${lessonLabel(course, cohort.selfPaced)} ${lesson.week}: ${lesson.title}`}
         actions={
           <Link href={`/learn/${cohortId}/classes/${classId}`} className="btn-secondary btn-sm">
             Preview as student

@@ -8,6 +8,7 @@ import { quizToText } from "@/lib/quiz-format";
 import { formatDate, toLagosParts } from "@/lib/time";
 import { addDays } from "@/lib/time";
 import { createCohort, deleteAssignment, deleteQuiz, saveAssignment, saveQuiz, updateCourse } from "../../actions";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Edit course" };
 
@@ -21,6 +22,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
   const cohorts = await db.query.cohorts.findMany({ where: eq(schema.cohorts.courseId, courseId), orderBy: desc(schema.cohorts.startsAt) });
   const suggestedStart = toLagosParts(addDays(new Date(), 28));
   const recorded = course.format === "recorded";
+  const daily = course.lessonUnit === "day";
   const selfPaced = cohorts.find((c) => c.selfPaced);
 
   return (
@@ -82,7 +84,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
         </div>
         <div>
           <label className="label" htmlFor="outline">
-            Week-by-week outline <span className="font-normal text-muted">(one week per line: Title | short summary)</span>
+            Outline <span className="font-normal text-muted">(one class per line: Title | short summary)</span>
           </label>
           <textarea
             className="input min-h-40 font-mono text-xs"
@@ -90,7 +92,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             name="outline"
             defaultValue={course.outline.map((w) => `${w.title} | ${w.summary}`).join("\n")}
           />
-          <p className="mt-1 text-xs text-muted">{recorded ? "One lesson per line." : "New intakes get one weekly class per line."}</p>
+          <p className="mt-1 text-xs text-muted">{recorded ? "One lesson per line." : `New intakes get one ${daily ? "daily" : "weekly"} class per line.`}</p>
         </div>
         <div>
           <label className="label" htmlFor="format">
@@ -101,6 +103,17 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             <option value="recorded">Recorded video lessons, self-paced (students start any time)</option>
           </select>
         </div>
+        {!recorded && (
+          <div>
+            <label className="label" htmlFor="lessonUnit">
+              How often live classes meet
+            </label>
+            <select className="input" id="lessonUnit" name="lessonUnit" defaultValue={course.lessonUnit}>
+              <option value="week">One class a week (Week 1, Week 2…)</option>
+              <option value="day">One class a day, a short intensive course (Day 1, Day 2…)</option>
+            </select>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label className="label" htmlFor="attendance">
@@ -162,7 +175,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
           </ul>
           <form action={createCohort.bind(null, courseId)} className="mt-5 rounded-xl bg-surface-2 p-4">
             <h3 className="font-semibold text-ink">Open a new intake</h3>
-            <div className="mt-3 grid gap-3 sm:grid-cols-5">
+            <div className="mt-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
               <div className="sm:col-span-1">
                 <label className="label" htmlFor="name">
                   Name
@@ -188,6 +201,12 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
                 <input className="input" id="capacity" name="capacity" type="number" min={1} defaultValue={30} />
               </div>
               <div>
+                <label className="label" htmlFor="duration">
+                  Class length (min)
+                </label>
+                <input className="input" id="duration" name="duration" type="number" min={15} step={15} defaultValue={daily ? 120 : 90} />
+              </div>
+              <div>
                 <label className="label" htmlFor="meetUrl">
                   Google Meet link
                 </label>
@@ -195,7 +214,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
               </div>
             </div>
             <button className="btn-primary btn-sm mt-3">Create intake</button>
-            <p className="mt-2 text-xs text-muted">Classes are created weekly from the first date, with notes copied from the last intake.</p>
+            <p className="mt-2 text-xs text-muted">Classes are created {daily ? "daily" : "weekly"} from the first date, with notes copied from the last intake.</p>
           </form>
         </section>
       )}
@@ -207,7 +226,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             <details key={t.id} className="rounded-xl border border-line p-4">
               <summary className="flex cursor-pointer items-center justify-between gap-2">
                 <span className="font-medium text-ink">
-                  Week {t.week}: {t.title}
+                  {lessonLabel(course)} {t.week}: {t.title}
                 </span>
                 {t.isFinalProject && <Pill tone="violet">Final project</Pill>}
               </summary>
@@ -233,7 +252,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
           {quizList.map((q) => (
             <details key={q.id} className="rounded-xl border border-line p-4">
               <summary className="cursor-pointer font-medium text-ink">
-                Week {q.week}: {q.title} <span className="text-sm font-normal text-muted">({q.questions.length} questions)</span>
+                {lessonLabel(course)} {q.week}: {q.title} <span className="text-sm font-normal text-muted">({q.questions.length} questions)</span>
               </summary>
               <QuizForm courseId={courseId} quiz={q} />
               <form action={deleteQuiz.bind(null, courseId, q.id)} className="mt-2">
@@ -256,7 +275,7 @@ function AssignmentForm({ courseId, task }: { courseId: string; task?: typeof sc
     <form action={saveAssignment.bind(null, courseId, task?.id ?? null)} className="mt-4 space-y-3">
       <div className="grid gap-3 sm:grid-cols-[6rem_1fr]">
         <div>
-          <label className="label">Week</label>
+          <label className="label">Week or day</label>
           <input className="input" name="week" type="number" min={1} defaultValue={task?.week ?? 1} />
         </div>
         <div>
@@ -281,7 +300,7 @@ function QuizForm({ courseId, quiz }: { courseId: string; quiz?: typeof schema.q
     <form action={saveQuiz.bind(null, courseId, quiz?.id ?? null)} className="mt-4 space-y-3">
       <div className="grid gap-3 sm:grid-cols-[6rem_1fr]">
         <div>
-          <label className="label">Week</label>
+          <label className="label">Week or day</label>
           <input className="input" name="week" type="number" min={1} defaultValue={quiz?.week ?? 1} />
         </div>
         <div>

@@ -11,6 +11,7 @@ import { getDb } from "@/lib/db";
 import { classState, untilText } from "@/lib/learn";
 import { badgesFor, studentOverview } from "@/lib/student";
 import { formatDateTime } from "@/lib/time";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "My learning" };
 
@@ -90,7 +91,7 @@ export default async function LearnHome() {
                             {state === "live" ? "Live now" : `Next class ${untilText(nextClass.startsAt)}`}
                           </p>
                           <p className="mt-1 font-medium text-ink">
-                            Week {nextClass.week}: {nextClass.title}
+                            {lessonLabel(course)} {nextClass.week}: {nextClass.title}
                           </p>
                           <p className="text-sm text-muted">{formatDateTime(nextClass.startsAt)} (Lagos time)</p>
                           {(state === "open" || state === "live") && (

@@ -17,7 +17,7 @@ export function CourseCard({ course, nextCohort }: { course: CourseRow; nextCoho
       <div className="flex flex-1 flex-col p-6">
         <div className="flex flex-wrap gap-2">
           <Pill tone={course.accent === "violet" ? "violet" : "primary"}>{recorded ? "Video course" : "Live classes"}</Pill>
-          <Pill>{recorded ? `${course.outline.length} lessons` : `${course.outline.length} weeks`}</Pill>
+          <Pill>{recorded ? `${course.outline.length} lessons` : `${course.outline.length} ${course.lessonUnit === "day" ? "days" : "weeks"}`}</Pill>
           <Pill>Certificate</Pill>
         </div>
         <h3 className="mt-4 font-display text-xl font-semibold text-ink group-hover:text-primary">{course.title}</h3>

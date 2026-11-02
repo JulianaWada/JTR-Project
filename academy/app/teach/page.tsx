@@ -9,6 +9,7 @@ import { classState, untilText } from "@/lib/learn";
 import { naira } from "@/lib/money";
 import { teacherDashboard, type Activity } from "@/lib/teacher";
 import { formatDateTime } from "@/lib/time";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Teacher dashboard" };
 
@@ -170,7 +171,7 @@ export default async function TeachHome() {
                   <li key={c.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
                       <Link href={`/teach/cohorts/${c.cohortId}/classes/${c.id}`} className="block truncate text-sm font-medium text-ink hover:text-primary">
-                        Week {c.week}: {c.title}
+                        {lessonLabel(c.course)} {c.week}: {c.title}
                       </Link>
                       <p className="truncate text-xs text-muted">
                         {c.course.title} · {state === "upcoming" ? `${formatDateTime(c.startsAt)} (${untilText(c.startsAt)})` : "now"}

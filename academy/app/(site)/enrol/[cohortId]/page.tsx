@@ -9,6 +9,7 @@ import { modes } from "@/lib/env";
 import { naira } from "@/lib/money";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { CheckoutForm } from "./checkout-form";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Enrol" };
 
@@ -44,7 +45,7 @@ export default async function EnrolPage({ params }: PageProps<"/enrol/[cohortId]
           {lessons.map((l) => (
             <li key={l.id} className="flex items-center justify-between gap-4 px-5 py-3 text-sm">
               <span className="text-ink">
-                <span className="text-muted">{cohort.selfPaced ? "Lesson" : "Week"} {l.week} · </span>
+                <span className="text-muted">{lessonLabel(course, cohort.selfPaced)} {l.week} · </span>
                 {l.title}
               </span>
               {!cohort.selfPaced && <span className="shrink-0 text-muted">{formatDateTime(l.startsAt)}</span>}

@@ -45,6 +45,7 @@ async function insertCourse(db: Database, t: CourseTemplate, sortOrder: number) 
       outline: t.outline,
       priceKobo: koboFromNaira(t.priceNaira),
       format: t.format,
+      lessonUnit: t.lessonUnit ?? "week",
       // A recorded course is complete once every lesson is watched.
       completionAttendancePercent: t.format === "recorded" ? 100 : 80,
       accent: t.accent,
@@ -56,17 +57,17 @@ async function insertCourse(db: Database, t: CourseTemplate, sortOrder: number) 
   return course;
 }
 
-/** A cohort with one weekly class per lesson, the first `firstClassWeeksFromNow` weeks from now. */
+/** A cohort with one class per lesson, weekly or daily (as the course says), starting at `startsAt`. */
 async function insertCohort(
   db: Database,
   t: CourseTemplate,
   courseId: string,
   name: string,
-  firstClassWeeksFromNow: number,
+  startsAt: Date,
   now: Date,
   opts: { enrolmentOpen: boolean; withRecordings: boolean; meetUrl: string },
 ) {
-  const startsAt = classSlot(now, firstClassWeeksFromNow);
+  const daily = t.lessonUnit === "day";
   const [cohort] = await db
     .insert(cohorts)
     .values({ courseId, name, startsAt, meetUrl: opts.meetUrl, enrolmentOpen: opts.enrolmentOpen })
@@ -75,12 +76,13 @@ async function insertCohort(
     .insert(classes)
     .values(
       t.lessons.map((l, i) => {
-        const at = classSlot(now, firstClassWeeksFromNow + i);
+        const at = addDays(startsAt, i * (daily ? 1 : 7));
         return {
           cohortId: cohort.id,
           week: l.week,
           title: l.title,
           startsAt: at,
+          durationMinutes: daily ? 120 : 90,
           notes: l.notes,
           resources: l.resources,
           recordingUrl: opts.withRecordings && at < now ? "https://drive.google.com/file/d/demo-recording/view" : null,
@@ -101,13 +103,17 @@ export async function seedCourses(db: Database, { demo = false }: { demo?: boole
   const salesCourse = await insertCourse(db, sales, 0);
   const animationCourse = await insertCourse(db, animation, 1);
 
-  // Sales is a recorded course with one self-paced intake. Animation is live, with an intake open for January.
+  // Sales is a recorded course with one self-paced intake. Animation is a live five-day course,
+  // with an intake open for 1 December 2026, 4pm to 6pm Lagos time (or 11 weeks out once that date has passed).
   const [salesSelfPaced] = await ensureSelfPacedCohorts(db, now);
   const meetUrl = demo ? "https://meet.google.com/jtr-demo-class" : "";
   const animationDone = demo
-    ? await insertCohort(db, animation, animationCourse.id, "September 2026", -8, now, { enrolmentOpen: false, withRecordings: true, meetUrl })
+    ? await insertCohort(db, animation, animationCourse.id, "September 2026", classSlot(now, -8), now, { enrolmentOpen: false, withRecordings: true, meetUrl })
     : null;
-  const animationNext = await insertCohort(db, animation, animationCourse.id, "January 2027", 11, now, { enrolmentOpen: true, withRecordings: false, meetUrl });
+  const december = fromLagos("2026-12-01", "16:00")!;
+  const nextStart = december > now ? december : classSlot(now, 11);
+  const nextName = december > now ? "December 2026" : "Next intake";
+  const animationNext = await insertCohort(db, animation, animationCourse.id, nextName, nextStart, now, { enrolmentOpen: true, withRecordings: false, meetUrl });
 
   if (demo) await db.insert(discountCodes).values({ code: "EARLYBIRD", percentOff: 20 });
   return { salesCourse, animationCourse, salesSelfPaced, animationDone, animationNext };

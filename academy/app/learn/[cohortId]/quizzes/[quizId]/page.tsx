@@ -8,6 +8,7 @@ import { awardBadges, BADGES } from "@/lib/badges";
 import { cn } from "@/lib/cn";
 import { schema } from "@/lib/db";
 import { requireCohortAccess } from "@/lib/learn";
+import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Quiz" };
 
@@ -52,7 +53,7 @@ export default async function QuizPage({ params, searchParams }: PageProps<"/lea
       <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
         ← {course.title}
       </Link>
-      <p className="eyebrow mt-4">Week {quiz.week} quiz</p>
+      <p className="eyebrow mt-4">{lessonLabel(course)} {quiz.week} quiz</p>
       <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{quiz.title}</h1>
       {previous && !attempt && (
         <p className="mt-2 text-sm text-muted">

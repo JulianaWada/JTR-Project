@@ -28,8 +28,10 @@ export const users = pgTable("users", {
 
 export type CourseWeek = { week: number; title: string; summary: string };
 
-/** "live": weekly classes on Google Meet in intakes. "recorded": video lessons students watch at their own pace. */
+/** "live": classes on Google Meet in dated intakes. "recorded": video lessons students watch at their own pace. */
 export type CourseFormat = "live" | "recorded";
+/** How often a live course meets: one class a week, or one a day for a short intensive course. */
+export type LessonUnit = "week" | "day";
 
 export const courses = pgTable("courses", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -44,6 +46,7 @@ export const courses = pgTable("courses", {
   outline: jsonb("outline").$type<CourseWeek[]>().notNull().default([]),
   priceKobo: integer("price_kobo").notNull(),
   format: text("format").$type<CourseFormat>().notNull().default("live"),
+  lessonUnit: text("lesson_unit").$type<LessonUnit>().notNull().default("week"),
   /** Share of classes a student must attend (live) or watch (recorded) to earn the certificate. */
   completionAttendancePercent: integer("completion_attendance_percent").notNull().default(80),
   /** Whether the final project must be passed to earn the certificate. */

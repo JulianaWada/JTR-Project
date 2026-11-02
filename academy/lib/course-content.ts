@@ -1,4 +1,4 @@
-import type { CourseFormat, CourseWeek, QuizQuestion, Resource } from "@/lib/db/schema";
+import type { CourseFormat, CourseWeek, LessonUnit, QuizQuestion, Resource } from "@/lib/db/schema";
 
 // Starter content for the first two courses. It is copied into the database once (lib/seed.ts);
 // after that Jules edits everything from the teacher dashboard. Prices are placeholders.
@@ -14,6 +14,8 @@ export type CourseTemplate = {
   outcomes: string[];
   priceNaira: number;
   format: CourseFormat;
+  /** Live courses only: "week" for one class a week, "day" for a short daily course. Defaults to week. */
+  lessonUnit?: LessonUnit;
   accent: "blue" | "violet";
   outline: CourseWeek[];
   lessons: LessonTemplate[];
@@ -201,7 +203,7 @@ export const animationCourse: CourseTemplate = {
   title: "Create Animation Videos with AI",
   tagline: "Turn an idea into a short animated video for ads, social media or teaching.",
   description:
-    "A hands-on six-week live course. You'll learn how short animated videos are planned, then use AI tools to write the script, create characters and scenes, animate them, and add voice and music. By the end you'll have finished your own 30 to 60 second animated video. No drawing or editing experience needed.",
+    "A hands-on five-day live course, one two-hour class a day. You'll learn how short animated videos are planned, then use AI tools to write the script, create characters and scenes, animate them, and add voice and music. By the end you'll have finished your own 30 to 60 second animated video. No drawing or editing experience needed.",
   audience: [
     "Business owners who want eye-catching video adverts",
     "Content creators and social media managers",
@@ -217,19 +219,19 @@ export const animationCourse: CourseTemplate = {
   ],
   priceNaira: 50000,
   format: "live",
+  lessonUnit: "day",
   accent: "violet",
   outline: [
-    { week: 1, title: "What makes a great short video", summary: "Hooks, length and formats, plus a tour of AI video and animation tools." },
-    { week: 2, title: "Script and storyboard", summary: "Writing a script and turning it into a storyboard with AI." },
-    { week: 3, title: "Characters and scenes", summary: "Creating consistent characters, backgrounds and props." },
-    { week: 4, title: "Bring it to life", summary: "Animating scenes, camera moves and transitions." },
-    { week: 5, title: "Sound and finishing", summary: "Voiceover, music, captions and editing." },
-    { week: 6, title: "Showcase", summary: "Final project: your own 30 to 60 second animated video." },
+    { week: 1, title: "Script and storyboard", summary: "What makes a great short video, then writing the script and storyboard with AI." },
+    { week: 2, title: "Characters and scenes", summary: "Creating consistent characters, backgrounds and props." },
+    { week: 3, title: "Bring it to life", summary: "Animating scenes, camera moves and transitions." },
+    { week: 4, title: "Sound and finishing", summary: "Voiceover, music, captions and editing." },
+    { week: 5, title: "Showcase", summary: "Final project: your own 30 to 60 second animated video." },
   ],
   lessons: [
     {
       week: 1,
-      title: "What makes a great short video",
+      title: "Script and storyboard",
       notes: `## The first 3 seconds
 On TikTok, Instagram Reels and YouTube Shorts people decide in about 3 seconds whether to keep watching. Start with movement, a question or a surprising image, never with a logo.
 
@@ -245,17 +247,7 @@ On TikTok, Instagram Reels and YouTube Shorts people decide in about 3 seconds w
 - Voice: an AI voice generator, or record your own on your phone
 - Editing: CapCut or Canva
 
-## Exercise
-Watch 5 animated adverts you like and note what happens in the first 3 seconds.`,
-      resources: [
-        { label: "CapCut", url: "https://www.capcut.com" },
-        { label: "Canva", url: "https://www.canva.com" },
-      ],
-    },
-    {
-      week: 2,
-      title: "Script and storyboard",
-      notes: `## One video, one message
+## One video, one message
 Decide the single thing the viewer should remember or do. Write it in one sentence before anything else.
 
 ## Writing the script with AI
@@ -265,11 +257,14 @@ Prompt: "Write a 30-second animated video script for [business]. Audience: [who]
 A storyboard is a list of frames: what we see, what we hear, and how long it lasts. Ask AI to turn the script into a table with Scene, Visual, Narration and Seconds. A 30-second video usually has 5 to 8 scenes.
 
 ## Exercise
-Write your script and storyboard for your final project idea.`,
-      resources: [],
+Write your script and storyboard for your final project idea. Before the next class, watch 5 animated adverts you like and note what happens in the first 3 seconds.`,
+      resources: [
+        { label: "CapCut", url: "https://www.capcut.com" },
+        { label: "Canva", url: "https://www.canva.com" },
+      ],
     },
     {
-      week: 3,
+      week: 2,
       title: "Characters and scenes",
       notes: `## Consistency is everything
 The hardest part of AI animation is keeping a character looking the same in every scene. Write a **character sheet**: name, age, skin tone, hair, clothes and colours, and paste exactly the same description into every image prompt.
@@ -286,7 +281,7 @@ Create your main character in 3 different poses and 2 backgrounds.`,
       resources: [],
     },
     {
-      week: 4,
+      week: 3,
       title: "Bring it to life",
       notes: `## Two ways to animate
 - **Image-to-video AI:** upload a still image and describe the motion ("she waves and smiles, camera slowly pushes in"). Keep each clip short, 3 to 5 seconds.
@@ -303,7 +298,7 @@ Animate every scene in your storyboard, even roughly.`,
       resources: [],
     },
     {
-      week: 5,
+      week: 4,
       title: "Sound and finishing",
       notes: `## Voiceover
 Record in a quiet room with your phone close to your mouth, or use an AI voice. Speak a little slower than normal. Keep sentences short.
@@ -322,7 +317,7 @@ Most people watch with the sound off. Add auto-captions in CapCut and check ever
       resources: [],
     },
     {
-      week: 6,
+      week: 5,
       title: "Showcase",
       notes: `## Final project
 Submit a finished 30 to 60 second animated video with:
@@ -340,9 +335,9 @@ Keep the AI tutor for questions, and share your next videos with the group.`,
     },
   ],
   assignments: [
-    { week: 2, title: "Script and storyboard", brief: "Submit your video script and a storyboard table (Scene, Visual, Narration, Seconds) for your final project idea." },
-    { week: 3, title: "Character sheet", brief: "Submit your character sheet and 3 images of your character in different poses (a Google Drive link is fine)." },
-    { week: 6, title: "Final project: your animated video", brief: "Submit a link to your finished 30 to 60 second animated video (Google Drive, YouTube unlisted or TikTok).", isFinalProject: true },
+    { week: 1, title: "Script and storyboard", brief: "Submit your video script and a storyboard table (Scene, Visual, Narration, Seconds) for your final project idea." },
+    { week: 2, title: "Character sheet", brief: "Submit your character sheet and 3 images of your character in different poses (a Google Drive link is fine)." },
+    { week: 5, title: "Final project: your animated video", brief: "Submit a link to your finished 30 to 60 second animated video (Google Drive, YouTube unlisted or TikTok).", isFinalProject: true },
   ],
   quizzes: [
     {
@@ -355,7 +350,7 @@ Keep the AI tutor for questions, and share your next videos with the group.`,
       ],
     },
     {
-      week: 3,
+      week: 2,
       title: "Characters quiz",
       questions: [
         { question: "How do you keep a character looking the same across scenes?", options: ["Use a different style each time", "Paste the same character description into every prompt", "Only use one scene"], answer: 1 },

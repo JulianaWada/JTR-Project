@@ -88,6 +88,7 @@ export async function updateCourse(courseId: string, form: FormData) {
       outline,
       priceKobo: koboFromNaira(price),
       format,
+      ...(form.has("lessonUnit") ? { lessonUnit: form.get("lessonUnit") === "day" ? ("day" as const) : ("week" as const) } : {}),
       completionAttendancePercent: pct,
       requiresFinalProject: form.get("requiresFinalProject") === "on",
       published: form.get("published") === "on",
@@ -154,7 +155,7 @@ export async function deleteQuiz(courseId: string, quizId: string) {
 
 // Intakes (cohorts) and classes
 
-/** A new intake with one weekly class per outline week. Notes are copied from the latest earlier intake. */
+/** A new intake with one class per outline line, weekly or daily as the course says. Notes are copied from the latest earlier intake. */
 export async function createCohort(courseId: string, form: FormData) {
   await requireTeacher();
   const db = await getDb();
@@ -163,8 +164,11 @@ export async function createCohort(courseId: string, form: FormData) {
   if (!course) back("/teach/courses", { error: "Course not found." });
   const first = fromLagos(str(form, "date"), str(form, "time") || "19:00");
   const capacity = Number(str(form, "capacity") || "30");
+  const daily = course?.lessonUnit === "day";
+  const duration = Number(str(form, "duration") || (daily ? "120" : "90"));
   if (!str(form, "name") || !first) back(path, { error: "Give the intake a name and a first class date." });
   if (!Number.isInteger(capacity) || capacity < 1) back(path, { error: "Capacity must be a whole number." });
+  if (!Number.isInteger(duration) || duration < 15 || duration > 600) back(path, { error: "Class length must be between 15 and 600 minutes." });
 
   const previous = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.courseId, courseId), orderBy: desc(schema.cohorts.startsAt) });
   const template = previous ? await db.query.classes.findMany({ where: eq(schema.classes.cohortId, previous.id), orderBy: asc(schema.classes.week) }) : [];
@@ -180,13 +184,14 @@ export async function createCohort(courseId: string, form: FormData) {
         cohortId: cohort.id,
         week: w.week,
         title: w.title,
-        startsAt: addDays(first, i * 7),
+        startsAt: addDays(first, i * (daily ? 1 : 7)),
+        durationMinutes: duration,
         notes: copy?.notes ?? "",
         resources: copy?.resources ?? [],
       };
     }),
   );
-  redirect(`/teach/cohorts/${cohort.id}?saved=${encodeURIComponent("Intake created with a weekly class for each week of the outline.")}`);
+  redirect(`/teach/cohorts/${cohort.id}?saved=${encodeURIComponent(daily ? "Intake created with a class on each day of the outline." : "Intake created with a weekly class for each week of the outline.")}`);
 }
 
 export async function updateCohort(cohortId: string, form: FormData) {

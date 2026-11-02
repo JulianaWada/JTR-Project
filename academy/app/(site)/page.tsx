@@ -12,7 +12,7 @@ const steps = [
   { title: "Choose a course and pay", body: "Pick a course and pay securely with Paystack: card, bank transfer or USSD." },
   {
     title: "Watch or join your classes",
-    body: "Video courses: watch each lesson whenever it suits you. Live courses: one 90-minute class a week with Jules on Google Meet, with a reminder the day before.",
+    body: "Video courses: watch each lesson whenever it suits you. Live courses: classes with Jules on Google Meet, weekly or on consecutive days, with a reminder the day before.",
   },
   { title: "Practise with your AI tutor", body: "Notes, recordings, assignments and quizzes after every class, plus an AI tutor that knows the course and answers any time." },
   { title: "Earn badges and your certificate", body: "Collect badges as you go. Finish the course and get a certificate anyone can verify online." },
@@ -20,7 +20,7 @@ const steps = [
 
 const faqs = [
   { q: "Do I need any technical background?", a: "No. If you can use WhatsApp and a web browser, you can follow both courses. Everything is shown step by step in class." },
-  { q: "What's the difference between a video course and a live course?", a: "A video course has recorded lessons you watch at your own pace, starting any day. A live course has a weekly class with Jules in a small group, recorded in case you miss one." },
+  { q: "What's the difference between a video course and a live course?", a: "A video course has recorded lessons you watch at your own pace, starting any day. A live course has classes with Jules in a small group on set dates, recorded in case you miss one." },
   {
     q: "How do I get the certificate?",
     a: "Watch every lesson of a video course, or attend at least 80% of a live course's classes, and pass the final project. Your certificate is issued automatically, as a PDF with a link anyone can use to check it.",
@@ -43,7 +43,7 @@ export default async function AcademyHome() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
               For business owners and creators: grow your sales with AI in a video course you take at your own pace, or make animated videos with AI in
-              six weeks of live classes. An AI tutor between lessons, and a certificate at the end.
+              a five-day live class. An AI tutor between lessons, and a certificate at the end.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#courses" className="btn-primary h-12 px-7 text-base">
