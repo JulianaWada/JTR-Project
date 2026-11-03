@@ -85,6 +85,9 @@ export const cohorts = pgTable(
 
 export type Resource = { label: string; url: string };
 
+/** A lesson's slide deck: the PowerPoint file, plus one image per slide for the slide viewer (empty when only the file is known). */
+export type LessonSlides = { file: string; images: string[] };
+
 /** A live class, or a video lesson in a self-paced intake. Notes and resources become the lesson page, and feed the AI tutor. */
 export const classes = pgTable(
   "classes",
@@ -102,6 +105,7 @@ export const classes = pgTable(
     recordingUrl: text("recording_url"),
     notes: text("notes").notNull().default(""),
     resources: jsonb("resources").$type<Resource[]>().notNull().default([]),
+    slides: jsonb("slides").$type<LessonSlides>(),
     reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
   },
   (t) => [index("classes_cohort_idx").on(t.cohortId, t.startsAt)],

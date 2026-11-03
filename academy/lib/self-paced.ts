@@ -31,6 +31,7 @@ export async function ensureSelfPacedCohorts(db: Database, now = new Date()) {
         title: fromIntake?.title ?? fromTemplate?.title ?? w.title,
         notes: fromIntake?.notes || fromTemplate?.notes || w.summary,
         resources: fromIntake?.resources.length ? fromIntake.resources : (fromTemplate?.resources ?? []),
+        slides: fromIntake?.slides ?? fromTemplate?.slides ?? null,
       };
     });
 

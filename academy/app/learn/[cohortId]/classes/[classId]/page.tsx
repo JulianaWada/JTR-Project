@@ -9,6 +9,9 @@ import { classState, requireCohortAccess, untilText } from "@/lib/learn";
 import { Markdown } from "@/lib/markdown";
 import { formatDateTime } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
+import { SlideViewer } from "@/components/slide-viewer";
+import { env } from "@/lib/env";
+import { officeViewerUrl, slidesFileUrl } from "@/lib/slides";
 import { setLessonWatched } from "./actions";
 import { lessonLabel } from "@/lib/lesson-unit";
 
@@ -76,6 +79,25 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
               </div>
             )}
           </div>
+        )}
+        {lesson.slides && (
+          <section className="mt-6" aria-labelledby="slides-heading">
+            <h2 id="slides-heading" className="mb-3 font-semibold text-ink">
+              Lesson slides
+            </h2>
+            {lesson.slides.images.length > 0 ? (
+              <SlideViewer title={lesson.title} images={lesson.slides.images} fileUrl={lesson.slides.file} />
+            ) : (
+              <>
+                <div className="aspect-video overflow-hidden rounded-card border border-line bg-surface-2">
+                  <iframe src={officeViewerUrl(slidesFileUrl(lesson.slides, env.appUrl))} title={`${lesson.title} slides`} className="size-full" allowFullScreen />
+                </div>
+                <a href={slidesFileUrl(lesson.slides, env.appUrl)} download className="btn-secondary mt-3 text-sm">
+                  ↓ Download the PowerPoint
+                </a>
+              </>
+            )}
+          </section>
         )}
         <div className="card mt-6">
           {lesson.notes.trim() ? <Markdown source={lesson.notes} /> : <p className="text-muted">Jules will add the notes for this class soon.</p>}
