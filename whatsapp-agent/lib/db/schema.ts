@@ -45,7 +45,7 @@ export const tenants = pgTable("tenants", {
   paystackSubaccount: text("paystack_subaccount"),
   dashboardPasswordHash: text("dashboard_password_hash").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export type CatalogKind = "service" | "product";
 
@@ -67,7 +67,7 @@ export const catalogItems = pgTable(
     sortOrder: integer("sort_order").notNull().default(0),
   },
   (t) => [index("catalog_items_tenant_idx").on(t.tenantId)],
-);
+).enableRLS();
 
 export type ChatMode = "ai" | "human";
 
@@ -99,7 +99,7 @@ export const customers = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("customers_tenant_wa_idx").on(t.tenantId, t.waId)],
-);
+).enableRLS();
 
 export type MessageAuthor = "customer" | "ai" | "owner" | "system";
 export type MessageStatus = "received" | "pending" | "sent" | "delivered" | "read" | "failed" | "simulated";
@@ -127,7 +127,7 @@ export const messages = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("messages_customer_idx").on(t.customerId, t.createdAt)],
-);
+).enableRLS();
 
 /**
  * The exact Claude conversation for a chat, one row per API message, append-only.
@@ -146,7 +146,7 @@ export const agentTurns = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("agent_turns_customer_seq_idx").on(t.customerId, t.seq)],
-);
+).enableRLS();
 
 export type OrderStatus =
   | "awaiting_payment"
@@ -184,7 +184,7 @@ export const orders = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("orders_tenant_idx").on(t.tenantId, t.createdAt)],
-);
+).enableRLS();
 
 export type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show" | "expired";
 
@@ -213,7 +213,7 @@ export const bookings = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("bookings_tenant_start_idx").on(t.tenantId, t.startsAt)],
-);
+).enableRLS();
 
 export type PaymentStatus = "pending" | "success" | "failed" | "abandoned";
 
@@ -239,7 +239,7 @@ export const payments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("payments_tenant_idx").on(t.tenantId, t.createdAt)],
-);
+).enableRLS();
 
 export type Tenant = typeof tenants.$inferSelect;
 export type CatalogItem = typeof catalogItems.$inferSelect;

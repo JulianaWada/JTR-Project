@@ -2,6 +2,8 @@ import { boolean, index, integer, pgTable, text, timestamp, uuid } from "drizzle
 
 // The website's own data. Leads and Academy sign-ups are saved here as well as emailed,
 // so nothing is lost if email is not set up yet. Times are stored in UTC.
+// Row-Level Security is on for every table with no policies: the site connects as the database owner (which bypasses RLS),
+// while Supabase's public API (anon and authenticated keys) gets no access. Keep .enableRLS() on any new table.
 
 export type LeadStatus = "new" | "contacted" | "done";
 
@@ -28,7 +30,7 @@ export const leads = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("leads_created_idx").on(t.createdAt)],
-);
+).enableRLS();
 
 /** JTR Academy register-interest form (/academy/interest). */
 export const academyInterest = pgTable(
@@ -48,7 +50,7 @@ export const academyInterest = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("academy_interest_created_idx").on(t.createdAt)],
-);
+).enableRLS();
 
 /**
  * Admin changes to the portfolio in content/site.ts, by project id. A missing row or a null field
@@ -62,7 +64,7 @@ export const projectSettings = pgTable("project_settings", {
   href: text("href"),
   sortOrder: integer("sort_order"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export type LeadRow = typeof leads.$inferSelect;
 export type AcademyInterestRow = typeof academyInterest.$inferSelect;

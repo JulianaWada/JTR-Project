@@ -43,6 +43,13 @@
       "when": 1793653781353,
       "tag": "0005_usd_all_courses",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793740981757,
+      "tag": "0006_enable_rls",
+      "breakpoints": true
     }
   ]
 }
