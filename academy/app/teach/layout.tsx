@@ -22,6 +22,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
         { href: "/teach/payments", label: "Payments", icon: "wallet" },
         { href: "/teach/tutor", label: "Tutor questions", icon: "sparkles" },
         { href: "/teach/outbox", label: "Emails", icon: "mail" },
+        { href: "/learn/preview", label: "Student view", icon: "eye" },
       ]}
     >
       {children}
