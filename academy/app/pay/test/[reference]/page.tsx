@@ -5,6 +5,7 @@ import { getDb, schema } from "@/lib/db";
 import { markPaymentSuccessful } from "@/lib/enrolment";
 import { money } from "@/lib/money";
 import { asset } from "@/lib/assets";
+import { env } from "@/lib/env";
 
 export const metadata: Metadata = { title: "Test payment", robots: { index: false } };
 
@@ -12,8 +13,8 @@ async function payNow(reference: string) {
   "use server";
   const db = await getDb();
   const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
-  // Only test-mode payments can be completed from this page.
-  if (!payment || payment.provider !== "test") return;
+  // Only unpaid test-mode payments, and only while practice payments are allowed (never on the live site).
+  if (!env.testPaymentsAllowed || !payment || payment.provider !== "test" || payment.status !== "pending") return;
   await markPaymentSuccessful(db, reference);
   redirect(`/pay/done?reference=${reference}`);
 }
@@ -23,7 +24,7 @@ export default async function TestCheckout({ params }: PageProps<"/pay/test/[ref
   const { reference } = await params;
   const db = await getDb();
   const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
-  if (!payment || payment.provider !== "test") notFound();
+  if (!env.testPaymentsAllowed || !payment || payment.provider !== "test") notFound();
   const enrolment = (await db.query.enrolments.findFirst({ where: eq(schema.enrolments.id, payment.enrolmentId) }))!;
   const cohort = (await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, enrolment.cohortId) }))!;
   const course = (await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId) }))!;

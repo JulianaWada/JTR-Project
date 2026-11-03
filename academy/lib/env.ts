@@ -59,6 +59,14 @@ export const env = {
   get paystackSecretKey() {
     return read("PAYSTACK_SECRET_KEY");
   },
+  /**
+   * Whether the practice checkout (no real money) may unlock courses. Only without a Paystack key, and never on the
+   * live site unless ALLOW_TEST_PAYMENTS=true is set on purpose (e.g. for a demo copy). Otherwise anyone could enrol for free.
+   */
+  get testPaymentsAllowed() {
+    if (read("PAYSTACK_SECRET_KEY")) return false;
+    return process.env.NODE_ENV !== "production" || read("ALLOW_TEST_PAYMENTS") === "true";
+  },
 
   // Email (Resend)
   get resendApiKey() {

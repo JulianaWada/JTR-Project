@@ -2,7 +2,7 @@ import { desc, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { Flash, PageTitle, Pill, Stat } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
-import { modes } from "@/lib/env";
+import { env, modes } from "@/lib/env";
 import { money, naira, usd } from "@/lib/money";
 import { formatDateTime } from "@/lib/time";
 import { createDiscount, toggleDiscount } from "../actions";
@@ -34,7 +34,9 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
     <>
       <PageTitle eyebrow="Teacher" title="Payments">
         {modes().paystack === "test"
-          ? "Test mode: these are practice payments. Add your Paystack secret key to take real money."
+          ? env.testPaymentsAllowed
+            ? "Test mode: these are practice payments. Add your Paystack secret key to take real money."
+            : "Checkout is closed: add your Paystack secret key (PAYSTACK_SECRET_KEY) so students can pay and get in."
           : "Payments through Paystack. Money settles to your Paystack balance."}
       </PageTitle>
       <Flash searchParams={searchParams} />
@@ -85,7 +87,7 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
                     {p.discountCode && <span className="block text-xs text-muted">{p.discountCode}</span>}
                   </td>
                   <td>
-                    {p.status === "success" ? <Pill tone="success">Paid</Pill> : p.status === "pending" ? <Pill tone="warning">Not finished</Pill> : <Pill>Replaced</Pill>}
+                    {p.status === "success" ? <Pill tone="success">Paid</Pill> : p.status === "pending" ? <Pill tone="warning">Not finished</Pill> : p.status === "refunded" ? <Pill>Refunded</Pill> : <Pill>Replaced</Pill>}
                     {p.provider === "test" && <span className="ms-1 text-xs text-muted">test</span>}
                   </td>
                   <td className="font-mono text-xs text-muted">{p.reference}</td>

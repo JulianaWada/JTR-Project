@@ -42,7 +42,7 @@ Delete `academy/.data` to start again with fresh demo data.
 1. **Database (Supabase).** Create a project, then copy *Project settings > Database > Connection string > Transaction pooler* (port 6543) into `DATABASE_URL`. Tables are created automatically on every build.
 2. **Vercel.** Add a new project from this repository with **Root Directory = `academy`**. Set the environment variables below. Vercel Cron sends class reminders every hour (`vercel.json`).
 3. **Connect it to the website.** Recommended: give the academy its own subdomain, `academy.jtechright.com` (step-by-step in [DOMAINS.md](../DOMAINS.md)). Set `APP_URL` here to `https://academy.jtechright.com`, and in the website's Vercel project set `ACADEMY_PUBLIC_URL` to the same address. The "Academy" link then appears in the website's menu and footer and goes to the subdomain; old `/academy` links on the website redirect there. `/academy/interest` stays a website page. (Alternative: set `ACADEMY_URL` on the website instead, to serve the academy at `/academy` on the website.)
-4. **Paystack.** Use your secret key, and set the webhook URL to `<APP_URL>/academy/api/paystack/webhook`, e.g. `https://academy.jtechright.com/academy/api/paystack/webhook`.
+4. **Paystack.** Use your secret key, and set the webhook URL to `<APP_URL>/academy/api/paystack/webhook`, e.g. `https://academy.jtechright.com/academy/api/paystack/webhook`. Students get into their course (dashboard, lessons, classes, AI tutor) automatically as soon as Paystack confirms the payment, and not before. A full refund in Paystack takes the course away again. On the live site the practice checkout is switched off: until `PAYSTACK_SECRET_KEY` is set, checkout says payment isn't open yet, so nobody can get in without paying.
 5. **Emails (Resend).** Verify the sending domain and set `RESEND_API_KEY`.
 
 | Variable | What it's for |
@@ -54,7 +54,8 @@ Delete `academy/.data` to start again with fresh demo data.
 | `DATABASE_URL` | Supabase connection string |
 | `TEACHER_EMAIL`, `TEACHER_PASSWORD` | Jules's teacher login, created on first start |
 | `ANTHROPIC_API_KEY`, `TUTOR_MODEL` | The AI tutor (default model `claude-sonnet-5-5`) |
-| `PAYSTACK_SECRET_KEY` | Real payments |
+| `PAYSTACK_SECRET_KEY` | Real payments (required for students to enroll on the live site) |
+| `ALLOW_TEST_PAYMENTS` | Leave empty. `true` turns the practice checkout back on for a demo copy, which lets anyone in for free |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Real emails |
 | `CRON_SECRET` | Protects the reminders endpoint; Vercel sends it automatically |
 | `DEMO_PASSWORD` | Leave empty in production (it creates the demo students) |

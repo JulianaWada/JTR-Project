@@ -5,7 +5,7 @@ import { openCohorts } from "@/lib/catalog";
 import { checkCompletion } from "@/lib/certificates";
 import { createInMemoryDb, type Database } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
-import { markPaymentSuccessful, priceFor, startCheckout } from "@/lib/enrolment";
+import { markPaymentRefunded, markPaymentSuccessful, priceFor, startCheckout } from "@/lib/enrolment";
 import { classState } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
@@ -108,6 +108,55 @@ describe("enrolment and payment", () => {
     expect(enrolment?.status).toBe("active");
     const receipt = (await db.query.emails.findMany({ where: eq(schema.emails.to, student.email) })).find((e) => e.body.includes(reference));
     expect(receipt?.body).toContain("$28");
+  });
+});
+
+describe("access only after payment", () => {
+  it("keeps the course locked until the payment succeeds", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    const result = await startCheckout(db, student, cohortId, null);
+    const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;
+    const active = () =>
+      db.query.enrolments.findFirst({
+        where: and(eq(schema.enrolments.userId, student.id), eq(schema.enrolments.cohortId, cohortId), eq(schema.enrolments.status, "active")),
+      });
+    expect(await active()).toBeUndefined();
+    await markPaymentSuccessful(db, reference);
+    expect(await active()).toBeDefined();
+  });
+
+  it("closes checkout on the live site when Paystack isn't set up, instead of letting students in for free", async () => {
+    const before = { node: process.env.NODE_ENV, allow: process.env.ALLOW_TEST_PAYMENTS };
+    const envs = process.env as Record<string, string | undefined>;
+    envs.NODE_ENV = "production";
+    delete envs.ALLOW_TEST_PAYMENTS;
+    try {
+      const result = await startCheckout(db, student, seeded.animationNext.cohort.id, null);
+      expect(result).toEqual({ error: expect.stringMatching(/payment isn't switched on/) });
+      const enrolment = await db.query.enrolments.findFirst({ where: eq(schema.enrolments.userId, student.id) });
+      expect(enrolment?.status ?? "none").not.toBe("active");
+      envs.ALLOW_TEST_PAYMENTS = "true";
+      expect(await startCheckout(db, student, seeded.animationNext.cohort.id, null)).toHaveProperty("redirectTo");
+    } finally {
+      envs.NODE_ENV = before.node;
+      if (before.allow === undefined) delete envs.ALLOW_TEST_PAYMENTS;
+      else envs.ALLOW_TEST_PAYMENTS = before.allow;
+    }
+  });
+
+  it("removes access after a full refund, but not after a partial one", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    const reference = await enrolAndPay(cohortId);
+    const status = async () => (await db.query.enrolments.findFirst({ where: eq(schema.enrolments.userId, student.id) }))?.status;
+    const payment = (await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) }))!;
+
+    await markPaymentRefunded(db, reference, payment.amountKobo - 100);
+    expect(await status()).toBe("active");
+
+    await markPaymentRefunded(db, reference, payment.amountKobo);
+    expect(await status()).toBe("cancelled");
+    const after = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    expect(after?.status).toBe("refunded");
   });
 });
 
