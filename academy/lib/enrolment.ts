@@ -82,8 +82,13 @@ export async function startCheckout(
     return { redirectTo: `/learn/${cohortId}?welcome=1` };
   }
 
-  const reference = shortCode("ACD", 8);
   const provider = env.paystackSecretKey ? "paystack" : "test";
+  // Without Paystack on the live site there is no way to take real money, so nobody gets in for free.
+  if (provider === "test" && !env.testPaymentsAllowed) {
+    console.error("[payments] PAYSTACK_SECRET_KEY is not set, so checkout is closed");
+    return { error: "Online payment isn't switched on yet. Please try again later or contact us." };
+  }
+  const reference = shortCode("ACD", 8);
   // Older unpaid attempts are replaced by this one.
   await db
     .update(payments)
@@ -180,4 +185,24 @@ export async function markPaymentSuccessful(db: Database, reference: string, che
     ).join("\n"),
   });
   return { ...payment, status: "success" as const };
+}
+
+/**
+ * Removes access when Paystack refunds a payment in full. A partial refund (a goodwill discount, say) keeps the student enrolled.
+ * Safe to call more than once.
+ */
+export async function markPaymentRefunded(db: Database, reference: string, refundedKobo: number) {
+  const payment = await db.query.payments.findFirst({ where: eq(payments.reference, reference) });
+  if (!payment || payment.status !== "success") return null;
+  if (refundedKobo < payment.amountKobo) {
+    console.warn("[payments] partial refund, access kept", reference, refundedKobo, payment.amountKobo);
+    return payment;
+  }
+  await db.update(payments).set({ status: "refunded" }).where(eq(payments.id, payment.id));
+  // Only cancel when no other successful payment covers the same enrolment.
+  const otherPaid = await db.query.payments.findFirst({
+    where: and(eq(payments.enrolmentId, payment.enrolmentId), eq(payments.status, "success"), ne(payments.id, payment.id)),
+  });
+  if (!otherPaid) await db.update(enrolments).set({ status: "cancelled" }).where(eq(enrolments.id, payment.enrolmentId));
+  return { ...payment, status: "refunded" as const };
 }

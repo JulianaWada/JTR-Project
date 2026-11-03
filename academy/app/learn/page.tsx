@@ -8,6 +8,7 @@ import { asset } from "@/lib/assets";
 import { requireUser } from "@/lib/auth";
 import { BADGES, type BadgeKey } from "@/lib/badges";
 import { getDb } from "@/lib/db";
+import { env } from "@/lib/env";
 import { classState, untilText } from "@/lib/learn";
 import { badgesFor, studentOverview } from "@/lib/student";
 import { formatDateTime } from "@/lib/time";
@@ -67,7 +68,7 @@ export default async function LearnHome() {
                     <div className="mt-4">
                       <p className="text-sm text-muted">Finish paying to unlock your {cohort.selfPaced ? "lessons" : "classes"}, notes and AI tutor.</p>
                       <Link
-                        href={pendingPayment?.provider === "test" ? `/pay/test/${pendingPayment.reference}` : `/enrol/${cohort.id}`}
+                        href={pendingPayment?.provider === "test" && env.testPaymentsAllowed ? `/pay/test/${pendingPayment.reference}` : `/enrol/${cohort.id}`}
                         className="btn-primary mt-4"
                       >
                         Complete payment

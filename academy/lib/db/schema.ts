@@ -126,7 +126,8 @@ export const enrolments = pgTable(
   (t) => [uniqueIndex("enrolments_user_cohort_idx").on(t.userId, t.cohortId)],
 ).enableRLS();
 
-export type PaymentStatus = "pending" | "success" | "failed";
+/** "failed" also covers an unpaid attempt replaced by a newer one; "refunded" means the money went back and access was removed. */
+export type PaymentStatus = "pending" | "success" | "failed" | "refunded";
 export type Currency = "NGN" | "USD";
 
 export const payments = pgTable(
