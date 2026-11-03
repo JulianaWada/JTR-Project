@@ -10,7 +10,7 @@ import { classState } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
@@ -20,6 +20,7 @@ import { askTutor } from "@/lib/tutor";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
+import { officeViewerUrl, slidesFileUrl, slidesFrom } from "@/lib/slides";
 
 let db: Database;
 let seeded: Awaited<ReturnType<typeof seedCourses>>;
@@ -237,6 +238,39 @@ describe("recorded course", () => {
     expect(created.classes.map((c) => c.notes)).toEqual(seeded.animationNext.classes.map((c) => c.notes));
     expect(await ensureSelfPacedCohorts(db)).toEqual([]);
     expect((await openCohorts(db, course.id)).map((c) => c.id)).toEqual([created.cohort.id]);
+  });
+
+  it("gives every Boost Sales lesson its slides, and the migration adds them to existing intakes once", async () => {
+    const counts = [10, 10, 9, 10, 10, 9];
+    const check = (rows: (typeof schema.classes.$inferSelect)[]) => {
+      expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
+        counts.map((n, i) => [i + 1, `/academy/slides/boost-sales-with-ai/lesson-${i + 1}.pptx`, n]),
+      );
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+    };
+    check(seeded.salesSelfPaced.classes);
+
+    const cohortId = seeded.salesSelfPaced.cohort.id;
+    await db.update(schema.classes).set({ slides: null }).where(eq(schema.classes.cohortId, cohortId));
+    const [, update] = readFileSync("drizzle/0007_lesson_slides.sql", "utf8").split("--> statement-breakpoint");
+    await db.execute(update);
+    const after = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
+    check(after);
+    // Slides Jules has changed are kept; other courses get none.
+    await db.update(schema.classes).set({ slides: { file: "https://example.com/mine.pptx", images: [] } }).where(eq(schema.classes.id, after[0].id));
+    await db.execute(update);
+    expect((await db.query.classes.findFirst({ where: eq(schema.classes.id, after[0].id) }))?.slides?.file).toBe("https://example.com/mine.pptx");
+    expect(seeded.animationNext.classes.every((c) => c.slides === null)).toBe(true);
+  });
+
+  it("keeps the slide images while the teacher's PowerPoint link is unchanged, and shows other links in the PowerPoint viewer", () => {
+    const current = { file: "/academy/slides/boost-sales-with-ai/lesson-1.pptx", images: ["/academy/slides/boost-sales-with-ai/lesson-1/01.webp"] };
+    expect(slidesFrom(" /academy/slides/boost-sales-with-ai/lesson-1.pptx ", current)).toBe(current);
+    expect(slidesFrom("", current)).toBeNull();
+    expect(slidesFrom("https://example.com/deck.pptx", current)).toEqual({ file: "https://example.com/deck.pptx", images: [] });
+    expect(slidesFrom("javascript:alert(1)", null)).toHaveProperty("error");
+    expect(slidesFileUrl(current, "https://academy.jtechright.com")).toBe("https://academy.jtechright.com/academy/slides/boost-sales-with-ai/lesson-1.pptx");
+    expect(officeViewerUrl("https://example.com/a b.pptx")).toBe("https://view.officeapps.live.com/op/embed.aspx?src=https%3A%2F%2Fexample.com%2Fa%20b.pptx");
   });
 
   it("turns video links into embeddable players", () => {

@@ -50,6 +50,13 @@
       "when": 1793740981757,
       "tag": "0006_enable_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793746437692,
+      "tag": "0007_lesson_slides",
+      "breakpoints": true
     }
   ]
 }

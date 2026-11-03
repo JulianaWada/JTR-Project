@@ -86,6 +86,7 @@ async function insertCohort(
           durationMinutes: daily ? 120 : 90,
           notes: l.notes,
           resources: l.resources,
+          slides: l.slides ?? null,
           recordingUrl: opts.withRecordings && at < now ? "https://drive.google.com/file/d/demo-recording/view" : null,
         };
       }),

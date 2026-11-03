@@ -1,9 +1,9 @@
-import type { CourseFormat, CourseWeek, LessonUnit, QuizQuestion, Resource } from "@/lib/db/schema";
+import type { CourseFormat, CourseWeek, LessonSlides, LessonUnit, QuizQuestion, Resource } from "@/lib/db/schema";
 
 // Starter content for the first two courses. It is copied into the database once (lib/seed.ts);
 // after that Jules edits everything from the teacher dashboard. Prices are placeholders.
 
-export type LessonTemplate = { week: number; title: string; notes: string; resources: Resource[] };
+export type LessonTemplate = { week: number; title: string; notes: string; resources: Resource[]; slides?: LessonSlides };
 
 export type CourseTemplate = {
   slug: string;
@@ -24,6 +24,12 @@ export type CourseTemplate = {
   assignments: { week: number; title: string; brief: string; isFinalProject?: boolean }[];
   quizzes: { week: number; title: string; questions: QuizQuestion[] }[];
 };
+
+/** The branded slides for a lesson of Boost Sales with AI: the PowerPoint and one image per slide (public/slides). */
+function salesSlides(lesson: number, count: number): LessonSlides {
+  const dir = `/academy/slides/boost-sales-with-ai/lesson-${lesson}`;
+  return { file: `${dir}.pptx`, images: Array.from({ length: count }, (_, i) => `${dir}/${String(i + 1).padStart(2, "0")}.webp`) };
+}
 
 export const salesCourse: CourseTemplate = {
   slug: "boost-sales-with-ai",
@@ -80,6 +86,7 @@ A vague request gets a vague answer. A good prompt says **who you are**, **who t
         { label: "ChatGPT", url: "https://chatgpt.com" },
         { label: "Claude", url: "https://claude.ai" },
       ],
+      slides: salesSlides(1, 10),
     },
     {
       week: 2,
@@ -99,6 +106,7 @@ Sales get easier when you know exactly who you are selling to. Write a short "cu
 ## Exercise
 Write your customer profile with AI's help and bring it to the next class.`,
       resources: [],
+      slides: salesSlides(2, 10),
     },
     {
       week: 3,
@@ -118,6 +126,7 @@ Most good adverts follow **Problem, Promise, Proof, Push**:
 ## Make it sound like you
 Paste 3 of your best past posts and say "Write in this same voice." Always edit the result: add a real customer quote, a local detail or a price.`,
       resources: [],
+      slides: salesSlides(3, 9),
     },
     {
       week: 4,
@@ -135,6 +144,7 @@ Ask AI to draft replies to your 15 most common questions: price, delivery time, 
 ## Going further
 An AI sales agent can answer on WhatsApp automatically, take orders and collect payment with a Paystack link. JTR builds these for businesses.`,
       resources: [{ label: "WhatsApp Business quick replies", url: "https://faq.whatsapp.com/1791692871267237" }],
+      slides: salesSlides(4, 10),
     },
     {
       week: 5,
@@ -154,6 +164,7 @@ Many customers say "I'll get back to you" and never do. A friendly follow-up 1 d
 ## Closing
 Make paying easy: one clear payment link, clear delivery times, and a thank-you message after purchase that asks for a review.`,
       resources: [],
+      slides: salesSlides(5, 10),
     },
     {
       week: 6,
@@ -172,6 +183,7 @@ In this class each student shares their plan in 3 minutes and gets feedback from
 ## After the course
 Keep using the AI tutor in the academy for questions, and join the next intake's showcase to share your results.`,
       resources: [],
+      slides: salesSlides(6, 9),
     },
   ],
   assignments: [

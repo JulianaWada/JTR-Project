@@ -85,6 +85,21 @@ export function ClassForm({
         </>
       )}
       <div>
+        <label className="label" htmlFor="slidesFile">
+          Slides <span className="font-normal text-muted">(link to a PowerPoint file; students click through it inside the lesson page and can download it)</span>
+        </label>
+        <input
+          className="input"
+          id="slidesFile"
+          name="slidesFile"
+          defaultValue={lesson?.slides?.file ?? ""}
+          placeholder="https://… .pptx"
+        />
+        {lesson?.slides && lesson.slides.images.length > 0 && (
+          <p className="mt-1 text-xs text-muted">{lesson.slides.images.length} slides ready in the slide viewer.</p>
+        )}
+      </div>
+      <div>
         <label className="label" htmlFor="notes">
           Lesson notes <span className="font-normal text-muted">(## for headings, - for bullets, **bold**). The AI tutor learns from these.</span>
         </label>

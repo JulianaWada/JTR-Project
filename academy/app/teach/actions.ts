@@ -12,6 +12,7 @@ import { cleanMeetUrl } from "@/lib/meet-links";
 import { koboFromNaira } from "@/lib/money";
 import { parseQuiz, parseResources } from "@/lib/quiz-format";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
+import { slidesFrom } from "@/lib/slides";
 import { addDays, fromLagos } from "@/lib/time";
 
 // Every action here re-checks that the caller is the teacher; server actions are public endpoints.
@@ -195,6 +196,7 @@ export async function createCohort(courseId: string, form: FormData) {
         durationMinutes: duration,
         notes: copy?.notes ?? "",
         resources: copy?.resources ?? [],
+        slides: copy?.slides ?? null,
       };
     }),
   );
@@ -247,6 +249,8 @@ export async function saveClass(cohortId: string, classId: string | null, form: 
   const week = Number(str(form, "week"));
   if (!startsAt || !str(form, "title") || !Number.isInteger(week) || week < 1)
     back(path, { error: cohort.selfPaced ? "A lesson needs a number and a title." : "A class needs a week, a title, a date and a time." });
+  const slides = slidesFrom(str(form, "slidesFile"), existing?.slides ?? null);
+  if (slides && "error" in slides) back(path, { error: slides.error });
   const values = {
     week,
     title: str(form, "title"),
@@ -256,6 +260,7 @@ export async function saveClass(cohortId: string, classId: string | null, form: 
     recordingUrl: str(form, "recordingUrl") || null,
     notes: String(form.get("notes") ?? ""),
     resources: parseResources(String(form.get("resources") ?? "")),
+    slides,
   };
   if (classId) {
     // Moving a class re-arms its reminder.
