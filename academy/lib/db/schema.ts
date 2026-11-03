@@ -13,6 +13,8 @@ import {
 
 // Money is always stored in kobo (1 naira = 100 kobo), the unit Paystack uses.
 // Times are stored in UTC; classes are scheduled on Lagos time (see lib/time.ts).
+// Row-Level Security is on for every table with no policies: the app connects as the database owner (which bypasses RLS),
+// while Supabase's public API (anon and authenticated keys) gets no access at all. Keep .enableRLS() on any new table.
 
 export type Role = "student" | "teacher";
 
@@ -24,7 +26,7 @@ export const users = pgTable("users", {
   role: text("role").$type<Role>().notNull().default("student"),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export type CourseWeek = { week: number; title: string; summary: string };
 
@@ -58,7 +60,7 @@ export const courses = pgTable("courses", {
   published: boolean("published").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 /** One intake of a course, e.g. "January 2027". Students enroll in a cohort, not a course. */
 export const cohorts = pgTable(
@@ -79,7 +81,7 @@ export const cohorts = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("cohorts_course_idx").on(t.courseId)],
-);
+).enableRLS();
 
 export type Resource = { label: string; url: string };
 
@@ -103,7 +105,7 @@ export const classes = pgTable(
     reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
   },
   (t) => [index("classes_cohort_idx").on(t.cohortId, t.startsAt)],
-);
+).enableRLS();
 
 export type EnrolmentStatus = "pending" | "active" | "cancelled";
 
@@ -122,7 +124,7 @@ export const enrolments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("enrolments_user_cohort_idx").on(t.userId, t.cohortId)],
-);
+).enableRLS();
 
 export type PaymentStatus = "pending" | "success" | "failed";
 export type Currency = "NGN" | "USD";
@@ -147,7 +149,7 @@ export const payments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("payments_enrolment_idx").on(t.enrolmentId)],
-);
+).enableRLS();
 
 export const discountCodes = pgTable("discount_codes", {
   code: text("code").primaryKey(),
@@ -158,7 +160,7 @@ export const discountCodes = pgTable("discount_codes", {
   maxUses: integer("max_uses"),
   uses: integer("uses").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export const attendance = pgTable(
   "attendance",
@@ -174,7 +176,7 @@ export const attendance = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.classId, t.userId] })],
-);
+).enableRLS();
 
 export const assignments = pgTable(
   "assignments",
@@ -189,7 +191,7 @@ export const assignments = pgTable(
     isFinalProject: boolean("is_final_project").notNull().default(false),
   },
   (t) => [index("assignments_course_idx").on(t.courseId)],
-);
+).enableRLS();
 
 export type Grade = "pass" | "redo";
 
@@ -214,7 +216,7 @@ export const submissions = pgTable(
     markedAt: timestamp("marked_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("submissions_assignment_user_idx").on(t.assignmentId, t.userId)],
-);
+).enableRLS();
 
 export type QuizQuestion = { question: string; options: string[]; answer: number };
 
@@ -226,7 +228,7 @@ export const quizzes = pgTable("quizzes", {
   week: integer("week").notNull(),
   title: text("title").notNull(),
   questions: jsonb("questions").$type<QuizQuestion[]>().notNull(),
-});
+}).enableRLS();
 
 export const quizAttempts = pgTable(
   "quiz_attempts",
@@ -244,7 +246,7 @@ export const quizAttempts = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("quiz_attempts_user_idx").on(t.userId, t.quizId)],
-);
+).enableRLS();
 
 export const userBadges = pgTable(
   "user_badges",
@@ -259,7 +261,7 @@ export const userBadges = pgTable(
     awardedAt: timestamp("awarded_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.cohortId, t.badge] })],
-);
+).enableRLS();
 
 export const certificates = pgTable(
   "certificates",
@@ -279,7 +281,7 @@ export const certificates = pgTable(
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
   },
   (t) => [uniqueIndex("certificates_user_cohort_idx").on(t.userId, t.cohortId)],
-);
+).enableRLS();
 
 export const tutorMessages = pgTable(
   "tutor_messages",
@@ -296,7 +298,7 @@ export const tutorMessages = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("tutor_messages_thread_idx").on(t.userId, t.cohortId, t.createdAt)],
-);
+).enableRLS();
 
 /** Every email the academy sends. In test mode this is the only place they go. */
 export const emails = pgTable("emails", {
@@ -307,4 +309,4 @@ export const emails = pgTable("emails", {
   mode: text("mode").$type<"live" | "test">().notNull(),
   error: text("error"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
