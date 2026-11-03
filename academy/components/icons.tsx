@@ -21,6 +21,7 @@ const paths = {
   alert: "M12 3l9.5 17h-19zM12 10v4M12 17h.01",
   arrow: "M5 12h14M13 6l6 6-6 6",
   globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z",
+  eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
 } as const;
 
 export type IconName = keyof typeof paths;

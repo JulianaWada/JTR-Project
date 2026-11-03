@@ -15,6 +15,7 @@ import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
+import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
@@ -157,6 +158,18 @@ describe("access only after payment", () => {
     expect(await status()).toBe("cancelled");
     const after = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
     expect(after?.status).toBe("refunded");
+  });
+});
+
+describe("teacher's student view", () => {
+  it("lists every course with an intake to open, without enrolling the teacher", async () => {
+    await ensureSelfPacedCohorts(db);
+    const courses = await previewCourses(db);
+    const all = await db.query.courses.findMany();
+    expect(courses).toHaveLength(all.length);
+    for (const c of courses) expect(c.main?.courseId).toBe(c.course.id);
+    const recorded = courses.find((c) => c.course.format === "recorded");
+    if (recorded) expect(recorded.main?.selfPaced).toBe(true);
   });
 });
 

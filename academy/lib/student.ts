@@ -1,8 +1,10 @@
-import { and, asc, eq, gt, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses, enrolments, payments, userBadges } from "@/lib/db/schema";
 import { getProgress } from "@/lib/progress";
 import { addMinutes } from "@/lib/time";
+
+export type PreviewCourse = Awaited<ReturnType<typeof previewCourses>>[number];
 
 /** Everything the student dashboard shows, one entry per course they've joined or started paying for. */
 export async function studentOverview(db: Database, userId: string, now = new Date()) {
@@ -34,4 +36,27 @@ export async function badgesFor(db: Database, userId: string, cohortIds?: string
     where: cohortIds ? and(eq(userBadges.userId, userId), inArray(userBadges.cohortId, cohortIds.length ? cohortIds : ["00000000-0000-0000-0000-000000000000"])) : eq(userBadges.userId, userId),
     orderBy: asc(userBadges.awardedAt),
   });
+}
+
+/**
+ * For the teacher's student view: every course with all its intakes, and the intake to open first
+ * (the video course's self-paced intake, else the running or next intake, else the latest one).
+ */
+export async function previewCourses(db: Database, now = new Date()) {
+  const rows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
+  return Promise.all(
+    rows.map(async (course) => {
+      const intakes = await db.query.cohorts.findMany({ where: eq(cohorts.courseId, course.id), orderBy: asc(cohorts.startsAt) });
+      const withEnd = await Promise.all(
+        intakes.map(async (cohort) => {
+          const last = await db.query.classes.findFirst({ where: eq(classes.cohortId, cohort.id), orderBy: desc(classes.startsAt) });
+          const endsAt = last ? addMinutes(last.startsAt, last.durationMinutes) : cohort.startsAt;
+          return { cohort, finished: !cohort.selfPaced && endsAt < now };
+        }),
+      );
+      const main =
+        withEnd.find((i) => i.cohort.selfPaced) ?? withEnd.find((i) => !i.finished) ?? withEnd[withEnd.length - 1] ?? null;
+      return { course, intakes: withEnd, main: main?.cohort ?? null };
+    }),
+  );
 }
