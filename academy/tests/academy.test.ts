@@ -7,6 +7,7 @@ import { createInMemoryDb, type Database } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { markPaymentRefunded, markPaymentSuccessful, priceFor, startCheckout } from "@/lib/enrolment";
 import { classState } from "@/lib/learn";
+import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
@@ -395,6 +396,40 @@ describe("teacher account", () => {
       delete process.env.TEACHER_EMAIL;
       delete process.env.TEACHER_PASSWORD;
     }
+  });
+});
+
+describe("live class resources unlock on the class day", () => {
+  const live = { selfPaced: false };
+  const lesson = { week: 2, startsAt: new Date("2026-12-02T18:00:00Z") }; // 7pm Lagos, Tue 2 Dec
+
+  it("opens at midnight Lagos time on the day of the class", () => {
+    expect(unlocksAt(lesson).toISOString()).toBe("2026-12-01T23:00:00.000Z");
+    expect(isLocked(lesson, live, student, new Date("2026-12-01T22:59:00Z"))).toBe(true);
+    expect(isLocked(lesson, live, student, new Date("2026-12-01T23:00:00Z"))).toBe(false);
+  });
+
+  it("never locks recorded courses or the teacher", () => {
+    const early = new Date("2026-11-04T12:00:00Z");
+    expect(isLocked(lesson, { selfPaced: true }, student, early)).toBe(false);
+    expect(isLocked(lesson, live, { role: "teacher" }, early)).toBe(false);
+  });
+
+  it("locks a week's quiz and assignment until its first class", () => {
+    const lessons = [{ week: 1, startsAt: new Date("2026-12-01T18:00:00Z") }, lesson];
+    const weeks = lockedWeeks(lessons, live, student, new Date("2026-12-01T10:00:00Z"));
+    expect([...weeks.keys()]).toEqual([2]);
+  });
+
+  it("keeps the tutor from seeing notes for classes that haven't opened", async () => {
+    const intake = seeded.animationNext;
+    await enrolAndPay(intake.cohort.id);
+    const future = intake.classes.at(-1)!;
+    expect(isLocked(future, intake.cohort, student)).toBe(true);
+    const heading = future.notes.match(/^## (.+)$/m)?.[1];
+    expect(heading).toBeTruthy();
+    const result = await askTutor(db, student.id, intake.cohort.id, heading!);
+    expect(result.answer).not.toContain(`"${heading}"`);
   });
 });
 

@@ -2,7 +2,8 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { getDb, schema } from "@/lib/db";
+import { getDb, schema, type Database } from "@/lib/db";
+import { lockedWeeks } from "@/lib/unlock";
 import { addMinutes } from "@/lib/time";
 
 /** The signed-in student's active enrolment in a cohort, or a 404. Teachers can look at any cohort. */
@@ -37,4 +38,17 @@ export function untilText(date: Date, now = new Date()) {
   const hours = Math.round(minutes / 60);
   if (hours < 48) return `in ${hours} hours`;
   return `in ${Math.round(hours / 24)} days`;
+}
+
+/** When a live course's week (or day) opens for this student, or null if it is already open. */
+export async function weekOpensAt(
+  db: Database,
+  cohort: { id: string; selfPaced: boolean },
+  user: { role: string },
+  week: number,
+  now = new Date(),
+): Promise<Date | null> {
+  if (cohort.selfPaced || user.role === "teacher") return null;
+  const lessons = await db.query.classes.findMany({ where: and(eq(schema.classes.cohortId, cohort.id), eq(schema.classes.week, week)) });
+  return lockedWeeks(lessons, cohort, user, now).get(week) ?? null;
 }
