@@ -57,6 +57,13 @@
       "when": 1793746437692,
       "tag": "0007_lesson_slides",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793832837692,
+      "tag": "0008_animation_slides",
+      "breakpoints": true
     }
   ]
 }

@@ -256,11 +256,32 @@ describe("recorded course", () => {
     await db.execute(update);
     const after = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
     check(after);
-    // Slides Jules has changed are kept; other courses get none.
+    // Slides Jules has changed are kept.
     await db.update(schema.classes).set({ slides: { file: "https://example.com/mine.pptx", images: [] } }).where(eq(schema.classes.id, after[0].id));
     await db.execute(update);
     expect((await db.query.classes.findFirst({ where: eq(schema.classes.id, after[0].id) }))?.slides?.file).toBe("https://example.com/mine.pptx");
-    expect(seeded.animationNext.classes.every((c) => c.slides === null)).toBe(true);
+  });
+
+  it("gives each day of the Animation course its slides, and the migration adds them to existing intakes once", async () => {
+    const counts = [11, 10, 10, 10, 9];
+    const check = (rows: (typeof schema.classes.$inferSelect)[]) => {
+      expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
+        counts.map((n, i) => [i + 1, `/academy/slides/animation-videos-with-ai/day-${i + 1}.pptx`, n]),
+      );
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+    };
+    const cohortId = seeded.animationNext.cohort.id;
+    const byDay = () => db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
+    check(await byDay());
+
+    await db.update(schema.classes).set({ slides: null }).where(eq(schema.classes.cohortId, cohortId));
+    const sql = readFileSync("drizzle/0008_animation_slides.sql", "utf8");
+    await db.execute(sql);
+    await db.execute(sql);
+    check(await byDay());
+    // Boost Sales lessons are left to their own slides.
+    const sales = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, seeded.salesSelfPaced.cohort.id) });
+    expect(sales.every((c) => c.slides?.file.includes("boost-sales-with-ai"))).toBe(true);
   });
 
   it("keeps the slide images while the teacher's PowerPoint link is unchanged, and shows other links in the PowerPoint viewer", () => {

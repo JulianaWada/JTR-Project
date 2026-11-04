@@ -25,11 +25,13 @@ export type CourseTemplate = {
   quizzes: { week: number; title: string; questions: QuizQuestion[] }[];
 };
 
-/** The branded slides for a lesson of Boost Sales with AI: the PowerPoint and one image per slide (public/slides). */
-function salesSlides(lesson: number, count: number): LessonSlides {
-  const dir = `/academy/slides/boost-sales-with-ai/lesson-${lesson}`;
+/** A lesson's branded slides: the PowerPoint and one image per slide, in public/slides/<course>/<lesson>. */
+function deck(course: string, lesson: string, count: number): LessonSlides {
+  const dir = `/academy/slides/${course}/${lesson}`;
   return { file: `${dir}.pptx`, images: Array.from({ length: count }, (_, i) => `${dir}/${String(i + 1).padStart(2, "0")}.webp`) };
 }
+const salesSlides = (lesson: number, count: number) => deck("boost-sales-with-ai", `lesson-${lesson}`, count);
+const animationSlides = (day: number, count: number) => deck("animation-videos-with-ai", `day-${day}`, count);
 
 export const salesCourse: CourseTemplate = {
   slug: "boost-sales-with-ai",
@@ -278,6 +280,7 @@ Write your script and storyboard for your final project idea. Before the next cl
         { label: "CapCut", url: "https://www.capcut.com" },
         { label: "Canva", url: "https://www.canva.com" },
       ],
+      slides: animationSlides(1, 11),
     },
     {
       week: 2,
@@ -295,6 +298,7 @@ Create backgrounds separately with no characters in them so you can reuse them a
 ## Exercise
 Create your main character in 3 different poses and 2 backgrounds.`,
       resources: [],
+      slides: animationSlides(2, 10),
     },
     {
       week: 3,
@@ -312,6 +316,7 @@ Use simple cuts most of the time. Save flashy transitions for the start and the 
 ## Exercise
 Animate every scene in your storyboard, even roughly.`,
       resources: [],
+      slides: animationSlides(3, 10),
     },
     {
       week: 4,
@@ -331,6 +336,7 @@ Most people watch with the sound off. Add auto-captions in CapCut and check ever
 - Is the logo at the end, not the start?
 - Export in 1080p at the right shape (9:16 for Reels, TikTok and Shorts).`,
       resources: [],
+      slides: animationSlides(4, 10),
     },
     {
       week: 5,
@@ -348,6 +354,7 @@ Everyone plays their video and gets feedback. Jules picks a few to feature on JT
 ## After the course
 Keep the AI tutor for questions, and share your next videos with the group.`,
       resources: [],
+      slides: animationSlides(5, 9),
     },
   ],
   assignments: [
