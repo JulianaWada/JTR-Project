@@ -5,11 +5,13 @@ import { notFound } from "next/navigation";
 import { Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
 import { schema } from "@/lib/db";
-import { classState, requireCohortAccess, untilText } from "@/lib/learn";
+import { classState, requireCohortAccess, untilText, weekOpensAt } from "@/lib/learn";
 import { Markdown } from "@/lib/markdown";
-import { formatDateTime } from "@/lib/time";
+import { formatDate, formatDateTime } from "@/lib/time";
+import { isLocked, unlocksAt } from "@/lib/unlock";
 import { videoEmbedUrl } from "@/lib/video";
 import { SlideViewer } from "@/components/slide-viewer";
+import { LockedCard } from "@/components/locked-card";
 import { env } from "@/lib/env";
 import { officeViewerUrl, slidesFileUrl } from "@/lib/slides";
 import { setLessonWatched } from "./actions";
@@ -35,6 +37,9 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
   });
   const state = classState(lesson);
   const selfPaced = cohort.selfPaced;
+  const locked = isLocked(lesson, cohort, user);
+  // The week's quiz and assignment open with its first class.
+  const weekLocked = (await weekOpensAt(db, cohort, user, lesson.week)) !== null;
   const embed = lesson.recordingUrl ? videoEmbedUrl(lesson.recordingUrl) : null;
   const lessons = selfPaced
     ? await db.query.classes.findMany({
@@ -80,7 +85,13 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             )}
           </div>
         )}
-        {lesson.slides && (
+        {locked && (
+          <LockedCard opens={formatDate(unlocksAt(lesson))}>
+            The notes, slides and files for this class unlock on the day of the class. Come back then to get ready, and join from this page when the
+            class starts.
+          </LockedCard>
+        )}
+        {!locked && lesson.slides && (
           <section className="mt-6" aria-labelledby="slides-heading">
             <h2 id="slides-heading" className="mb-3 font-semibold text-ink">
               Lesson slides
@@ -99,9 +110,11 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             )}
           </section>
         )}
+        {!locked && (
         <div className="card mt-6">
           {lesson.notes.trim() ? <Markdown source={lesson.notes} /> : <p className="text-muted">Jules will add the notes for this class soon.</p>}
         </div>
+        )}
       </article>
 
       <aside className="space-y-4 lg:pt-16">
@@ -149,14 +162,14 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
                 Join class now
               </a>
             )}
-            {lesson.recordingUrl && (
+            {!locked && lesson.recordingUrl && (
               <a href={lesson.recordingUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary mt-3 w-full">
                 ▶ Watch the recording
               </a>
             )}
           </section>
         )}
-        {lesson.resources.length > 0 && (
+        {!locked && lesson.resources.length > 0 && (
           <section className="card">
             <h2 className="font-semibold text-ink">Links and files</h2>
             <ul className="mt-2 space-y-2 text-sm">
@@ -170,7 +183,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             </ul>
           </section>
         )}
-        {(quiz || task) && (
+        {!weekLocked && (quiz || task) && (
           <section className="card">
             <h2 className="font-semibold text-ink">{selfPaced ? "Practise this lesson" : "This week"}</h2>
             <div className="mt-3 flex flex-col gap-2">
@@ -187,6 +200,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             </div>
           </section>
         )}
+        {!locked && (
         <section className="card">
           <h2 className="font-semibold text-ink">Questions about this {selfPaced ? "lesson" : "class"}?</h2>
           <Link
@@ -196,6 +210,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             ✨ Ask the AI tutor
           </Link>
         </section>
+        )}
       </aside>
     </div>
   );

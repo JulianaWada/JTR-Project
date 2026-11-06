@@ -8,7 +8,8 @@ import { asset } from "@/lib/assets";
 import { schema } from "@/lib/db";
 import { classState, requireCohortAccess, untilText } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
-import { formatDateTime } from "@/lib/time";
+import { formatDate, formatDateTime } from "@/lib/time";
+import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Course" };
@@ -58,6 +59,8 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
   const selfPaced = cohort.selfPaced;
   const next = selfPaced ? undefined : lessons.find((l) => classState(l) !== "ended");
   const nextState = next ? classState(next) : null;
+  const locked = lockedWeeks(lessons, cohort, user);
+  const shortDate = (d: Date) => formatDate(d).replace(/ \d{4}$/, "");
   const nextToWatch = selfPaced ? lessons.find((l) => !attended.has(l.id)) : undefined;
 
   return (
@@ -105,7 +108,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                   <span className="btn-secondary pointer-events-none opacity-70">Join opens 30 min before</span>
                 )}
                 <Link href={`/learn/${cohortId}/classes/${next.id}`} className="btn-secondary">
-                  Class notes
+                  {isLocked(next, cohort, user) ? `🔒 Notes open ${shortDate(unlocksAt(next))}` : "Class notes"}
                 </Link>
               </div>
             </section>
@@ -164,7 +167,11 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                           {l.recordingUrl && <Pill tone="primary">Recording</Pill>}
                         </>
                       ) : state === "upcoming" ? (
-                        <Pill>Upcoming</Pill>
+                        isLocked(l, cohort, user) ? (
+                          <Pill>🔒 Opens {shortDate(unlocksAt(l))}</Pill>
+                        ) : (
+                          <Pill tone="primary">Notes open</Pill>
+                        )
                       ) : (
                         <Pill tone="warning">Live</Pill>
                       )}
@@ -191,7 +198,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {t.isFinalProject ? " · Final project" : ""}
                       </p>
                     </div>
-                    {s?.grade === "pass" ? (
+                    {locked.has(t.week) ? (
+                      <Pill>🔒 Opens {shortDate(locked.get(t.week)!)}</Pill>
+                    ) : s?.grade === "pass" ? (
                       <Pill tone="success">Passed</Pill>
                     ) : s?.grade === "redo" ? (
                       <Pill tone="warning">Please resubmit</Pill>
@@ -221,7 +230,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {lessonLabel(course, selfPaced)} {q.week} · {q.questions.length} questions
                       </p>
                     </div>
-                    {best ? (
+                    {locked.has(q.week) ? (
+                      <Pill>🔒 Opens {shortDate(locked.get(q.week)!)}</Pill>
+                    ) : best ? (
                       <Pill tone={best.score === best.total ? "success" : "primary"}>
                         Best {best.score}/{best.total}
                       </Pill>

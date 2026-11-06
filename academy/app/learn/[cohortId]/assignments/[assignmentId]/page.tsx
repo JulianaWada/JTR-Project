@@ -4,8 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pill } from "@/components/ui";
 import { schema } from "@/lib/db";
-import { requireCohortAccess } from "@/lib/learn";
-import { formatDateTime } from "@/lib/time";
+import { requireCohortAccess, weekOpensAt } from "@/lib/learn";
+import { LockedCard } from "@/components/locked-card";
+import { formatDate, formatDateTime } from "@/lib/time";
 import { SubmitForm } from "./submit-form";
 import { lessonLabel } from "@/lib/lesson-unit";
 
@@ -13,9 +14,24 @@ export const metadata: Metadata = { title: "Assignment" };
 
 export default async function AssignmentPage({ params }: PageProps<"/learn/[cohortId]/assignments/[assignmentId]">) {
   const { cohortId, assignmentId } = await params;
-  const { db, user, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/assignments/${assignmentId}`);
+  const { db, user, cohort, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/assignments/${assignmentId}`);
   const task = await db.query.assignments.findFirst({ where: and(eq(schema.assignments.id, assignmentId), eq(schema.assignments.courseId, course.id)) });
   if (!task) notFound();
+  const opensAt = await weekOpensAt(db, cohort, user, task.week);
+  if (opensAt) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
+          ← {course.title}
+        </Link>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Pill>{lessonLabel(course)} {task.week}</Pill>
+        </div>
+        <h1 className="mt-3 font-display text-3xl font-semibold text-ink">{task.title}</h1>
+        <LockedCard opens={formatDate(opensAt)}>This assignment unlocks on the day of the class it goes with.</LockedCard>
+      </div>
+    );
+  }
   const submission = await db.query.submissions.findFirst({
     where: and(eq(schema.submissions.assignmentId, assignmentId), eq(schema.submissions.userId, user.id)),
   });
