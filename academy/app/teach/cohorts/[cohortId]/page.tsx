@@ -74,6 +74,11 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
         <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm">
           💬 Open the class chat
         </Link>
+        {!selfPaced && cohort.room !== "link" && (
+          <Link href={`/learn/${cohortId}/room`} className="btn-secondary btn-sm">
+            🎥 Open the class room
+          </Link>
+        )}
       </div>
       {meetIntake && (
         <div className="mb-6">

@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { requireTeacher } from "@/lib/auth";
 import { recentStudentMessages } from "@/lib/chat";
 import { getDb, schema } from "@/lib/db";
+import { needsLink } from "@/lib/class-room";
 import { liveIntakes } from "@/lib/meet-links";
 
 export default async function TeachLayout({ children }: { children: React.ReactNode }) {
@@ -10,7 +11,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
   const db = await getDb();
   const [{ value: toMark }] = await db.select({ value: count() }).from(schema.submissions).where(isNull(schema.submissions.grade));
   const newChat = await recentStudentMessages(db);
-  const noMeetLink = (await liveIntakes(db)).filter((i) => !i.cohort.meetUrl).length;
+  const noMeetLink = (await liveIntakes(db)).filter((i) => needsLink(i.cohort)).length;
   return (
     <AppShell
       user={user}
@@ -19,7 +20,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
       items={[
         { href: "/teach", label: "Overview", icon: "grid", exact: true },
         { href: "/teach/courses", label: "Courses & intakes", icon: "book" },
-        { href: "/teach/meet", label: "Meet links", icon: "video", badge: noMeetLink },
+        { href: "/teach/meet", label: "Class rooms", icon: "video", badge: noMeetLink },
         { href: "/teach/marking", label: "Marking", icon: "check", badge: toMark },
         { href: "/teach/payments", label: "Payments", icon: "wallet" },
         { href: "/teach/chat", label: "Class chats", icon: "chat", badge: newChat },

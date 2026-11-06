@@ -179,7 +179,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                 </>
               ) : (
                 <>
-                  <li>✓ Live classes with Jules on Google Meet</li>
+                  <li>✓ Live classes with Jules in the JTR online class room</li>
                   <li>✓ Recordings and notes after every class</li>
                 </>
               )}

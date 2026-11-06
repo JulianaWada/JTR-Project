@@ -71,6 +71,13 @@
       "when": 1793991462529,
       "tag": "0009_animation_slides",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793995910879,
+      "tag": "0010_class_room",
+      "breakpoints": true
     }
   ]
 }

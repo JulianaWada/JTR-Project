@@ -182,7 +182,7 @@ export async function createCohort(courseId: string, form: FormData) {
   const template = previous ? await db.query.classes.findMany({ where: eq(schema.classes.cohortId, previous.id), orderBy: asc(schema.classes.week) }) : [];
   const [cohort] = await db
     .insert(schema.cohorts)
-    .values({ courseId, name: str(form, "name"), startsAt: first, capacity, meetUrl: str(form, "meetUrl"), enrolmentOpen: true })
+    .values({ courseId, name: str(form, "name"), startsAt: first, capacity, meetUrl: str(form, "meetUrl"), room: str(form, "meetUrl") ? "link" : "jtr", enrolmentOpen: true })
     .returning();
   const weeks = course.outline.length ? course.outline : [{ week: 1, title: "Week 1", summary: "" }];
   await db.insert(schema.classes).values(
@@ -203,18 +203,25 @@ export async function createCohort(courseId: string, form: FormData) {
   redirect(`/teach/cohorts/${cohort.id}?saved=${encodeURIComponent(daily ? "Intake created with a class on each day of the outline." : "Intake created with a weekly class for each week of the outline.")}`);
 }
 
-/** The Meet links page (and the overview): set the one link every class of an intake uses. */
+/** The Class rooms page (and the overview): the JTR class room, or the one outside link every class of an intake uses. */
 export async function saveMeetLink(cohortId: string, returnTo: string, form: FormData) {
   await requireTeacher();
   const db = await getDb();
   const path = returnTo.startsWith("/teach") ? returnTo : "/teach/meet";
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
   if (!cohort) back(path, { error: "Intake not found." });
+  const room = form.get("room") === "link" ? "link" : "jtr";
   const cleaned = cleanMeetUrl(str(form, "meetUrl"));
   if ("error" in cleaned) back(path, { error: cleaned.error });
-  await db.update(schema.cohorts).set({ meetUrl: cleaned.url }).where(eq(schema.cohorts.id, cohortId));
+  if (room === "link" && !cleaned.url) back(path, { error: "Paste the outside link, or choose the JTR class room." });
+  await db.update(schema.cohorts).set({ room, meetUrl: cleaned.url }).where(eq(schema.cohorts.id, cohortId));
   revalidatePath("/", "layout");
-  back(path, { saved: cleaned.url ? `Meet link saved for ${cohort.name}. Students join with it from their dashboard.` : `Meet link removed from ${cohort.name}.` });
+  back(path, {
+    saved:
+      room === "jtr"
+        ? `${cohort.name} classes will happen in the JTR class room. Students join from their dashboard.`
+        : `Outside link saved for ${cohort.name}. Students join with it from their dashboard.`,
+  });
 }
 
 export async function updateCohort(cohortId: string, form: FormData) {
@@ -223,7 +230,7 @@ export async function updateCohort(cohortId: string, form: FormData) {
   const path = `/teach/cohorts/${cohortId}`;
   const capacity = Number(str(form, "capacity"));
   if (!str(form, "name") || !Number.isInteger(capacity) || capacity < 1) back(path, { error: "Name and a whole-number capacity are required." });
-  // The Meet link has its own box now (MeetLinkCard); only change it if this form sent one.
+  // Where classes happen has its own box now (MeetLinkCard); only change the link if this form sent one.
   const meet = form.has("meetUrl") ? cleanMeetUrl(str(form, "meetUrl")) : { url: undefined };
   if ("error" in meet) back(path, { error: meet.error });
   await db

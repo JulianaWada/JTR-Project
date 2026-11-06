@@ -12,7 +12,7 @@ export function ClassForm({
   cohortId: string;
   lesson?: typeof classes.$inferSelect;
   defaults?: { week: number; date: string };
-  /** A video lesson of a recorded course: no date, time or Meet link. */
+  /** A video lesson of a recorded course: no date, time or meeting link. */
   selfPaced?: boolean;
 }) {
   const when = lesson ? toLagosParts(lesson.startsAt) : { date: defaults?.date ?? "", time: "19:00" };
@@ -71,7 +71,7 @@ export function ClassForm({
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="meetUrl">
-                Meet link <span className="font-normal text-muted">(leave empty to use the intake&apos;s link)</span>
+                Outside meeting link <span className="font-normal text-muted">(only for intakes on an outside link; leave empty to use the intake&apos;s)</span>
               </label>
               <input className="input" id="meetUrl" name="meetUrl" type="url" defaultValue={lesson?.meetUrl ?? ""} />
             </div>
