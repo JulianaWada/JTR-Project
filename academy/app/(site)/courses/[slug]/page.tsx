@@ -158,7 +158,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
                             </p>
                             <p className="text-sm text-muted">{intake.classes.length} {course.lessonUnit === "day" ? "daily" : "weekly"} live classes</p>
                           </div>
-                          <Pill tone={intake.seatsLeft <= 5 ? "warning" : "success"}>{intake.seatsLeft === 0 ? "Full" : `${intake.seatsLeft} seats left`}</Pill>
+                          <Pill tone={intake.seatsLeft === 0 ? "warning" : "success"}>{intake.seatsLeft === 0 ? "Full" : "Open"}</Pill>
                         </div>
                         {intake.seatsLeft > 0 && (
                           <Link href={`/enrol/${intake.id}`} className="btn-primary mt-4 w-full">
