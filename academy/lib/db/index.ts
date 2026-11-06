@@ -25,9 +25,19 @@ async function createPglite(dataDir?: string): Promise<DbState> {
 
 function createPostgres(url: string): DbState {
   // `prepare: false` keeps it compatible with Supabase's transaction pooler (port 6543).
-  const db = drizzlePostgres(postgres(url, { prepare: false, max: 5 }), { schema }) as unknown as Database;
-  // Production migrations run at build time (scripts/migrate.ts), not on every cold start.
-  return { db, ready: Promise.resolve() };
+  const client = drizzlePostgres(postgres(url, { prepare: false, max: 5 }), { schema });
+  const db = client as unknown as Database;
+  // Migrations run at build time (scripts/migrate.ts). As a safety net, a cold start also applies any the build missed
+  // (already-applied ones are skipped, so this is one quick query). A failure here is logged, never fatal.
+  const ready = (async () => {
+    try {
+      const { migrate } = await import("drizzle-orm/postgres-js/migrator");
+      await migrate(client, { migrationsFolder: MIGRATIONS_FOLDER });
+    } catch (err) {
+      console.error("[db] Couldn't apply pending migrations at start:", err);
+    }
+  })();
+  return { db, ready };
 }
 
 let pending: Promise<DbState> | null = null;
