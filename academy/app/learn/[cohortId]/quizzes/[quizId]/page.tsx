@@ -7,16 +7,19 @@ import { Pill } from "@/components/ui";
 import { awardBadges, BADGES } from "@/lib/badges";
 import { cn } from "@/lib/cn";
 import { schema } from "@/lib/db";
-import { requireCohortAccess } from "@/lib/learn";
+import { requireCohortAccess, weekOpensAt } from "@/lib/learn";
+import { formatDate } from "@/lib/time";
+import { LockedCard } from "@/components/locked-card";
 import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Quiz" };
 
 async function submitQuiz(cohortId: string, quizId: string, form: FormData) {
   "use server";
-  const { db, user, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/quizzes/${quizId}`);
+  const { db, user, cohort, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/quizzes/${quizId}`);
   const quiz = await db.query.quizzes.findFirst({ where: and(eq(schema.quizzes.id, quizId), eq(schema.quizzes.courseId, course.id)) });
   if (!quiz || user.role === "teacher") redirect(`/learn/${cohortId}`);
+  if (await weekOpensAt(db, cohort, user, quiz.week)) redirect(`/learn/${cohortId}/quizzes/${quizId}`);
   const answers = quiz.questions.map((_, i) => {
     const value = Number(form.get(`q${i}`));
     return Number.isInteger(value) ? value : -1;
@@ -33,9 +36,22 @@ async function submitQuiz(cohortId: string, quizId: string, form: FormData) {
 export default async function QuizPage({ params, searchParams }: PageProps<"/learn/[cohortId]/quizzes/[quizId]">) {
   const { cohortId, quizId } = await params;
   const { attempt: attemptId, badges } = await searchParams;
-  const { db, user, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/quizzes/${quizId}`);
+  const { db, user, cohort, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/quizzes/${quizId}`);
   const quiz = await db.query.quizzes.findFirst({ where: and(eq(schema.quizzes.id, quizId), eq(schema.quizzes.courseId, course.id)) });
   if (!quiz) notFound();
+  const opensAt = await weekOpensAt(db, cohort, user, quiz.week);
+  if (opensAt) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
+          ← {course.title}
+        </Link>
+        <p className="eyebrow mt-4">{lessonLabel(course)} {quiz.week} quiz</p>
+        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{quiz.title}</h1>
+        <LockedCard opens={formatDate(opensAt)}>This quiz unlocks on the day of the class it goes with.</LockedCard>
+      </div>
+    );
+  }
   const attempt =
     typeof attemptId === "string"
       ? await db.query.quizAttempts.findFirst({

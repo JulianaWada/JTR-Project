@@ -1,7 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { and, asc, count, desc, eq, gte } from "drizzle-orm";
 import type { Database } from "@/lib/db";
-import { assignments, classes, cohorts, courses, tutorMessages } from "@/lib/db/schema";
+import { assignments, classes, cohorts, courses, tutorMessages, users } from "@/lib/db/schema";
+import { isLocked, lockedWeeks } from "@/lib/unlock";
 import { env } from "@/lib/env";
 import { addDays } from "@/lib/time";
 
@@ -10,12 +11,20 @@ const HISTORY_MESSAGES = 20;
 
 type Material = { courseTitle: string; recorded?: boolean; daily?: boolean; lessons: { week: number; title: string; notes: string }[]; assignments: { week: number; title: string; brief: string }[] };
 
-async function loadMaterial(db: Database, cohortId: string): Promise<Material> {
+/** The course material the tutor may use. Students only get the classes that have unlocked so far. */
+async function loadMaterial(db: Database, cohortId: string, viewer: { role: string } | undefined, now = new Date()): Promise<Material> {
   const cohort = (await db.query.cohorts.findFirst({ where: eq(cohorts.id, cohortId) }))!;
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
   const lessons = await db.query.classes.findMany({ where: eq(classes.cohortId, cohortId), orderBy: asc(classes.week) });
   const tasks = await db.query.assignments.findMany({ where: eq(assignments.courseId, course.id), orderBy: asc(assignments.week) });
-  return { courseTitle: course.title, recorded: course.format === "recorded", daily: course.format === "live" && course.lessonUnit === "day", lessons, assignments: tasks };
+  const locked = lockedWeeks(lessons, cohort, viewer, now);
+  return {
+    courseTitle: course.title,
+    recorded: course.format === "recorded",
+    daily: course.format === "live" && course.lessonUnit === "day",
+    lessons: lessons.filter((l) => !isLocked(l, cohort, viewer, now)),
+    assignments: tasks.filter((t) => !locked.has(t.week)),
+  };
 }
 
 export function tutorSystemPrompt(m: Material) {
@@ -30,6 +39,7 @@ How to help:
 - Use plain, friendly English, short paragraphs and Nigerian examples (naira prices, WhatsApp, Instagram, Lagos and Abuja businesses).
 - For assignments, coach: ask questions, give examples and feedback on drafts, but don't write the whole submission for the student.
 - If a question is about payments, certificates, class times or anything you can't see, tell them to message Jules.
+- ${m.recorded ? "" : "Notes for a class unlock on the day of that class, so later classes may be missing below. If asked about one, say it opens on its class day."}
 - Keep answers under about 200 words unless the student asks for more.
 
 <course_material>
@@ -111,7 +121,8 @@ export async function askTutor(db: Database, userId: string, cohortId: string, q
   if ((await questionsToday(db, userId)) >= DAILY_QUESTION_LIMIT) {
     return { error: `You've asked ${DAILY_QUESTION_LIMIT} questions in the last 24 hours. Please try again tomorrow.` };
   }
-  const material = await loadMaterial(db, cohortId);
+  const viewer = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { role: true } });
+  const material = await loadMaterial(db, cohortId, viewer);
   const previous = await db.query.tutorMessages.findMany({
     where: and(eq(tutorMessages.userId, userId), eq(tutorMessages.cohortId, cohortId)),
     orderBy: desc(tutorMessages.createdAt),

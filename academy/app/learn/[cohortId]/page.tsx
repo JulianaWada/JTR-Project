@@ -1,5 +1,5 @@
 import { BadgeIcon } from "@/components/badge-icon";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeGrid } from "@/components/badge-grid";
@@ -8,7 +8,8 @@ import { asset } from "@/lib/assets";
 import { schema } from "@/lib/db";
 import { classState, requireCohortAccess, untilText } from "@/lib/learn";
 import { getProgress } from "@/lib/progress";
-import { formatDateTime } from "@/lib/time";
+import { formatDate, formatDateTime } from "@/lib/time";
+import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { lessonLabel } from "@/lib/lesson-unit";
 
 export const metadata: Metadata = { title: "Course" };
@@ -47,9 +48,19 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
   }
   const progress = await getProgress(db, user.id, cohortId);
   const badges = await db.query.userBadges.findMany({ where: and(eq(schema.userBadges.userId, user.id), eq(schema.userBadges.cohortId, cohortId)) });
+  const [{ value: chatCount }] = await db.select({ value: count() }).from(schema.chatMessages).where(eq(schema.chatMessages.cohortId, cohortId));
+  const [lastChat] = await db
+    .select({ body: schema.chatMessages.body, name: schema.users.name })
+    .from(schema.chatMessages)
+    .innerJoin(schema.users, eq(schema.users.id, schema.chatMessages.userId))
+    .where(eq(schema.chatMessages.cohortId, cohortId))
+    .orderBy(desc(schema.chatMessages.createdAt))
+    .limit(1);
   const selfPaced = cohort.selfPaced;
   const next = selfPaced ? undefined : lessons.find((l) => classState(l) !== "ended");
   const nextState = next ? classState(next) : null;
+  const locked = lockedWeeks(lessons, cohort, user);
+  const shortDate = (d: Date) => formatDate(d).replace(/ \d{4}$/, "");
   const nextToWatch = selfPaced ? lessons.find((l) => !attended.has(l.id)) : undefined;
 
   return (
@@ -68,9 +79,14 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
         eyebrow={selfPaced ? "Video course · learn at your own pace" : `${cohort.name} intake`}
         title={course.title}
         actions={
-          <Link href={`/learn/${cohortId}/tutor`} className="btn-primary">
-            ✨ Ask the AI tutor
-          </Link>
+          <>
+            <Link href={`/learn/${cohortId}/chat`} className="btn-secondary">
+              💬 Class chat
+            </Link>
+            <Link href={`/learn/${cohortId}/tutor`} className="btn-primary">
+              ✨ Ask the AI tutor
+            </Link>
+          </>
         }
       />
 
@@ -92,7 +108,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                   <span className="btn-secondary pointer-events-none opacity-70">Join opens 30 min before</span>
                 )}
                 <Link href={`/learn/${cohortId}/classes/${next.id}`} className="btn-secondary">
-                  Class notes
+                  {isLocked(next, cohort, user) ? `🔒 Notes open ${shortDate(unlocksAt(next))}` : "Class notes"}
                 </Link>
               </div>
             </section>
@@ -151,7 +167,11 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                           {l.recordingUrl && <Pill tone="primary">Recording</Pill>}
                         </>
                       ) : state === "upcoming" ? (
-                        <Pill>Upcoming</Pill>
+                        isLocked(l, cohort, user) ? (
+                          <Pill>🔒 Opens {shortDate(unlocksAt(l))}</Pill>
+                        ) : (
+                          <Pill tone="primary">Notes open</Pill>
+                        )
                       ) : (
                         <Pill tone="warning">Live</Pill>
                       )}
@@ -178,7 +198,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {t.isFinalProject ? " · Final project" : ""}
                       </p>
                     </div>
-                    {s?.grade === "pass" ? (
+                    {locked.has(t.week) ? (
+                      <Pill>🔒 Opens {shortDate(locked.get(t.week)!)}</Pill>
+                    ) : s?.grade === "pass" ? (
                       <Pill tone="success">Passed</Pill>
                     ) : s?.grade === "redo" ? (
                       <Pill tone="warning">Please resubmit</Pill>
@@ -208,7 +230,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                         {lessonLabel(course, selfPaced)} {q.week} · {q.questions.length} questions
                       </p>
                     </div>
-                    {best ? (
+                    {locked.has(q.week) ? (
+                      <Pill>🔒 Opens {shortDate(locked.get(q.week)!)}</Pill>
+                    ) : best ? (
                       <Pill tone={best.score === best.total ? "success" : "primary"}>
                         Best {best.score}/{best.total}
                       </Pill>
@@ -274,6 +298,23 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
             <div className="mt-4">
               <BadgeGrid earned={badges} compact />
             </div>
+          </section>
+
+          <section className="card">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-display text-lg font-semibold text-ink">💬 Class chat</h2>
+              {chatCount > 0 && <span className="text-sm text-muted">{chatCount} messages</span>}
+            </div>
+            {lastChat ? (
+              <p className="mt-2 line-clamp-2 text-sm text-ink">
+                <span className="font-medium">{lastChat.name.split(" ")[0]}:</span> {lastChat.body}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-muted">Chat with your classmates and Jules: share your work, ask questions and help each other.</p>
+            )}
+            <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm mt-4">
+              Open the chat
+            </Link>
           </section>
 
           <section className="card bg-gradient-to-br from-primary-soft to-surface">

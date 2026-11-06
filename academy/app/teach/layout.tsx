@@ -1,6 +1,7 @@
 import { count, isNull } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
 import { requireTeacher } from "@/lib/auth";
+import { recentStudentMessages } from "@/lib/chat";
 import { getDb, schema } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
 
@@ -8,6 +9,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
   const user = await requireTeacher();
   const db = await getDb();
   const [{ value: toMark }] = await db.select({ value: count() }).from(schema.submissions).where(isNull(schema.submissions.grade));
+  const newChat = await recentStudentMessages(db);
   const noMeetLink = (await liveIntakes(db)).filter((i) => !i.cohort.meetUrl).length;
   return (
     <AppShell
@@ -20,6 +22,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
         { href: "/teach/meet", label: "Meet links", icon: "video", badge: noMeetLink },
         { href: "/teach/marking", label: "Marking", icon: "check", badge: toMark },
         { href: "/teach/payments", label: "Payments", icon: "wallet" },
+        { href: "/teach/chat", label: "Class chats", icon: "chat", badge: newChat },
         { href: "/teach/tutor", label: "Tutor questions", icon: "sparkles" },
         { href: "/teach/outbox", label: "Emails", icon: "mail" },
         { href: "/learn/preview", label: "Student view", icon: "eye" },

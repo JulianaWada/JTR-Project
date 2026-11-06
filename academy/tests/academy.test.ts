@@ -7,6 +7,7 @@ import { createInMemoryDb, type Database } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { markPaymentRefunded, markPaymentSuccessful, priceFor, startCheckout } from "@/lib/enrolment";
 import { classState } from "@/lib/learn";
+import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { getProgress } from "@/lib/progress";
 import { parseQuiz, quizToText } from "@/lib/quiz-format";
 import { sendClassReminders } from "@/lib/reminders";
@@ -18,6 +19,7 @@ import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
 import { sendEmail } from "@/lib/email";
+import { chatMessagesFor, deleteChatMessage, pinChatMessage, postChatMessage, recentStudentMessages } from "@/lib/chat";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
@@ -257,11 +259,56 @@ describe("recorded course", () => {
     await db.execute(update);
     const after = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
     check(after);
-    // Slides Jules has changed are kept; other courses get none.
+    // Slides Jules has changed are kept.
     await db.update(schema.classes).set({ slides: { file: "https://example.com/mine.pptx", images: [] } }).where(eq(schema.classes.id, after[0].id));
     await db.execute(update);
     expect((await db.query.classes.findFirst({ where: eq(schema.classes.id, after[0].id) }))?.slides?.file).toBe("https://example.com/mine.pptx");
-    expect(seeded.animationNext.classes.every((c) => c.slides === null)).toBe(true);
+  });
+
+  it("gives each day of the Animation course its slides, and the migration adds them to existing intakes once", async () => {
+    const counts = [11, 10, 10, 10, 9];
+    const check = (rows: (typeof schema.classes.$inferSelect)[]) => {
+      expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
+        counts.map((n, i) => [i + 1, `/academy/slides/animation-videos-with-ai/day-${i + 1}.pptx`, n]),
+      );
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+    };
+    const cohortId = seeded.animationNext.cohort.id;
+    const byDay = () => db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
+    check(await byDay());
+
+    await db.update(schema.classes).set({ slides: null }).where(eq(schema.classes.cohortId, cohortId));
+    const sql = readFileSync("drizzle/0009_animation_slides.sql", "utf8").split("--> statement-breakpoint");
+    const run = async () => {
+      for (const statement of sql) await db.execute(statement);
+    };
+    // An intake made before Digen AI was the course's generator gets the new wording and links, once.
+    const before = await byDay();
+    await db
+      .update(schema.classes)
+      .set({ notes: before[0].notes.replace("Digen AI (text to image)", "an AI image generator") })
+      .where(eq(schema.classes.id, before[0].id));
+    for (const c of before)
+      await db
+        .update(schema.classes)
+        .set({ resources: c.resources.filter((r) => !r.url.includes("digen.ai")) })
+        .where(eq(schema.classes.id, c.id));
+    await run();
+    await run();
+    check(await byDay());
+    const after = await byDay();
+    expect(after[0].notes).toBe(before[0].notes);
+    expect(after.map((c) => c.resources.map((r) => r.url))).toEqual([
+      ["https://digen.ai/image", "https://digen.ai/en/space", "https://www.capcut.com", "https://www.canva.com"],
+      ["https://digen.ai/image"],
+      ["https://digen.ai/en/space"],
+      ["https://digen.ai/create"],
+      [],
+    ]);
+    expect(after.map((c) => c.resources)).toEqual(before.map((c) => c.resources));
+    // Boost Sales lessons are left to their own slides.
+    const sales = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, seeded.salesSelfPaced.cohort.id) });
+    expect(sales.every((c) => c.slides?.file.includes("boost-sales-with-ai"))).toBe(true);
   });
 
   it("keeps the slide images while the teacher's PowerPoint link is unchanged, and shows other links in the PowerPoint viewer", () => {
@@ -405,6 +452,81 @@ describe("emails", () => {
     expect(result).toEqual({ mode: "test", error: null });
     const saved = await db.query.emails.findFirst({ where: eq(schema.emails.to, "jules@example.com") });
     expect(saved?.mode).toBe("test");
+  });
+});
+
+describe("live class resources unlock on the class day", () => {
+  const live = { selfPaced: false };
+  const lesson = { week: 2, startsAt: new Date("2026-12-02T18:00:00Z") }; // 7pm Lagos, Tue 2 Dec
+
+  it("opens at midnight Lagos time on the day of the class", () => {
+    expect(unlocksAt(lesson).toISOString()).toBe("2026-12-01T23:00:00.000Z");
+    expect(isLocked(lesson, live, student, new Date("2026-12-01T22:59:00Z"))).toBe(true);
+    expect(isLocked(lesson, live, student, new Date("2026-12-01T23:00:00Z"))).toBe(false);
+  });
+
+  it("never locks recorded courses or the teacher", () => {
+    const early = new Date("2026-11-04T12:00:00Z");
+    expect(isLocked(lesson, { selfPaced: true }, student, early)).toBe(false);
+    expect(isLocked(lesson, live, { role: "teacher" }, early)).toBe(false);
+  });
+
+  it("locks a week's quiz and assignment until its first class", () => {
+    const lessons = [{ week: 1, startsAt: new Date("2026-12-01T18:00:00Z") }, lesson];
+    const weeks = lockedWeeks(lessons, live, student, new Date("2026-12-01T10:00:00Z"));
+    expect([...weeks.keys()]).toEqual([2]);
+  });
+
+  it("keeps the tutor from seeing notes for classes that haven't opened", async () => {
+    const intake = seeded.animationNext;
+    await enrolAndPay(intake.cohort.id);
+    const future = intake.classes.at(-1)!;
+    expect(isLocked(future, intake.cohort, student)).toBe(true);
+    const heading = future.notes.match(/^## (.+)$/m)?.[1];
+    expect(heading).toBeTruthy();
+    const result = await askTutor(db, student.id, intake.cohort.id, heading!);
+    expect(result.answer).not.toContain(`"${heading}"`);
+  });
+});
+
+describe("class chat", () => {
+  it("lets students and the teacher chat in an intake, with pins and removals", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    const [teacher] = await db.insert(schema.users).values({ email: "t@example.com", name: "Jules", role: "teacher", passwordHash: "x" }).returning();
+    const [other] = await db.insert(schema.users).values({ email: "b@example.com", name: "Bola Ade", passwordHash: "x" }).returning();
+
+    expect(await postChatMessage(db, student, cohortId, "   ")).toEqual({ error: expect.any(String) });
+    expect(await postChatMessage(db, student, cohortId, "x".repeat(1001))).toEqual({ error: expect.any(String) });
+    const hello = await postChatMessage(db, student, cohortId, " Hello class! ");
+    if (!("id" in hello)) throw new Error("not sent");
+    const welcome = await postChatMessage(db, teacher, cohortId, "Welcome everyone");
+    if (!("id" in welcome)) throw new Error("not sent");
+
+    const seen = await chatMessagesFor(db, other, cohortId);
+    expect(seen.map((m) => [m.author, m.body, m.fromTeacher, m.canDelete])).toEqual([
+      ["Amaka Obi", "Hello class!", false, false],
+      ["Jules", "Welcome everyone", true, false],
+    ]);
+    // Each intake has its own chat.
+    expect(await chatMessagesFor(db, student, seeded.animationDone!.cohort.id)).toEqual([]);
+
+    // Students can't pin or remove someone else's message; the teacher can do both.
+    expect(await pinChatMessage(db, other, cohortId, welcome.id, true)).toBe(false);
+    expect(await deleteChatMessage(db, other, cohortId, hello.id)).toBe(false);
+    expect(await pinChatMessage(db, teacher, cohortId, welcome.id, true)).toBe(true);
+    expect((await chatMessagesFor(db, student, cohortId)).find((m) => m.id === welcome.id)?.pinned).toBe(true);
+    expect(await deleteChatMessage(db, student, cohortId, hello.id)).toBe(true);
+    expect(await recentStudentMessages(db)).toBe(0);
+    await postChatMessage(db, other, cohortId, "Hi from Bola");
+    expect(await recentStudentMessages(db)).toBe(1);
+    expect(await deleteChatMessage(db, teacher, cohortId, welcome.id)).toBe(true);
+    expect((await chatMessagesFor(db, teacher, cohortId)).map((m) => m.body)).toEqual(["Hi from Bola"]);
+  });
+
+  it("slows down a student who floods the chat", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    for (let i = 0; i < 10; i++) expect(await postChatMessage(db, student, cohortId, `message ${i}`)).toHaveProperty("id");
+    expect(await postChatMessage(db, student, cohortId, "one more")).toEqual({ error: expect.stringContaining("wait") });
   });
 });
 
