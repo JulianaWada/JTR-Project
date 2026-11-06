@@ -83,12 +83,20 @@ export async function pinChatMessage(db: Database, user: User, cohortId: string,
   return updated.length > 0;
 }
 
-/** Student messages across all class chats in the last day, for the teacher's menu badge. */
+/**
+ * Student messages across all class chats in the last day, for the teacher's menu badge.
+ * Never throws: a badge must not take the whole teacher dashboard down.
+ */
 export async function recentStudentMessages(db: Database, now = new Date()): Promise<number> {
-  const [{ value }] = await db
-    .select({ value: count() })
-    .from(schema.chatMessages)
-    .innerJoin(schema.users, eq(schema.users.id, schema.chatMessages.userId))
-    .where(and(eq(schema.users.role, "student"), gte(schema.chatMessages.createdAt, new Date(now.getTime() - 24 * 60 * 60 * 1000))));
-  return value;
+  try {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(schema.chatMessages)
+      .innerJoin(schema.users, eq(schema.users.id, schema.chatMessages.userId))
+      .where(and(eq(schema.users.role, "student"), gte(schema.chatMessages.createdAt, new Date(now.getTime() - 24 * 60 * 60 * 1000))));
+    return value;
+  } catch (err) {
+    console.error("[chat] Couldn't count new chat messages:", err);
+    return 0;
+  }
 }
