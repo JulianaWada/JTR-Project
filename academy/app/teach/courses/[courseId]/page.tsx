@@ -106,7 +106,7 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             Format
           </label>
           <select className="input" id="format" name="format" defaultValue={course.format}>
-            <option value="live">Live classes in dated intakes (Google Meet)</option>
+            <option value="live">Live classes in dated intakes (JTR class room)</option>
             <option value="recorded">Recorded video lessons, self-paced (students start any time)</option>
           </select>
         </div>
@@ -215,13 +215,13 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
               </div>
               <div>
                 <label className="label" htmlFor="meetUrl">
-                  Google Meet link
+                  Outside link <span className="font-normal text-muted">(optional)</span>
                 </label>
                 <input className="input" id="meetUrl" name="meetUrl" type="url" placeholder="https://meet.google.com/…" />
               </div>
             </div>
             <button className="btn-primary btn-sm mt-3">Create intake</button>
-            <p className="mt-2 text-xs text-muted">Classes are created {daily ? "daily" : "weekly"} from the first date, with notes copied from the last intake.</p>
+            <p className="mt-2 text-xs text-muted">Classes are created {daily ? "daily" : "weekly"} from the first date, with notes copied from the last intake. Leave the outside link empty to teach in the JTR class room.</p>
           </form>
         </section>
       )}

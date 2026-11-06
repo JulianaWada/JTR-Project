@@ -13,7 +13,7 @@ const steps = [
   { title: "Choose a course and pay", body: "Pick a course and pay securely with Paystack: card, bank transfer or USSD." },
   {
     title: "Watch or join your classes",
-    body: "Video courses: watch each lesson whenever it suits you. Live courses: classes with Jules on Google Meet, weekly or on consecutive days, with a reminder the day before.",
+    body: "Video courses: watch each lesson whenever it suits you. Live courses: classes with Jules in the JTR online class room, weekly or on consecutive days, with a reminder the day before.",
   },
   { title: "Practise with your AI tutor", body: "Notes, recordings, assignments and quizzes after every class, plus an AI tutor that knows the course and answers any time." },
   { title: "Earn badges and your certificate", body: "Collect badges as you go. Finish the course and get a certificate anyone can verify online." },

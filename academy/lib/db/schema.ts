@@ -30,7 +30,7 @@ export const users = pgTable("users", {
 
 export type CourseWeek = { week: number; title: string; summary: string };
 
-/** "live": classes on Google Meet in dated intakes. "recorded": video lessons students watch at their own pace. */
+/** "live": classes in the JTR class room in dated intakes. "recorded": video lessons students watch at their own pace. */
 export type CourseFormat = "live" | "recorded";
 /** How often a live course meets: one class a week, or one a day for a short intensive course. */
 export type LessonUnit = "week" | "day";
@@ -73,7 +73,9 @@ export const cohorts = pgTable(
     name: text("name").notNull(),
     startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
     capacity: integer("capacity").notNull().default(30),
-    /** Default Google Meet or Zoom link for this cohort's classes. */
+    /** "jtr": classes happen in the JTR class room inside the academy. "link": they use meetUrl (Google Meet, Zoom…). */
+    room: text("room").$type<"jtr" | "link">().notNull().default("jtr"),
+    /** Outside meeting link for this cohort's classes, used when room is "link". */
     meetUrl: text("meet_url").notNull().default(""),
     enrolmentOpen: boolean("enrolment_open").notNull().default(true),
     /** The single always-open intake of a recorded course; its classes are video lessons. */

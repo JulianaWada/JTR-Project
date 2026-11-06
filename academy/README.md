@@ -44,6 +44,7 @@ Delete `academy/.data` to start again with fresh demo data.
 3. **Connect it to the website.** Recommended: give the academy its own subdomain, `academy.jtechright.com` (step-by-step in [DOMAINS.md](../DOMAINS.md)). Set `APP_URL` here to `https://academy.jtechright.com`, and in the website's Vercel project set `ACADEMY_PUBLIC_URL` to the same address. The "Academy" link then appears in the website's menu and footer and goes to the subdomain; old `/academy` links on the website redirect there. `/academy/interest` stays a website page. (Alternative: set `ACADEMY_URL` on the website instead, to serve the academy at `/academy` on the website.)
 4. **Paystack.** Use your secret key, and set the webhook URL to `<APP_URL>/academy/api/paystack/webhook`, e.g. `https://academy.jtechright.com/academy/api/paystack/webhook`. Students get into their course (dashboard, lessons, classes, AI tutor) automatically as soon as Paystack confirms the payment, and not before. A full refund in Paystack takes the course away again. On the live site the practice checkout is switched off: until `PAYSTACK_SECRET_KEY` is set, checkout says payment isn't open yet, so nobody can get in without paying.
 5. **Emails (Resend).** Verify the sending domain and set `RESEND_API_KEY`.
+6. **Class video room (Daily).** Live classes happen in the JTR class room inside the academy (`/learn/<intake>/room`), one private room per intake. Sign up at daily.co, copy the API key from *Developers* and set `DAILY_API_KEY`. The academy creates each room itself and gives every person a personal pass: only students who paid for that intake (from 30 minutes before a class until it ends) and the teacher, who is the host. Joining counts as attendance. Without the key the room shows a preview. An intake can still use Google Meet or Zoom: Teacher > Class rooms > "An outside link".
 
 | Variable | What it's for |
 | --- | --- |
@@ -57,6 +58,7 @@ Delete `academy/.data` to start again with fresh demo data.
 | `PAYSTACK_SECRET_KEY` | Real payments (required for students to enroll on the live site) |
 | `ALLOW_TEST_PAYMENTS` | Leave empty. `true` turns the practice checkout back on for a demo copy, which lets anyone in for free |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Real emails |
+| `DAILY_API_KEY` | Live video in the JTR class room |
 | `CRON_SECRET` | Protects the reminders endpoint; Vercel sends it automatically |
 | `DEMO_PASSWORD` | Leave empty in production (it creates the demo students) |
 

@@ -98,7 +98,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
               <h2 className="mt-2 font-display text-xl font-semibold text-ink">
                 {lessonLabel(course)} {next.week}: {next.title}
               </h2>
-              <p className="mt-1 text-muted">{formatDateTime(next.startsAt)} Lagos time · {next.durationMinutes} minutes on Google Meet</p>
+              <p className="mt-1 text-muted">{formatDateTime(next.startsAt)} Lagos time · {next.durationMinutes} minutes in the JTR class room</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {nextState === "open" || nextState === "live" ? (
                   <a href={asset(`/join/${next.id}`)} className="btn-primary">

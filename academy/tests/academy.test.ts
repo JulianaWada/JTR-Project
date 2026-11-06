@@ -14,6 +14,7 @@ import { sendClassReminders } from "@/lib/reminders";
 import { existsSync, readFileSync } from "node:fs";
 import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
+import { needsLink, openClass, outsideLink, roomName, roomPass, usesJtrRoom } from "@/lib/class-room";
 import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
@@ -552,5 +553,55 @@ describe("helpers", () => {
     expect(readSessionToken(token, 1000)).toBe("user-1");
     expect(readSessionToken(token.replace("user-1", "user-2"), 1000)).toBeNull();
     expect(readSessionToken(token, 1000 * 60 * 60 * 24 * 31)).toBeNull();
+  });
+});
+
+describe("JTR class room", () => {
+  it("uses the JTR class room by default, and an outside link only when chosen", async () => {
+    const cohort = (await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, seeded.animationNext.cohort.id) }))!;
+    expect(cohort.room).toBe("jtr");
+    expect(usesJtrRoom(cohort)).toBe(true);
+    expect(outsideLink(cohort, { meetUrl: "https://meet.google.com/old" })).toBe("");
+    expect(needsLink({ room: "jtr", meetUrl: "" })).toBe(false);
+    expect(needsLink({ room: "link", meetUrl: "" })).toBe(true);
+    expect(outsideLink({ room: "link", meetUrl: "https://zoom.us/j/1" }, { meetUrl: null })).toBe("https://zoom.us/j/1");
+    expect(outsideLink({ room: "link", meetUrl: "https://zoom.us/j/1" }, { meetUrl: "https://zoom.us/j/2" })).toBe("https://zoom.us/j/2");
+    expect(roomName(cohort.id)).toMatch(/^jtr-class-[0-9a-f-]{36}$/);
+  });
+
+  it("lets students in from 30 minutes before a class until it ends", () => {
+    const startsAt = new Date("2026-12-01T15:00:00Z");
+    const lessons = [{ id: "a", startsAt, durationMinutes: 120 }, { id: "b", startsAt: addMinutes(startsAt, 24 * 60), durationMinutes: 120 }];
+    expect(openClass(lessons, addMinutes(startsAt, -31))).toBeUndefined();
+    expect(openClass(lessons, addMinutes(startsAt, -30))?.id).toBe("a");
+    expect(openClass(lessons, addMinutes(startsAt, 121))).toBeUndefined();
+    expect(openClass(lessons, addMinutes(startsAt, 24 * 60 + 5))?.id).toBe("b");
+  });
+
+  it("runs in test mode without a Daily key, and asks Daily for a private room and a personal pass with one", async () => {
+    const user = { id: "u1", name: "Amaka Obi" };
+    const until = new Date("2026-12-01T17:00:00Z");
+    expect(await roomPass({ cohortId: "c1", user, host: false, until })).toEqual({ mode: "test" });
+
+    process.env.DAILY_API_KEY = "test-key";
+    const calls: { url: string; body?: unknown }[] = [];
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+      calls.push({ url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.endsWith("/rooms/jtr-class-c1")) return new Response("{}", { status: 404 });
+      if (url.endsWith("/rooms")) return Response.json({ url: "https://jtr.daily.co/jtr-class-c1" });
+      return Response.json({ token: "abc" });
+    }) as typeof fetch;
+    try {
+      const pass = await roomPass({ cohortId: "c1", user, host: false, until });
+      expect(pass).toEqual({ mode: "live", url: "https://jtr.daily.co/jtr-class-c1?t=abc" });
+      expect(calls[1].body).toMatchObject({ name: "jtr-class-c1", privacy: "private" });
+      expect(calls[2].body).toMatchObject({
+        properties: { room_name: "jtr-class-c1", user_name: "Amaka Obi", is_owner: false, exp: until.getTime() / 1000 + 3600 },
+      });
+    } finally {
+      globalThis.fetch = realFetch;
+      delete process.env.DAILY_API_KEY;
+    }
   });
 });

@@ -1,0 +1,1 @@
+ALTER TABLE "cohorts" ADD COLUMN "room" text DEFAULT 'jtr' NOT NULL;

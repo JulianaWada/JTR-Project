@@ -76,6 +76,11 @@ export const env = {
     return read("EMAIL_FROM") ?? "JTR Academy <academy@jtechright.com>";
   },
 
+  // Daily (video for the JTR class room)
+  get dailyApiKey() {
+    return read("DAILY_API_KEY");
+  },
+
   // Sessions and cron
   get sessionSecret() {
     const value = read("SESSION_SECRET");
@@ -94,11 +99,12 @@ export const env = {
 
 export type ServiceMode = "live" | "test";
 
-export function modes(): { claude: ServiceMode; paystack: ServiceMode; email: ServiceMode; database: "postgres" | "embedded" } {
+export function modes(): { claude: ServiceMode; paystack: ServiceMode; email: ServiceMode; video: ServiceMode; database: "postgres" | "embedded" } {
   return {
     claude: env.anthropicApiKey ? "live" : "test",
     paystack: env.paystackSecretKey ? "live" : "test",
     email: env.resendApiKey ? "live" : "test",
+    video: env.dailyApiKey ? "live" : "test",
     database: env.databaseUrl ? "postgres" : "embedded",
   };
 }

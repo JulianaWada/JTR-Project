@@ -1,3 +1,4 @@
+import { needsLink } from "@/lib/class-room";
 import { and, asc, desc, eq } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { certificates, classes, cohorts, courses, enrolments, submissions, tutorMessages } from "@/lib/db/schema";
@@ -61,7 +62,7 @@ export async function teacherDashboard(db: Database, now = new Date()) {
     (c) => !selfPacedIds.has(c.cohortId) && !c.recordingUrl && addMinutes(c.startsAt, c.durationMinutes) < now && c.startsAt > new Date(now.getTime() - 21 * 86400000),
   );
   const soon = new Date(now.getTime() + 14 * 86400000);
-  const noMeetLink = classRows.filter((c) => !selfPacedIds.has(c.cohortId) && c.startsAt > now && c.startsAt < soon && !c.meetUrl && !cohortOf(c.cohortId)?.meetUrl);
+  const noMeetLink = classRows.filter((c) => !selfPacedIds.has(c.cohortId) && c.startsAt > now && c.startsAt < soon && !c.meetUrl && !!cohortOf(c.cohortId) && needsLink(cohortOf(c.cohortId)!));
   const unpaid = enrolmentRows.filter((e) => e.status === "pending");
 
   const upcoming = classRows

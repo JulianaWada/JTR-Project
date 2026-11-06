@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BarChart, BarList, KpiCard } from "@/components/charts";
 import { Icon, type IconName } from "@/components/icons";
+import { needsLink } from "@/lib/class-room";
 import { MeetLinkCard } from "@/components/meet-link-card";
 import { Empty, Flash, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
@@ -42,7 +43,7 @@ const activityIcon: Record<Activity["kind"], { icon: IconName; chip: string }> =
 export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
   const db = await getDb();
   const d = await teacherDashboard(db);
-  const needLink = (await liveIntakes(db)).filter((i) => !i.cohort.meetUrl);
+  const needLink = (await liveIntakes(db)).filter((i) => needsLink(i.cohort));
   const change = d.incomeLastMonthKobo ? Math.round(((d.incomeThisMonthKobo - d.incomeLastMonthKobo) / d.incomeLastMonthKobo) * 100) : null;
   const todo = [
     d.toMark.length > 0 && { href: "/teach/marking", icon: "check" as const, text: `${d.toMark.length} ${d.toMark.length === 1 ? "piece" : "pieces"} of work to mark` },
@@ -59,7 +60,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
     d.noMeetLink.length > 0 && {
       href: "/teach/meet",
       icon: "alert" as const,
-      text: `${d.noMeetLink.length} ${d.noMeetLink.length === 1 ? "class" : "classes"} in the next 2 weeks without a Meet link`,
+      text: `${d.noMeetLink.length} ${d.noMeetLink.length === 1 ? "class" : "classes"} in the next 2 weeks without a meeting link`,
     },
     d.unpaid.length > 0 && { href: "/teach/payments", icon: "wallet" as const, text: `${d.unpaid.length} started enrolling but haven't paid` },
   ].filter((t) => !!t);
@@ -90,7 +91,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
           ))}
           {needLink.length > 2 && (
             <Link href="/teach/meet" className="text-sm font-medium text-primary hover:underline">
-              {needLink.length - 2} more {needLink.length - 2 === 1 ? "intake needs" : "intakes need"} a Meet link →
+              {needLink.length - 2} more {needLink.length - 2 === 1 ? "intake needs" : "intakes need"} a meeting link →
             </Link>
           )}
         </div>

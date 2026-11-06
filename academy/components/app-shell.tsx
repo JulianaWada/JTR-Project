@@ -69,7 +69,7 @@ export function AppShell({
   area: string;
 }) {
   const m = modes();
-  const testServices = [m.paystack === "test" && "payments", m.claude === "test" && "AI tutor", m.email === "test" && "emails"].filter(Boolean);
+  const testServices = [m.paystack === "test" && "payments", m.claude === "test" && "AI tutor", m.email === "test" && "emails", m.video === "test" && "class video room"].filter(Boolean);
   const footer: { href: string; label: string; icon: IconName }[] =
     user.role === "teacher" && home === "/teach" ? [{ href: "/", label: "View academy site", icon: "globe" }] : [{ href: "/", label: "All courses", icon: "compass" }];
   const initials = user.name
