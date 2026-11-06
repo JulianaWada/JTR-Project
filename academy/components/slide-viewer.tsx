@@ -56,19 +56,23 @@ export function SlideViewer({ title, images, fileUrl }: { title: string; images:
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- plain images keep the slides crisp at any size */}
         <img src={images[index]} alt={`${title}, slide ${index + 1} of ${images.length}`} className="size-full object-contain" />
+        {/* Click areas over the slide. They never take focus, so no focus outline is drawn across the slide
+            (the buttons below and the arrow keys do the same job for keyboard users). */}
         <button
           type="button"
           onClick={() => go(index - 1)}
           disabled={index === 0}
           aria-label="Previous slide"
-          className="absolute inset-y-0 left-0 w-1/4 cursor-w-resize disabled:cursor-default"
+          tabIndex={-1}
+          className="absolute inset-y-0 outline-none left-0 w-1/4 cursor-w-resize disabled:cursor-default"
         />
         <button
           type="button"
           onClick={() => go(index + 1)}
           disabled={index === last}
           aria-label="Next slide"
-          className="absolute inset-y-0 right-0 w-3/4 cursor-e-resize disabled:cursor-default"
+          tabIndex={-1}
+          className="absolute inset-y-0 outline-none right-0 w-3/4 cursor-e-resize disabled:cursor-default"
         />
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
