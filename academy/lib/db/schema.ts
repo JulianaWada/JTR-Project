@@ -305,6 +305,27 @@ export const tutorMessages = pgTable(
   (t) => [index("tutor_messages_thread_idx").on(t.userId, t.cohortId, t.createdAt)],
 ).enableRLS();
 
+/**
+ * The class chat: one group chat per intake, for its paid students and the teacher.
+ * The teacher can pin and remove messages; students can remove their own.
+ */
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    cohortId: uuid("cohort_id")
+      .notNull()
+      .references(() => cohorts.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    pinned: boolean("pinned").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("chat_messages_cohort_idx").on(t.cohortId, t.createdAt)],
+).enableRLS();
+
 /** Every email the academy sends. In test mode this is the only place they go. */
 export const emails = pgTable("emails", {
   id: uuid("id").primaryKey().defaultRandom(),
