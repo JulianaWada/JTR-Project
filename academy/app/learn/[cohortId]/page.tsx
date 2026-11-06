@@ -1,5 +1,5 @@
 import { BadgeIcon } from "@/components/badge-icon";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeGrid } from "@/components/badge-grid";
@@ -47,6 +47,14 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
   }
   const progress = await getProgress(db, user.id, cohortId);
   const badges = await db.query.userBadges.findMany({ where: and(eq(schema.userBadges.userId, user.id), eq(schema.userBadges.cohortId, cohortId)) });
+  const [{ value: chatCount }] = await db.select({ value: count() }).from(schema.chatMessages).where(eq(schema.chatMessages.cohortId, cohortId));
+  const [lastChat] = await db
+    .select({ body: schema.chatMessages.body, name: schema.users.name })
+    .from(schema.chatMessages)
+    .innerJoin(schema.users, eq(schema.users.id, schema.chatMessages.userId))
+    .where(eq(schema.chatMessages.cohortId, cohortId))
+    .orderBy(desc(schema.chatMessages.createdAt))
+    .limit(1);
   const selfPaced = cohort.selfPaced;
   const next = selfPaced ? undefined : lessons.find((l) => classState(l) !== "ended");
   const nextState = next ? classState(next) : null;
@@ -68,9 +76,14 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
         eyebrow={selfPaced ? "Video course · learn at your own pace" : `${cohort.name} intake`}
         title={course.title}
         actions={
-          <Link href={`/learn/${cohortId}/tutor`} className="btn-primary">
-            ✨ Ask the AI tutor
-          </Link>
+          <>
+            <Link href={`/learn/${cohortId}/chat`} className="btn-secondary">
+              💬 Class chat
+            </Link>
+            <Link href={`/learn/${cohortId}/tutor`} className="btn-primary">
+              ✨ Ask the AI tutor
+            </Link>
+          </>
         }
       />
 
@@ -274,6 +287,23 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
             <div className="mt-4">
               <BadgeGrid earned={badges} compact />
             </div>
+          </section>
+
+          <section className="card">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="font-display text-lg font-semibold text-ink">💬 Class chat</h2>
+              {chatCount > 0 && <span className="text-sm text-muted">{chatCount} messages</span>}
+            </div>
+            {lastChat ? (
+              <p className="mt-2 line-clamp-2 text-sm text-ink">
+                <span className="font-medium">{lastChat.name.split(" ")[0]}:</span> {lastChat.body}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-muted">Chat with your classmates and Jules: share your work, ask questions and help each other.</p>
+            )}
+            <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm mt-4">
+              Open the chat
+            </Link>
           </section>
 
           <section className="card bg-gradient-to-br from-primary-soft to-surface">

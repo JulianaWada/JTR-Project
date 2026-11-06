@@ -17,6 +17,7 @@ import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed"
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
+import { chatMessagesFor, deleteChatMessage, pinChatMessage, postChatMessage, recentStudentMessages } from "@/lib/chat";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
@@ -275,7 +276,7 @@ describe("recorded course", () => {
     check(await byDay());
 
     await db.update(schema.classes).set({ slides: null }).where(eq(schema.classes.cohortId, cohortId));
-    const sql = readFileSync("drizzle/0008_animation_slides.sql", "utf8").split("--> statement-breakpoint");
+    const sql = readFileSync("drizzle/0009_animation_slides.sql", "utf8").split("--> statement-breakpoint");
     const run = async () => {
       for (const statement of sql) await db.execute(statement);
     };
@@ -440,6 +441,47 @@ describe("teacher account", () => {
       delete process.env.TEACHER_EMAIL;
       delete process.env.TEACHER_PASSWORD;
     }
+  });
+});
+
+describe("class chat", () => {
+  it("lets students and the teacher chat in an intake, with pins and removals", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    const [teacher] = await db.insert(schema.users).values({ email: "t@example.com", name: "Jules", role: "teacher", passwordHash: "x" }).returning();
+    const [other] = await db.insert(schema.users).values({ email: "b@example.com", name: "Bola Ade", passwordHash: "x" }).returning();
+
+    expect(await postChatMessage(db, student, cohortId, "   ")).toEqual({ error: expect.any(String) });
+    expect(await postChatMessage(db, student, cohortId, "x".repeat(1001))).toEqual({ error: expect.any(String) });
+    const hello = await postChatMessage(db, student, cohortId, " Hello class! ");
+    if (!("id" in hello)) throw new Error("not sent");
+    const welcome = await postChatMessage(db, teacher, cohortId, "Welcome everyone");
+    if (!("id" in welcome)) throw new Error("not sent");
+
+    const seen = await chatMessagesFor(db, other, cohortId);
+    expect(seen.map((m) => [m.author, m.body, m.fromTeacher, m.canDelete])).toEqual([
+      ["Amaka Obi", "Hello class!", false, false],
+      ["Jules", "Welcome everyone", true, false],
+    ]);
+    // Each intake has its own chat.
+    expect(await chatMessagesFor(db, student, seeded.animationDone!.cohort.id)).toEqual([]);
+
+    // Students can't pin or remove someone else's message; the teacher can do both.
+    expect(await pinChatMessage(db, other, cohortId, welcome.id, true)).toBe(false);
+    expect(await deleteChatMessage(db, other, cohortId, hello.id)).toBe(false);
+    expect(await pinChatMessage(db, teacher, cohortId, welcome.id, true)).toBe(true);
+    expect((await chatMessagesFor(db, student, cohortId)).find((m) => m.id === welcome.id)?.pinned).toBe(true);
+    expect(await deleteChatMessage(db, student, cohortId, hello.id)).toBe(true);
+    expect(await recentStudentMessages(db)).toBe(0);
+    await postChatMessage(db, other, cohortId, "Hi from Bola");
+    expect(await recentStudentMessages(db)).toBe(1);
+    expect(await deleteChatMessage(db, teacher, cohortId, welcome.id)).toBe(true);
+    expect((await chatMessagesFor(db, teacher, cohortId)).map((m) => m.body)).toEqual(["Hi from Bola"]);
+  });
+
+  it("slows down a student who floods the chat", async () => {
+    const cohortId = seeded.animationNext.cohort.id;
+    for (let i = 0; i < 10; i++) expect(await postChatMessage(db, student, cohortId, `message ${i}`)).toHaveProperty("id");
+    expect(await postChatMessage(db, student, cohortId, "one more")).toEqual({ error: expect.stringContaining("wait") });
   });
 });
 

@@ -70,6 +70,11 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
           : `Starts ${formatDate(cohort.startsAt)} · ${active.length}/${cohort.capacity} students · ${cohort.enrolmentOpen ? "enrollment open" : "enrollment closed"}`}
       </PageTitle>
       <Flash searchParams={searchParams} />
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm">
+          💬 Open the class chat
+        </Link>
+      </div>
       {meetIntake && (
         <div className="mb-6">
           <MeetLinkCard intake={meetIntake} returnTo={`/teach/cohorts/${cohortId}`} />
