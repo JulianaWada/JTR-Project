@@ -23,4 +23,5 @@ export async function sendEmail(db: Database, message: { to: string; subject: st
     if (error) console.error("[email] send failed", message.to, error);
   }
   await db.insert(emails).values({ ...message, mode, error });
+  return { mode, error };
 }
