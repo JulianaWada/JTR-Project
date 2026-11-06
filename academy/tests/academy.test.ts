@@ -275,10 +275,34 @@ describe("recorded course", () => {
     check(await byDay());
 
     await db.update(schema.classes).set({ slides: null }).where(eq(schema.classes.cohortId, cohortId));
-    const sql = readFileSync("drizzle/0008_animation_slides.sql", "utf8");
-    await db.execute(sql);
-    await db.execute(sql);
+    const sql = readFileSync("drizzle/0008_animation_slides.sql", "utf8").split("--> statement-breakpoint");
+    const run = async () => {
+      for (const statement of sql) await db.execute(statement);
+    };
+    // An intake made before Digen AI was the course's generator gets the new wording and links, once.
+    const before = await byDay();
+    await db
+      .update(schema.classes)
+      .set({ notes: before[0].notes.replace("Digen AI (text to image)", "an AI image generator") })
+      .where(eq(schema.classes.id, before[0].id));
+    for (const c of before)
+      await db
+        .update(schema.classes)
+        .set({ resources: c.resources.filter((r) => !r.url.includes("digen.ai")) })
+        .where(eq(schema.classes.id, c.id));
+    await run();
+    await run();
     check(await byDay());
+    const after = await byDay();
+    expect(after[0].notes).toBe(before[0].notes);
+    expect(after.map((c) => c.resources.map((r) => r.url))).toEqual([
+      ["https://digen.ai/image", "https://digen.ai/en/space", "https://www.capcut.com", "https://www.canva.com"],
+      ["https://digen.ai/image"],
+      ["https://digen.ai/en/space"],
+      ["https://digen.ai/create"],
+      [],
+    ]);
+    expect(after.map((c) => c.resources)).toEqual(before.map((c) => c.resources));
     // Boost Sales lessons are left to their own slides.
     const sales = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, seeded.salesSelfPaced.cohort.id) });
     expect(sales.every((c) => c.slides?.file.includes("boost-sales-with-ai"))).toBe(true);

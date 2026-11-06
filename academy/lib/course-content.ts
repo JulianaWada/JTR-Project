@@ -260,9 +260,9 @@ On TikTok, Instagram Reels and YouTube Shorts people decide in about 3 seconds w
 
 ## The AI toolkit
 - Script: ChatGPT or Claude
-- Images and characters: an AI image generator
-- Animation: an AI video generator (image-to-video) or a simple animation app such as CapCut or Canva
-- Voice: an AI voice generator, or record your own on your phone
+- Images and characters: Digen AI (text to image)
+- Animation: Digen AI (image to video, and lip sync for talking characters) or a simple animation app such as CapCut or Canva
+- Voice: Digen AI text to speech, or record your own on your phone
 - Editing: CapCut or Canva
 
 ## One video, one message
@@ -277,6 +277,8 @@ A storyboard is a list of frames: what we see, what we hear, and how long it las
 ## Exercise
 Write your script and storyboard for your final project idea. Before the next class, watch 5 animated adverts you like and note what happens in the first 3 seconds.`,
       resources: [
+        { label: "Digen AI: text to image", url: "https://digen.ai/image" },
+        { label: "Digen AI: image to video", url: "https://digen.ai/en/space" },
         { label: "CapCut", url: "https://www.capcut.com" },
         { label: "Canva", url: "https://www.canva.com" },
       ],
@@ -297,14 +299,16 @@ Create backgrounds separately with no characters in them so you can reuse them a
 
 ## Exercise
 Create your main character in 3 different poses and 2 backgrounds.`,
-      resources: [],
+      resources: [
+        { label: "Digen AI: text to image", url: "https://digen.ai/image" },
+      ],
       slides: animationSlides(2, 10),
     },
     {
       week: 3,
       title: "Bring it to life",
       notes: `## Two ways to animate
-- **Image-to-video AI:** upload a still image and describe the motion ("she waves and smiles, camera slowly pushes in"). Keep each clip short, 3 to 5 seconds.
+- **Image to video in Digen AI:** upload a still image and describe the motion ("she waves and smiles, camera slowly pushes in"). Keep each clip short, 3 to 5 seconds.
 - **Simple motion in an editor:** in CapCut or Canva, add zoom, pan, slide-in and bounce effects to still images. Fast, cheap and reliable.
 
 ## Camera moves that look professional
@@ -315,14 +319,16 @@ Use simple cuts most of the time. Save flashy transitions for the start and the 
 
 ## Exercise
 Animate every scene in your storyboard, even roughly.`,
-      resources: [],
+      resources: [
+        { label: "Digen AI: image to video", url: "https://digen.ai/en/space" },
+      ],
       slides: animationSlides(3, 10),
     },
     {
       week: 4,
       title: "Sound and finishing",
       notes: `## Voiceover
-Record in a quiet room with your phone close to your mouth, or use an AI voice. Speak a little slower than normal. Keep sentences short.
+Record in a quiet room with your phone close to your mouth, or use Digen AI text to speech. Speak a little slower than normal. Keep sentences short.
 
 ## Music
 Use royalty-free music from your editing app's library so your video is not muted on social media. Lower the music under the voice.
@@ -335,7 +341,9 @@ Most people watch with the sound off. Add auto-captions in CapCut and check ever
 - Is the call to action on screen for at least 2 seconds?
 - Is the logo at the end, not the start?
 - Export in 1080p at the right shape (9:16 for Reels, TikTok and Shorts).`,
-      resources: [],
+      resources: [
+        { label: "Digen AI: lip sync and text to speech", url: "https://digen.ai/create" },
+      ],
       slides: animationSlides(4, 10),
     },
     {
