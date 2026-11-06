@@ -7,7 +7,7 @@ import { requireTeacher } from "@/lib/auth";
 import { checkCompletion, issueCertificate, revokeCertificate } from "@/lib/certificates";
 import { getDb, schema } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
-import { url } from "@/lib/env";
+import { env, url } from "@/lib/env";
 import { cleanMeetUrl } from "@/lib/meet-links";
 import { koboFromNaira } from "@/lib/money";
 import { parseQuiz, parseResources } from "@/lib/quiz-format";
@@ -395,4 +395,30 @@ export async function toggleDiscount(code: string) {
   const discount = await db.query.discountCodes.findFirst({ where: eq(schema.discountCodes.code, code) });
   if (discount) await db.update(schema.discountCodes).set({ active: !discount.active }).where(eq(schema.discountCodes.code, code));
   back("/teach/payments#discounts", { saved: discount?.active ? `Code ${code} turned off.` : `Code ${code} turned on.` });
+}
+
+/** Sends a sample "You're enrolled" email, so the teacher can check that emails really arrive. */
+export async function sendTestEmail(form: FormData) {
+  const user = await requireTeacher();
+  const to = String(form.get("to") ?? "").trim() || user.email;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) back("/teach/outbox", { error: "Please enter a valid email address." });
+  const db = await getDb();
+  const result = await sendEmail(db, {
+    to,
+    subject: "Test email from JTR Academy",
+    body: [
+      "Hi,",
+      "",
+      "This is a test from your JTR Academy teacher dashboard. If you can read this, the academy can send emails:",
+      "students will get their \"You're enrolled\" receipt after paying, class reminders, marking results and certificates.",
+      "",
+      `Sent from ${env.emailFrom}. Your academy: ${url("/")}`,
+      "",
+      "Jules, JTR Academy",
+    ].join("\n"),
+  });
+  revalidatePath("/teach/outbox");
+  if (result.mode === "test") back("/teach/outbox", { error: "Not sent: RESEND_API_KEY isn't set on the academy Vercel project, so emails are only saved here." });
+  if (result.error) back("/teach/outbox", { error: `Resend refused the email: ${result.error}` });
+  back("/teach/outbox", { saved: `Test email sent to ${to}. Check that inbox (and the spam folder).` });
 }

@@ -18,6 +18,7 @@ import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed"
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
+import { sendEmail } from "@/lib/email";
 import { chatMessagesFor, deleteChatMessage, pinChatMessage, postChatMessage, recentStudentMessages } from "@/lib/chat";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
@@ -442,6 +443,15 @@ describe("teacher account", () => {
       delete process.env.TEACHER_EMAIL;
       delete process.env.TEACHER_PASSWORD;
     }
+  });
+});
+
+describe("emails", () => {
+  it("says when an email was only saved because no Resend key is set", async () => {
+    const result = await sendEmail(db, { to: "jules@example.com", subject: "Test", body: "Hello" });
+    expect(result).toEqual({ mode: "test", error: null });
+    const saved = await db.query.emails.findFirst({ where: eq(schema.emails.to, "jules@example.com") });
+    expect(saved?.mode).toBe("test");
   });
 });
 

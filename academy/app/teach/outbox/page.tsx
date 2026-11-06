@@ -1,13 +1,16 @@
 import { desc } from "drizzle-orm";
 import type { Metadata } from "next";
-import { Empty, PageTitle, Pill } from "@/components/ui";
+import { Empty, Flash, PageTitle, Pill } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { modes } from "@/lib/env";
 import { formatDateTime } from "@/lib/time";
+import { sendTestEmail } from "../actions";
 
 export const metadata: Metadata = { title: "Emails" };
 
-export default async function Outbox() {
+export default async function Outbox({ searchParams }: PageProps<"/teach/outbox">) {
+  const user = await requireTeacher();
   const db = await getDb();
   const rows = await db.query.emails.findMany({ orderBy: desc(schema.emails.createdAt), limit: 100 });
   return (
@@ -16,6 +19,15 @@ export default async function Outbox() {
         Receipts, class reminders, marking results and certificates.{" "}
         {modes().email === "test" ? "Test mode: these were not actually sent. Add a Resend API key to send them." : ""}
       </PageTitle>
+      <Flash searchParams={searchParams} />
+      <form action={sendTestEmail} className="card mb-6 flex flex-wrap items-end gap-3">
+        <label className="min-w-64 flex-1">
+          <span className="text-sm font-medium text-ink">Send a test email to</span>
+          <input className="input mt-1" name="to" type="email" required defaultValue={user.email} />
+        </label>
+        <button className="btn-primary">Send test email</button>
+        <p className="w-full text-xs text-muted">Checks that real emails leave the academy and arrive. It appears in the list below too.</p>
+      </form>
       {rows.length === 0 ? (
         <Empty>No emails yet.</Empty>
       ) : (
