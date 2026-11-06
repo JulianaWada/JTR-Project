@@ -64,6 +64,13 @@
       "when": 1793991402529,
       "tag": "0008_class_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793991462529,
+      "tag": "0009_animation_slides",
+      "breakpoints": true
     }
   ]
 }
