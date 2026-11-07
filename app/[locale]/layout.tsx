@@ -20,10 +20,8 @@ export function generateStaticParams() {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f7fa" },
-    { media: "(prefers-color-scheme: dark)", color: "#07111f" },
-  ],
+  // The site opens in day (light) mode for everyone, so the browser bar matches it.
+  themeColor: "#f5f7fa",
 };
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
