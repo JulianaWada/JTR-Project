@@ -8,7 +8,7 @@ const loadFeatures = () => import("@/lib/motion-features").then((mod) => mod.def
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
       {/* reducedMotion="user" turns animations off for visitors who ask for less motion. */}
       <MotionConfig reducedMotion="user">
         <LazyMotion features={loadFeatures} strict>
