@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f7fa",
+  themeColor: "#dfe6ef",
 };
 
 // Opens in light (day) mode by default, like the JTR website. Dark mode only when the
