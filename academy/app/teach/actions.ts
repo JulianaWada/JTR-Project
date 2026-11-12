@@ -3,7 +3,7 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireTeacher } from "@/lib/auth";
+import { requireAdmin, requireTeacher } from "@/lib/auth";
 import { checkCompletion, issueCertificate, revokeCertificate } from "@/lib/certificates";
 import { getDb, schema } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
@@ -13,9 +13,24 @@ import { koboFromNaira } from "@/lib/money";
 import { parseQuiz, parseResources } from "@/lib/quiz-format";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { slidesFrom } from "@/lib/slides";
+import { canManageCohort, canManageCourse, ownCourseIds } from "@/lib/teachers";
 import { addDays, fromLagos } from "@/lib/time";
 
-// Every action here re-checks that the caller is the teacher; server actions are public endpoints.
+// Every action here re-checks that the caller is a teacher of that course (or the admin); server actions are public endpoints.
+
+/** The signed-in teacher, if they run this course; otherwise back to their course list. */
+async function courseTeacher(courseId: string) {
+  const user = await requireTeacher();
+  if (!(await canManageCourse(await getDb(), user, courseId))) back("/teach/courses", { error: "That course isn't one of yours." });
+  return user;
+}
+
+/** The signed-in teacher, if they run this intake's course. */
+async function cohortTeacher(cohortId: string) {
+  const user = await requireTeacher();
+  if (!(await canManageCohort(await getDb(), user, cohortId))) back("/teach/courses", { error: "That intake isn't one of yours." });
+  return user;
+}
 
 function str(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
@@ -38,7 +53,7 @@ function slugify(text: string) {
 // Courses
 
 export async function createCourse(form: FormData) {
-  await requireTeacher();
+  const user = await requireTeacher();
   const db = await getDb();
   const title = str(form, "title");
   const price = Number(str(form, "price"));
@@ -59,13 +74,15 @@ export async function createCourse(form: FormData) {
       published: false,
       outline: [1, 2, 3, 4, 5, 6].map((week) => ({ week, title: `Week ${week}`, summary: "" })),
       sortOrder: 100,
+      // The admin's new courses are JTR Academy courses; everyone else's are their own.
+      teacherId: user.isAdmin ? null : user.id,
     })
     .returning();
   redirect(`/teach/courses/${course.id}?saved=${encodeURIComponent("Course created. Fill in the details, then publish it.")}`);
 }
 
 export async function updateCourse(courseId: string, form: FormData) {
-  await requireTeacher();
+  const user = await courseTeacher(courseId);
   const db = await getDb();
   const path = `/teach/courses/${courseId}`;
   const price = Number(str(form, "price"));
@@ -101,11 +118,19 @@ export async function updateCourse(courseId: string, form: FormData) {
       requiresFinalProject: form.get("requiresFinalProject") === "on",
       published: form.get("published") === "on",
       accent: form.get("accent") === "violet" ? "violet" : "blue",
+      ...(user.isAdmin && form.has("teacherId") ? { teacherId: await approvedTeacherId(str(form, "teacherId")) } : {}),
     })
     .where(eq(schema.courses.id, courseId));
   if (before && before.format !== format) await switchFormat(courseId, format);
   revalidatePath("/", "layout");
   back(path, { saved: format === "recorded" && before?.format !== format ? "Saved. This is now a video course: add a video to each lesson below." : "Course saved." });
+}
+
+/** An approved teacher's id, or null (a JTR Academy course) for anything else. */
+async function approvedTeacherId(id: string) {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const profile = await (await getDb()).query.teacherProfiles.findFirst({ where: eq(schema.teacherProfiles.userId, id) });
+  return profile?.status === "approved" ? id : null;
 }
 
 /** Recorded: students enroll in the self-paced intake (created if needed). Live: they choose a dated intake again. */
@@ -122,7 +147,7 @@ async function switchFormat(courseId: string, format: "live" | "recorded") {
 }
 
 export async function saveAssignment(courseId: string, assignmentId: string | null, form: FormData) {
-  await requireTeacher();
+  await courseTeacher(courseId);
   const db = await getDb();
   const path = `/teach/courses/${courseId}#assignments`;
   const week = Number(str(form, "week"));
@@ -134,14 +159,14 @@ export async function saveAssignment(courseId: string, assignmentId: string | nu
 }
 
 export async function deleteAssignment(courseId: string, assignmentId: string) {
-  await requireTeacher();
+  await courseTeacher(courseId);
   const db = await getDb();
   await db.delete(schema.assignments).where(and(eq(schema.assignments.id, assignmentId), eq(schema.assignments.courseId, courseId)));
   back(`/teach/courses/${courseId}#assignments`, { saved: "Assignment deleted." });
 }
 
 export async function saveQuiz(courseId: string, quizId: string | null, form: FormData) {
-  await requireTeacher();
+  await courseTeacher(courseId);
   const db = await getDb();
   const path = `/teach/courses/${courseId}#quizzes`;
   const week = Number(str(form, "week"));
@@ -155,7 +180,7 @@ export async function saveQuiz(courseId: string, quizId: string | null, form: Fo
 }
 
 export async function deleteQuiz(courseId: string, quizId: string) {
-  await requireTeacher();
+  await courseTeacher(courseId);
   const db = await getDb();
   await db.delete(schema.quizzes).where(and(eq(schema.quizzes.id, quizId), eq(schema.quizzes.courseId, courseId)));
   back(`/teach/courses/${courseId}#quizzes`, { saved: "Quiz deleted." });
@@ -165,7 +190,7 @@ export async function deleteQuiz(courseId: string, quizId: string) {
 
 /** A new intake with one class per outline line, weekly or daily as the course says. Notes are copied from the latest earlier intake. */
 export async function createCohort(courseId: string, form: FormData) {
-  await requireTeacher();
+  await courseTeacher(courseId);
   const db = await getDb();
   const path = `/teach/courses/${courseId}#intakes`;
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, courseId) });
@@ -205,7 +230,7 @@ export async function createCohort(courseId: string, form: FormData) {
 
 /** The Class rooms page (and the overview): the JTR class room, or the one outside link every class of an intake uses. */
 export async function saveMeetLink(cohortId: string, returnTo: string, form: FormData) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   const path = returnTo.startsWith("/teach") ? returnTo : "/teach/meet";
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
@@ -225,7 +250,7 @@ export async function saveMeetLink(cohortId: string, returnTo: string, form: For
 }
 
 export async function updateCohort(cohortId: string, form: FormData) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   const path = `/teach/cohorts/${cohortId}`;
   const capacity = Number(str(form, "capacity"));
@@ -242,7 +267,7 @@ export async function updateCohort(cohortId: string, form: FormData) {
 }
 
 export async function saveClass(cohortId: string, classId: string | null, form: FormData) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   const path = classId ? `/teach/cohorts/${cohortId}/classes/${classId}` : `/teach/cohorts/${cohortId}`;
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
@@ -283,7 +308,7 @@ export async function saveClass(cohortId: string, classId: string | null, form: 
 }
 
 export async function deleteClass(cohortId: string, classId: string) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   await db.delete(schema.classes).where(and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)));
   back(`/teach/cohorts/${cohortId}`, { saved: "Class deleted." });
@@ -291,7 +316,7 @@ export async function deleteClass(cohortId: string, classId: string) {
 
 /** Saves the whole attendance grid for an intake. */
 export async function saveAttendance(cohortId: string, form: FormData) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   const lessons = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId) });
   const classIds = lessons.map((l) => l.id);
@@ -316,7 +341,7 @@ export async function saveAttendance(cohortId: string, form: FormData) {
 }
 
 export async function sendAnnouncement(cohortId: string, form: FormData) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
   const db = await getDb();
   const path = `/teach/cohorts/${cohortId}#announce`;
   const subject = str(form, "subject");
@@ -334,22 +359,31 @@ export async function sendAnnouncement(cohortId: string, form: FormData) {
 }
 
 export async function issueCertificateAction(cohortId: string, userId: string) {
-  await requireTeacher();
+  await cohortTeacher(cohortId);
+  const enrolled = await (await getDb()).query.enrolments.findFirst({
+    where: and(eq(schema.enrolments.cohortId, cohortId), eq(schema.enrolments.userId, userId), eq(schema.enrolments.status, "active")),
+  });
+  if (!enrolled) back(`/teach/cohorts/${cohortId}#students`, { error: "That student isn't in this intake." });
   await issueCertificate(await getDb(), userId, cohortId, { force: true });
   back(`/teach/cohorts/${cohortId}#students`, { saved: "Certificate issued and emailed." });
 }
 
 export async function revokeCertificateAction(cohortId: string, code: string) {
-  await requireTeacher();
-  await revokeCertificate(await getDb(), code);
+  await cohortTeacher(cohortId);
+  const db = await getDb();
+  const cert = await db.query.certificates.findFirst({ where: eq(schema.certificates.code, code) });
+  if (!cert || cert.cohortId !== cohortId) back(`/teach/cohorts/${cohortId}#students`, { error: "Certificate not found." });
+  await revokeCertificate(db, code);
   back(`/teach/cohorts/${cohortId}#students`, { saved: "Certificate withdrawn." });
 }
 
 // Marking
 
 export async function markSubmission(submissionId: string, form: FormData) {
-  await requireTeacher();
+  const user = await requireTeacher();
   const db = await getDb();
+  const target = await db.query.submissions.findFirst({ where: eq(schema.submissions.id, submissionId), columns: { cohortId: true } });
+  if (!target || !(await canManageCohort(db, user, target.cohortId))) back("/teach/marking", { error: "Submission not found." });
   const grade = form.get("grade") === "pass" ? "pass" : "redo";
   const [submission] = await db
     .update(schema.submissions)
@@ -365,7 +399,7 @@ export async function markSubmission(submissionId: string, form: FormData) {
     body: [
       `Hi ${student.name.split(" ")[0]},`,
       "",
-      grade === "pass" ? `Your assignment "${assignment.title}" has passed. Well done!` : `Jules has asked you to update "${assignment.title}" and hand it in again.`,
+      grade === "pass" ? `Your assignment "${assignment.title}" has passed. Well done!` : `Your teacher has asked you to update "${assignment.title}" and hand it in again.`,
       submission.feedback ? `\nFeedback: ${submission.feedback}` : "",
       "",
       url(`/learn/${submission.cohortId}/assignments/${assignment.id}`),
@@ -378,8 +412,11 @@ export async function markSubmission(submissionId: string, form: FormData) {
 // Payments
 
 export async function createDiscount(form: FormData) {
-  await requireTeacher();
+  const user = await requireTeacher();
   const db = await getDb();
+  // Teachers make codes for their own courses only; a code for every course is the admin's.
+  const courseId = str(form, "courseId") || null;
+  if (!user.isAdmin && (!courseId || !(await canManageCourse(db, user, courseId)))) back("/teach/payments#discounts", { error: "Choose one of your courses for the code." });
   const code = str(form, "code").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const percent = Number(str(form, "percent"));
   const maxUses = str(form, "maxUses") ? Number(str(form, "maxUses")) : null;
@@ -390,23 +427,27 @@ export async function createDiscount(form: FormData) {
   await db.insert(schema.discountCodes).values({
     code,
     percentOff: percent,
-    courseId: str(form, "courseId") || null,
+    courseId,
     maxUses: maxUses && Number.isInteger(maxUses) && maxUses > 0 ? maxUses : null,
   });
   back("/teach/payments#discounts", { saved: `Code ${code} created.` });
 }
 
 export async function toggleDiscount(code: string) {
-  await requireTeacher();
+  const user = await requireTeacher();
   const db = await getDb();
   const discount = await db.query.discountCodes.findFirst({ where: eq(schema.discountCodes.code, code) });
+  if (discount && !user.isAdmin) {
+    const mine = await ownCourseIds(db, user);
+    if (!discount.courseId || !mine?.includes(discount.courseId)) back("/teach/payments#discounts", { error: "That code isn't one of yours." });
+  }
   if (discount) await db.update(schema.discountCodes).set({ active: !discount.active }).where(eq(schema.discountCodes.code, code));
   back("/teach/payments#discounts", { saved: discount?.active ? `Code ${code} turned off.` : `Code ${code} turned on.` });
 }
 
 /** Sends a sample "You're enrolled" email, so the teacher can check that emails really arrive. */
 export async function sendTestEmail(form: FormData) {
-  const user = await requireTeacher();
+  const user = await requireAdmin();
   const to = String(form.get("to") ?? "").trim() || user.email;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) back("/teach/outbox", { error: "Please enter a valid email address." });
   const db = await getDb();

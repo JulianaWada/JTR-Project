@@ -25,6 +25,10 @@ import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
 import { videoEmbedUrl } from "@/lib/video";
 import { officeViewerUrl, slidesFileUrl, slidesFrom } from "@/lib/slides";
+import { applyAsTeacher, reviewTeacher } from "@/lib/teacher-applications";
+import { brandFor, canManageCohort, canManageCourse, cleanImage, JTR_BRAND, ownCohortIds, teachesCourse } from "@/lib/teachers";
+import { teacherDashboard } from "@/lib/teacher";
+import { publishedCourses } from "@/lib/catalog";
 
 let db: Database;
 let seeded: Awaited<ReturnType<typeof seedCourses>>;
@@ -169,7 +173,7 @@ describe("access only after payment", () => {
 describe("teacher's student view", () => {
   it("lists every course with an intake to open, without enrolling the teacher", async () => {
     await ensureSelfPacedCohorts(db);
-    const courses = await previewCourses(db);
+    const courses = await previewCourses(db, { id: "admin", role: "teacher", isAdmin: true });
     const all = await db.query.courses.findMany();
     expect(courses).toHaveLength(all.length);
     for (const c of courses) expect(c.main?.courseId).toBe(c.course.id);
@@ -603,5 +607,101 @@ describe("JTR class room", () => {
       globalThis.fetch = realFetch;
       delete process.env.DAILY_API_KEY;
     }
+  });
+});
+
+describe("many teachers", () => {
+  const application = { brandName: "Bisi Creative Studio", headline: "Designer", subjects: "Social media design with Canva", website: "", bio: "" };
+
+  async function approvedTeacher(email = "bisi@example.com") {
+    const [user] = await db.insert(schema.users).values({ email, name: "Bisi Adeyemi", passwordHash: hashPassword("password123") }).returning();
+    await applyAsTeacher(db, user.id, application);
+    await reviewTeacher(db, user.id, "approve");
+    return (await db.query.users.findFirst({ where: eq(schema.users.id, user.id) }))!;
+  }
+
+  it("keeps a new teacher out of the teacher dashboard until the admin approves them", async () => {
+    const result = await applyAsTeacher(db, student.id, application);
+    expect(result).toEqual({ ok: true });
+    let user = await db.query.users.findFirst({ where: eq(schema.users.id, student.id) });
+    expect(user?.role).toBe("student");
+    expect((await db.query.teacherProfiles.findFirst({ where: eq(schema.teacherProfiles.userId, student.id) }))?.status).toBe("pending");
+    // The admin is told by email.
+    expect(await db.query.emails.findFirst({ where: eq(schema.emails.subject, "New teacher application: Bisi Creative Studio") })).toBeTruthy();
+    expect(await applyAsTeacher(db, student.id, application)).toEqual({ error: "Your application is already waiting for approval." });
+
+    await reviewTeacher(db, student.id, "approve");
+    user = await db.query.users.findFirst({ where: eq(schema.users.id, student.id) });
+    expect(user?.role).toBe("teacher");
+    expect(user?.isAdmin).toBe(false);
+
+    await reviewTeacher(db, student.id, "suspend", "Paused while we talk.");
+    user = await db.query.users.findFirst({ where: eq(schema.users.id, student.id) });
+    expect(user?.role).toBe("student");
+  });
+
+  it("never changes the admin account", async () => {
+    await ensureTeacherAccount(db);
+    const admin = (await db.query.users.findFirst({ where: eq(schema.users.isAdmin, true) }))!;
+    expect(admin.role).toBe("teacher");
+    await db.insert(schema.teacherProfiles).values({ userId: admin.id, status: "approved" });
+    expect(await reviewTeacher(db, admin.id, "suspend")).toEqual({ error: "That's the admin account." });
+  });
+
+  it("lets each teacher manage only their own courses, while the admin manages all", async () => {
+    const bisi = await approvedTeacher();
+    const other = await approvedTeacher("kemi@example.com");
+    const admin = { id: "admin", role: "teacher", isAdmin: true };
+    const [course] = await db
+      .insert(schema.courses)
+      .values({ slug: "canva", title: "Canva", tagline: "", description: "", priceKobo: 100, teacherId: bisi.id })
+      .returning();
+    const [cohort] = await db.insert(schema.cohorts).values({ courseId: course.id, name: "Jan", startsAt: new Date(Date.now() + 86400000) }).returning();
+
+    expect(teachesCourse(bisi, course)).toBe(true);
+    expect(teachesCourse(other, course)).toBe(false);
+    expect(teachesCourse(admin, course)).toBe(true);
+    expect(await canManageCourse(db, other, seeded.salesCourse.id)).toBe(false);
+    expect(await canManageCohort(db, bisi, cohort.id)).toBe(true);
+    expect(await canManageCohort(db, other, cohort.id)).toBe(false);
+    expect(await ownCohortIds(db, bisi)).toEqual([cohort.id]);
+    expect(await ownCohortIds(db, admin)).toBeNull();
+
+    const mine = await teacherDashboard(db, bisi);
+    expect(mine.byCourse.map((c) => c.course.id)).toEqual([course.id]);
+    expect((await teacherDashboard(db, other)).byCourse).toHaveLength(0);
+    expect((await teacherDashboard(db, admin)).byCourse.length).toBeGreaterThan(1);
+    expect((await liveIntakes(db, undefined, other)).length).toBe(0);
+    expect((await previewCourses(db, bisi)).map((c) => c.course.id)).toEqual([course.id]);
+  });
+
+  it("shows the teacher's brand on their courses, and hides a suspended teacher's courses", async () => {
+    const bisi = await approvedTeacher();
+    await db.insert(schema.courses).values({ slug: "canva", title: "Canva", tagline: "", description: "", priceKobo: 100, teacherId: bisi.id });
+    let listed = await publishedCourses(db);
+    expect(listed.find((c) => c.slug === "canva")?.teacher.name).toBe("Bisi Creative Studio");
+    expect(listed.find((c) => c.slug === seeded.salesCourse.slug)?.teacher).toEqual(JTR_BRAND);
+    expect((await brandFor(db, bisi.id)).name).toBe("Bisi Creative Studio");
+
+    await reviewTeacher(db, bisi.id, "suspend");
+    listed = await publishedCourses(db);
+    expect(listed.find((c) => c.slug === "canva")).toBeUndefined();
+    expect(await brandFor(db, bisi.id)).toEqual(JTR_BRAND);
+  });
+
+  it("only accepts small PNG, JPEG or WebP pictures as logos", () => {
+    expect(cleanImage("data:image/png;base64,iVBORw0KGgo=")).toBe("data:image/png;base64,iVBORw0KGgo=");
+    expect(cleanImage("data:image/svg+xml;base64,PHN2Zz4=")).toBeNull();
+    expect(cleanImage("https://example.com/logo.png")).toBeNull();
+    expect(cleanImage(`data:image/png;base64,${"A".repeat(500_000)}`)).toBeNull();
+  });
+
+  it("makes a teacher a student in someone else's intake", async () => {
+    const bisi = await approvedTeacher();
+    // Bisi doesn't teach the animation course, so she's treated like any student there: locked lessons stay locked.
+    const lesson = seeded.animationNext.classes[1];
+    const role = teachesCourse(bisi, seeded.animationCourse) ? "teacher" : "student";
+    expect(role).toBe("student");
+    expect(isLocked(lesson, seeded.animationNext.cohort, { role }, new Date(lesson.startsAt.getTime() - 3 * 86400000))).toBe(true);
   });
 });

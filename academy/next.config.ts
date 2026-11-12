@@ -22,7 +22,8 @@ const nextConfig: NextConfig = {
     return [{ source: "/", destination: "/academy", basePath: false, permanent: false }];
   },
   experimental: {
-    serverActions: { allowedOrigins: ["jtr-project.vercel.app", "jtechright.com", "www.jtechright.com", ...forwardedOrigins] },
+    // 2 MB: room for a teacher's logo and photo (both shrunk in the browser first).
+    serverActions: { bodySizeLimit: "2mb", allowedOrigins: ["jtr-project.vercel.app", "jtechright.com", "www.jtechright.com", ...forwardedOrigins] },
   },
 };
 

@@ -1,3 +1,4 @@
+import { ownCourses, type Staff } from "@/lib/teachers";
 import { and, asc, desc, eq, gt, inArray } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses, enrolments, payments, userBadges } from "@/lib/db/schema";
@@ -42,8 +43,9 @@ export async function badgesFor(db: Database, userId: string, cohortIds?: string
  * For the teacher's student view: every course with all its intakes, and the intake to open first
  * (the video course's self-paced intake, else the running or next intake, else the latest one).
  */
-export async function previewCourses(db: Database, now = new Date()) {
-  const rows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
+/** The courses `teacher` can open as a student: their own, or every course for the admin. */
+export async function previewCourses(db: Database, teacher: Staff, now = new Date()) {
+  const rows = await db.query.courses.findMany({ where: ownCourses(teacher), orderBy: asc(courses.sortOrder) });
   return Promise.all(
     rows.map(async (course) => {
       const intakes = await db.query.cohorts.findMany({ where: eq(cohorts.courseId, course.id), orderBy: asc(cohorts.startsAt) });

@@ -310,7 +310,7 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                 <span className="font-medium">{lastChat.name.split(" ")[0]}:</span> {lastChat.body}
               </p>
             ) : (
-              <p className="mt-1 text-sm text-muted">Chat with your classmates and Jules: share your work, ask questions and help each other.</p>
+              <p className="mt-1 text-sm text-muted">Chat with your classmates and your teacher: share your work, ask questions and help each other.</p>
             )}
             <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm mt-4">
               Open the chat

@@ -1,15 +1,16 @@
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses } from "@/lib/db/schema";
+import { ownCourses, type Staff } from "@/lib/teachers";
 import { addMinutes } from "@/lib/time";
 
-/** Live intakes that haven't finished yet, soonest first, with their class dates and Meet link. */
-export async function liveIntakes(db: Database, now = new Date()) {
+/** Live intakes that haven't finished yet, soonest first, with their class dates and Meet link; only `teacher`'s courses (all of them for the admin, or when no teacher is given). */
+export async function liveIntakes(db: Database, now = new Date(), teacher?: Staff) {
   const rows = await db
     .select({ cohort: cohorts, course: courses })
     .from(cohorts)
     .innerJoin(courses, eq(courses.id, cohorts.courseId))
-    .where(eq(cohorts.selfPaced, false))
+    .where(and(eq(cohorts.selfPaced, false), teacher ? ownCourses(teacher) : undefined))
     .orderBy(asc(cohorts.startsAt));
   if (!rows.length) return [];
   const classRows = await db.query.classes.findMany({

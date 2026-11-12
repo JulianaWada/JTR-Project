@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClassForm } from "@/components/class-form";
 import { Flash, PageTitle } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { canManageCohort } from "@/lib/teachers";
 import { addDays, toLagosParts } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Add a lesson" };
@@ -13,7 +15,7 @@ export default async function NewClass({ params, searchParams }: PageProps<"/tea
   const { cohortId } = await params;
   const db = await getDb();
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
-  if (!cohort) notFound();
+  if (!cohort || !(await canManageCohort(db, await requireTeacher(), cohortId))) notFound();
   const last = await db.query.classes.findFirst({ where: eq(schema.classes.cohortId, cohortId), orderBy: desc(schema.classes.startsAt) });
   return (
     <div className="mx-auto max-w-4xl">

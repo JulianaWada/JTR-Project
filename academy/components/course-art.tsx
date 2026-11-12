@@ -11,6 +11,7 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
   const color = accent === "violet" ? "#6d4aff" : "#1563d6";
   const soft = accent === "violet" ? "#ece8ff" : "#e4eefb";
   const sales = slug.includes("sales");
+  const animation = !sales && slug.includes("animation");
   return (
     <div
       className={cn("relative overflow-hidden border-b border-[#e6eaf0]", className ?? "h-40")}
@@ -48,6 +49,26 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
               <text y="5" textAnchor="middle" fontSize="15" fontWeight="700" fill={color} fontFamily="system-ui, sans-serif">+</text>
             </g>
           </g>
+        ) : !animation ? (
+          <g>
+            {/* any other course (e.g. a guest teacher's): a lesson page with a certificate ribbon */}
+            <rect x="196" y="20" width="168" height="118" rx="14" fill="#fff" stroke="#e1e6ee" />
+            <rect x="212" y="34" width="70" height="7" rx="3.5" fill={NAVY} opacity="0.85" />
+            <rect x="212" y="48" width="48" height="5" rx="2.5" fill={SILVER} />
+            <rect x="212" y="64" width="136" height="38" rx="8" fill={soft} />
+            <circle cx="232" cy="83" r="10" fill={color} />
+            <path d="M228 83 l3 3 l5 -6" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="250" y="77" width="80" height="5" rx="2.5" fill={NAVY} opacity="0.6" />
+            <rect x="250" y="86" width="56" height="5" rx="2.5" fill={SILVER} />
+            <rect x="212" y="112" width="110" height="5" rx="2.5" fill={SILVER} />
+            <rect x="212" y="122" width="80" height="5" rx="2.5" fill={SILVER} opacity="0.7" />
+            <g transform="translate(150 52)">
+              <rect width="40" height="52" rx="7" fill={NAVY} />
+              <circle cx="20" cy="22" r="10" fill={color} />
+              <path d="M13 40 l7 -6 l7 6" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+            <path d="M372 26 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z" fill={color} />
+          </g>
         ) : (
           <g>
             {/* video frame */}
@@ -84,7 +105,7 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
         className="absolute bottom-4 left-5 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase"
         style={{ color: NAVY, background: "rgba(255,255,255,0.85)", boxShadow: `inset 0 0 0 1px ${SILVER}` }}
       >
-        {sales ? "AI for sales" : "AI animation"}
+        {sales ? "AI for sales" : animation ? "AI animation" : "Online course"}
       </span>
     </div>
   );

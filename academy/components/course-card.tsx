@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { CohortRow, CourseRow } from "@/lib/catalog";
+import { asset } from "@/lib/assets";
 import { money } from "@/lib/money";
+import type { TeacherBrand } from "@/lib/teachers";
 import { formatDate } from "@/lib/time";
 import { accentClasses, Pill } from "./ui";
 import { CourseArt } from "./course-art";
@@ -10,8 +12,11 @@ export function CourseCard({
   course,
   nextCohort,
   currency = "NGN",
+  teacher,
 }: {
   course: CourseRow;
+  /** Shown as "by …" when the course has its own teacher. */
+  teacher?: TeacherBrand;
   nextCohort: (CohortRow & { seatsLeft: number }) | null;
   currency?: "NGN" | "USD";
 }) {
@@ -30,6 +35,19 @@ export function CourseCard({
           <Pill>Certificate</Pill>
         </div>
         <h3 className="mt-4 font-display text-xl font-semibold text-ink group-hover:text-primary">{course.title}</h3>
+        {teacher?.userId && (
+          <p className="mt-2 flex items-center gap-2 text-sm text-muted">
+            {teacher.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element -- the teacher's uploaded logo
+              <img src={asset(teacher.logo)} alt="" className="size-6 rounded-md border border-line bg-white object-contain" />
+            ) : (
+              <span className="grid size-6 place-items-center rounded-md text-[0.65rem] font-bold text-white" style={{ background: teacher.color }}>
+                {teacher.name.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            by <span className="font-medium text-ink">{teacher.name}</span>
+          </p>
+        )}
         <p className="mt-2 flex-1 text-muted">{course.tagline}</p>
         <div className="mt-6 flex items-end justify-between gap-4 border-t border-line pt-4">
           <div>

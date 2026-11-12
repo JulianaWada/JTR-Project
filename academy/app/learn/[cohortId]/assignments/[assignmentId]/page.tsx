@@ -66,7 +66,7 @@ export default async function AssignmentPage({ params }: PageProps<"/learn/[coho
           <p className="mt-1 text-xs text-muted">Handed in {formatDateTime(submission.submittedAt)}</p>
           {submission.feedback && (
             <blockquote className="mt-4 rounded-xl border-s-4 border-primary bg-surface-2 p-4 text-sm text-ink">
-              <p className="text-xs font-semibold text-muted">Feedback from Jules</p>
+              <p className="text-xs font-semibold text-muted">Feedback from your teacher</p>
               <p className="mt-1">{submission.feedback}</p>
             </blockquote>
           )}

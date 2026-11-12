@@ -96,7 +96,7 @@ export default async function AcademyHome() {
         <h2 className="mt-2 font-display text-3xl font-semibold text-ink">Start with one of our first two courses</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {courses.map((course) => (
-            <CourseCard key={course.id} course={course} nextCohort={course.nextCohort} currency={currencyFor(country, course)} />
+            <CourseCard key={course.id} course={course} nextCohort={course.nextCohort} currency={currencyFor(country, course)} teacher={course.teacher} />
           ))}
         </div>
       </section>

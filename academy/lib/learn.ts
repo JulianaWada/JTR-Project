@@ -3,16 +3,24 @@ import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getDb, schema, type Database } from "@/lib/db";
+import { teachesCourse } from "@/lib/teachers";
 import { lockedWeeks } from "@/lib/unlock";
 import { addMinutes } from "@/lib/time";
 
-/** The signed-in student's active enrolment in a cohort, or a 404. Teachers can look at any cohort. */
+/**
+ * The signed-in student's active enrolment in a cohort, or a 404. The course's own teacher (and the admin) can look at it too.
+ * The returned user's role is what they are in this intake: "teacher" only for whoever teaches it, so a teacher who
+ * enrolled in another teacher's course is a student there.
+ */
 export async function requireCohortAccess(cohortId: string, next: string) {
-  const user = await requireUser(next);
+  const signedIn = await requireUser(next);
   const db = await getDb();
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
   if (!cohort) notFound();
-  if (user.role !== "teacher") {
+  const owner = await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId), columns: { teacherId: true } });
+  const teaching = !!owner && teachesCourse(signedIn, owner);
+  const user = { ...signedIn, role: teaching ? ("teacher" as const) : ("student" as const) };
+  if (!teaching) {
     const enrolment = await db.query.enrolments.findFirst({
       where: and(eq(schema.enrolments.userId, user.id), eq(schema.enrolments.cohortId, cohortId), eq(schema.enrolments.status, "active")),
     });

@@ -97,7 +97,7 @@ export default async function ClassRoom({ params }: PageProps<"/learn/[cohortId]
         <TestRoom names={[user.name, teacher ? "Amaka Obi" : "Jules", "Tunde A."]} error={pass.mode === "error" ? pass.message : null} />
       )}
       <p className="mt-3 text-xs text-muted">
-        Allow your browser to use your camera and microphone when it asks. The room is private to this intake: only students who paid, and Jules, can come
+        Allow your browser to use your camera and microphone when it asks. The room is private to this intake: only students who paid, and the teacher, can come
         in.
       </p>
     </div>

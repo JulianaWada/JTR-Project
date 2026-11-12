@@ -2,6 +2,7 @@ import { and, asc, eq, gt, or } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses } from "@/lib/db/schema";
 import { seatsTaken } from "@/lib/enrolment";
+import { brandsFor, JTR_BRAND } from "@/lib/teachers";
 
 export type CourseRow = typeof courses.$inferSelect;
 export type CohortRow = typeof cohorts.$inferSelect;
@@ -20,9 +21,18 @@ export async function openCohorts(db: Database, courseId: string, now = new Date
   );
 }
 
+/** Published courses, with their teacher's brand. Courses of a teacher who isn't approved (e.g. suspended) are left out. */
 export async function publishedCourses(db: Database) {
   const rows = await db.query.courses.findMany({ where: eq(courses.published, true), orderBy: asc(courses.sortOrder) });
-  return Promise.all(rows.map(async (course) => ({ ...course, nextCohort: (await openCohorts(db, course.id))[0] ?? null })));
+  const brands = await brandsFor(db, rows.map((c) => c.teacherId));
+  const listed = rows.filter((c) => !c.teacherId || brands.has(c.teacherId));
+  return Promise.all(
+    listed.map(async (course) => ({
+      ...course,
+      teacher: course.teacherId ? brands.get(course.teacherId)! : JTR_BRAND,
+      nextCohort: (await openCohorts(db, course.id))[0] ?? null,
+    })),
+  );
 }
 
 export function lines(text: string) {

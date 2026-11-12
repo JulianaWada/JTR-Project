@@ -15,6 +15,7 @@ import {
   submissions,
   tutorMessages,
   userBadges,
+  teacherProfiles,
   users,
 } from "@/lib/db/schema";
 import { courseTemplates, type CourseTemplate } from "@/lib/course-content";
@@ -239,6 +240,83 @@ export async function seedDemoStudents(db: Database, password: string, seeded: A
   });
 }
 
+/**
+ * Demo teachers (test mode only): Bisi, an approved teacher with her own branded course and one student,
+ * and Kemi, whose application is waiting for the admin.
+ */
+export async function seedDemoTeachers(db: Database, password: string, now = new Date()) {
+  const passwordHash = hashPassword(password);
+  const [bisi, kemi] = await db
+    .insert(users)
+    .values([
+      { email: "bisi@example.com", name: "Bisi Adeyemi", phone: "+234 803 000 0011", role: "teacher", passwordHash },
+      { email: "kemi@example.com", name: "Kemi Lawal", phone: "+234 803 000 0012", passwordHash },
+    ])
+    .returning();
+  await db.insert(teacherProfiles).values([
+    {
+      userId: bisi.id,
+      status: "approved",
+      brandName: "Bisi Creative Studio",
+      headline: "Brand designer and Canva expert",
+      bio: "I help small businesses look professional online. 8 years designing logos, flyers and social media posts for Lagos brands.",
+      subjects: "Design social media posts with Canva and AI",
+      website: "https://instagram.com/bisicreative",
+      brandColor: "#0f9d77",
+      appliedAt: addDays(now, -20),
+      reviewedAt: addDays(now, -19),
+    },
+    {
+      userId: kemi.id,
+      status: "pending",
+      brandName: "Kemi Codes",
+      headline: "Software developer",
+      subjects: "Build your first website with AI, for complete beginners. A 4-week live course on Saturday mornings.",
+      bio: "Frontend developer at a fintech in Lagos. I've run weekend coding bootcamps for teenagers since 2022.",
+      website: "https://github.com/kemicodes",
+      appliedAt: addDays(now, -1),
+    },
+  ]);
+  const outline = [
+    { week: 1, title: "Canva basics and your brand kit", summary: "Colours, fonts and logo in one place." },
+    { week: 2, title: "Posts that stop the scroll", summary: "Layouts, photos and short text." },
+    { week: 3, title: "AI for ideas and captions", summary: "Plan a month of posts in an hour." },
+  ];
+  const [course] = await db
+    .insert(courses)
+    .values({
+      slug: "social-media-design-with-canva",
+      title: "Social Media Design with Canva and AI",
+      tagline: "Make posts and flyers that look professional, in minutes.",
+      description: "Three live classes for business owners who want their Instagram and WhatsApp status to look as good as the big brands.",
+      audience: "Small business owners\nSocial media managers",
+      outcomes: "Set up a brand kit\nDesign posts and flyers fast\nPlan a month of content with AI",
+      outline,
+      priceKobo: koboFromNaira(25000),
+      priceUsdCents: 2000,
+      format: "live",
+      accent: "blue",
+      sortOrder: 5,
+      teacherId: bisi.id,
+    })
+    .returning();
+  const start = classSlot(now, 2);
+  const [cohort] = await db.insert(cohorts).values({ courseId: course.id, name: "Next intake", startsAt: start, capacity: 20 }).returning();
+  await db.insert(classes).values(
+    outline.map((w, i) => ({
+      cohortId: cohort.id,
+      week: w.week,
+      title: w.title,
+      startsAt: addDays(start, i * 7),
+      durationMinutes: 90,
+      notes: `## ${w.title}\n\n${w.summary}`,
+      resources: [],
+    })),
+  );
+  const tunde = await db.query.users.findFirst({ where: eq(users.email, "tunde@example.com") });
+  if (tunde) await enrolPaid(db, tunde.id, cohort.id, course.priceKobo, addDays(now, -3));
+}
+
 /** First start: the starter courses and (outside production) demo students. */
 export async function ensureDemoData(db: Database) {
   if (process.env.SKIP_DEMO_SEED === "true") return;
@@ -246,7 +324,10 @@ export async function ensureDemoData(db: Database) {
   if (value > 0) return;
 
   const seeded = await seedCourses(db, { demo: Boolean(env.demoPassword) });
-  if (env.demoPassword) await seedDemoStudents(db, env.demoPassword, seeded);
+  if (env.demoPassword) {
+    await seedDemoStudents(db, env.demoPassword, seeded);
+    await seedDemoTeachers(db, env.demoPassword);
+  }
   console.info("[seed] Created the starter courses.");
 }
 
@@ -263,6 +344,7 @@ export async function ensureTeacherAccount(db: Database) {
   const password = explicitPassword || env.demoPassword;
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing?.role === "teacher") {
+    if (!existing.isAdmin) await db.update(users).set({ isAdmin: true }).where(eq(users.id, existing.id));
     // TEACHER_PASSWORD is the teacher's password: changing it in Vercel and redeploying changes the login.
     if (explicitPassword && !verifyPassword(explicitPassword, existing.passwordHash)) {
       await db.update(users).set({ passwordHash: hashPassword(explicitPassword) }).where(eq(users.id, existing.id));
@@ -275,7 +357,7 @@ export async function ensureTeacherAccount(db: Database) {
       console.warn(`[seed] ${email} is a student account. Set TEACHER_PASSWORD to make it the teacher.`);
       return;
     }
-    await db.update(users).set({ role: "teacher", passwordHash: hashPassword(explicitPassword) }).where(eq(users.id, existing.id));
+    await db.update(users).set({ role: "teacher", isAdmin: true, passwordHash: hashPassword(explicitPassword) }).where(eq(users.id, existing.id));
     console.info(`[seed] ${email} is now the teacher account.`);
     return;
   }
@@ -283,5 +365,5 @@ export async function ensureTeacherAccount(db: Database) {
     console.warn("[seed] TEACHER_PASSWORD is not set, so no teacher account was created.");
     return;
   }
-  await db.insert(users).values({ email, name: "Jules", role: "teacher", passwordHash: hashPassword(password) }).onConflictDoNothing();
+  await db.insert(users).values({ email, name: "Jules", role: "teacher", isAdmin: true, passwordHash: hashPassword(password) }).onConflictDoNothing();
 }

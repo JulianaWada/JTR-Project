@@ -22,6 +22,9 @@ export async function SiteHeader() {
           <Link href="/verify" className="rounded-full px-3 py-2 hover:text-primary">
             Verify a certificate
           </Link>
+          <Link href="/teach-with-us" className="rounded-full px-3 py-2 hover:text-primary">
+            Teach with JTR
+          </Link>
           {/* The website is another app, so this is a plain link (see Next.js multi-zones). */}
           <a href={env.websiteUrl} className="rounded-full px-3 py-2 hover:text-primary">
             JTR website
@@ -76,6 +79,11 @@ export function SiteFooter() {
             <li>
               <Link href="/verify" className="hover:text-primary">
                 Verify a certificate
+              </Link>
+            </li>
+            <li>
+              <Link href="/teach-with-us" className="hover:text-primary">
+                Teach with JTR
               </Link>
             </li>
           </ul>

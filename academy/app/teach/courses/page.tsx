@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Flash, PageTitle, Pill } from "@/components/ui";
+import { Empty, Flash, PageTitle, Pill } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
+import { brandsFor } from "@/lib/teachers";
 import { getDb } from "@/lib/db";
 import { naira, usd } from "@/lib/money";
 import { courseWithCohorts } from "@/lib/teacher";
@@ -10,13 +12,19 @@ import { createCourse } from "../actions";
 export const metadata: Metadata = { title: "Courses" };
 
 export default async function TeachCourses({ searchParams }: PageProps<"/teach/courses">) {
-  const courses = await courseWithCohorts(await getDb());
+  const user = await requireTeacher();
+  const db = await getDb();
+  const courses = await courseWithCohorts(db, user);
+  const brands = user.isAdmin ? await brandsFor(db, courses.map((c) => c.course.teacherId)) : new Map();
   return (
     <>
       <PageTitle eyebrow="Teacher" title="Courses & intakes">
         Edit a course&apos;s details, outline, assignments and quizzes, or open a new intake.
       </PageTitle>
       <Flash searchParams={searchParams} />
+      {courses.length === 0 && (
+        <Empty>You haven&apos;t made a course yet. Add your first one below: it starts as a draft that only you can see.</Empty>
+      )}
       <div className="space-y-6">
         {courses.map(({ course, cohorts }) => (
           <section key={course.id} className="card">
@@ -26,6 +34,7 @@ export default async function TeachCourses({ searchParams }: PageProps<"/teach/c
                   {course.published ? <Pill tone="success">Published</Pill> : <Pill tone="warning">Draft</Pill>}
                   <Pill>{naira(course.priceKobo)}{course.priceUsdCents ? ` · ${usd(course.priceUsdCents)}` : ""}</Pill>
                   <Pill tone={course.format === "recorded" ? "violet" : "primary"}>{course.format === "recorded" ? "Video course" : "Live classes"}</Pill>
+                  {user.isAdmin && <Pill>{course.teacherId ? (brands.get(course.teacherId)?.name ?? "Teacher not approved") : "JTR Academy"}</Pill>}
                 </div>
                 <h2 className="mt-2 font-display text-xl font-semibold text-ink">{course.title}</h2>
                 <p className="text-sm text-muted">{course.tagline}</p>

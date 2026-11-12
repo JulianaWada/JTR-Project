@@ -2,15 +2,18 @@ import { count, desc, eq, inArray, max } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Empty, PageTitle, Pill } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { inCohorts, ownCourses } from "@/lib/teachers";
 import { formatDateTime } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Class chats" };
 
 export default async function ClassChats() {
+  const user = await requireTeacher();
   const db = await getDb();
-  const cohorts = await db.query.cohorts.findMany();
-  const courses = await db.query.courses.findMany({ orderBy: schema.courses.sortOrder });
+  const courses = await db.query.courses.findMany({ where: ownCourses(user), orderBy: schema.courses.sortOrder });
+  const cohorts = courses.length ? await db.query.cohorts.findMany({ where: inArray(schema.cohorts.courseId, courses.map((c) => c.id)) }) : [];
   const students = await db
     .select({ cohortId: schema.enrolments.cohortId, value: count() })
     .from(schema.enrolments)
@@ -19,6 +22,7 @@ export default async function ClassChats() {
   const activity = await db
     .select({ cohortId: schema.chatMessages.cohortId, messages: count(), last: max(schema.chatMessages.createdAt) })
     .from(schema.chatMessages)
+    .where(inCohorts(schema.chatMessages.cohortId, cohorts.map((c) => c.id)))
     .groupBy(schema.chatMessages.cohortId);
   const latest = await db
     .select({ message: schema.chatMessages, name: schema.users.name })

@@ -10,11 +10,11 @@ import { formatDateTime } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Student view" };
 
-/** Teacher only: open any course exactly as a student sees it, without enrolling or paying. */
+/** Teachers: open any of their courses exactly as a student sees it, without enrolling or paying. */
 export default async function StudentView() {
   const user = await requireUser("/learn/preview");
   if (user.role !== "teacher") redirect("/learn");
-  const courses = await previewCourses(await getDb());
+  const courses = await previewCourses(await getDb(), user);
 
   return (
     <>

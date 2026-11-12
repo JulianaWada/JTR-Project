@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { and, asc, count, desc, eq, gte } from "drizzle-orm";
 import type { Database } from "@/lib/db";
-import { assignments, classes, cohorts, courses, tutorMessages, users } from "@/lib/db/schema";
+import { assignments, classes, cohorts, courses, tutorMessages } from "@/lib/db/schema";
 import { isLocked, lockedWeeks } from "@/lib/unlock";
 import { env } from "@/lib/env";
 import { addDays } from "@/lib/time";
@@ -115,13 +115,14 @@ export async function questionsToday(db: Database, userId: string, now = new Dat
 }
 
 /** Saves the question, asks Claude (or the test-mode tutor) and saves the answer. */
-export async function askTutor(db: Database, userId: string, cohortId: string, question: string) {
+/** `viewer` is the asker's role in this intake (from requireCohortAccess): its teacher sees every lesson. */
+export async function askTutor(db: Database, userId: string, cohortId: string, question: string, viewer?: { role: string }) {
   const text = question.trim().slice(0, 2000);
   if (!text) return { error: "Type a question first." };
   if ((await questionsToday(db, userId)) >= DAILY_QUESTION_LIMIT) {
     return { error: `You've asked ${DAILY_QUESTION_LIMIT} questions in the last 24 hours. Please try again tomorrow.` };
   }
-  const viewer = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { role: true } });
+  viewer ??= { role: "student" };
   const material = await loadMaterial(db, cohortId, viewer);
   const previous = await db.query.tutorMessages.findMany({
     where: and(eq(tutorMessages.userId, userId), eq(tutorMessages.cohortId, cohortId)),

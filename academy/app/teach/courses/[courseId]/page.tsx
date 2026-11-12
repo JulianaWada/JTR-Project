@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Flash, PageTitle, Pill } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { teachesCourse } from "@/lib/teachers";
 import { quizToText } from "@/lib/quiz-format";
 import { formatDate, toLagosParts } from "@/lib/time";
 import { addDays } from "@/lib/time";
@@ -15,8 +17,17 @@ export const metadata: Metadata = { title: "Edit course" };
 export default async function EditCourse({ params, searchParams }: PageProps<"/teach/courses/[courseId]">) {
   const { courseId } = await params;
   const db = await getDb();
+  const user = await requireTeacher();
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, courseId) });
-  if (!course) notFound();
+  if (!course || !teachesCourse(user, course)) notFound();
+  // The admin can hand a course to an approved teacher, or keep it as a JTR Academy course.
+  const teachers = user.isAdmin
+    ? await db
+        .select({ id: schema.users.id, name: schema.users.name, brandName: schema.teacherProfiles.brandName })
+        .from(schema.teacherProfiles)
+        .innerJoin(schema.users, eq(schema.users.id, schema.teacherProfiles.userId))
+        .where(eq(schema.teacherProfiles.status, "approved"))
+    : [];
   const tasks = await db.query.assignments.findMany({ where: eq(schema.assignments.courseId, courseId), orderBy: asc(schema.assignments.week) });
   const quizList = await db.query.quizzes.findMany({ where: eq(schema.quizzes.courseId, courseId), orderBy: asc(schema.quizzes.week) });
   const cohorts = await db.query.cohorts.findMany({ where: eq(schema.cohorts.courseId, courseId), orderBy: desc(schema.cohorts.startsAt) });
@@ -146,6 +157,22 @@ export default async function EditCourse({ params, searchParams }: PageProps<"/t
             </label>
           </div>
         </div>
+        {user.isAdmin && (
+          <div className="max-w-sm">
+            <label className="label" htmlFor="teacherId">
+              Teacher
+            </label>
+            <select className="input" id="teacherId" name="teacherId" defaultValue={course.teacherId ?? ""}>
+              <option value="">JTR Academy (you)</option>
+              {teachers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.brandName ? `${t.brandName} (${t.name})` : t.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-muted">The teacher runs this course from their own dashboard, and their logo shows on its page.</p>
+          </div>
+        )}
         <button className="btn-primary">Save course</button>
       </form>
 

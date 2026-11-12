@@ -24,8 +24,42 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   phone: text("phone"),
   role: text("role").$type<Role>().notNull().default("student"),
+  /** The academy owner (Jules, TEACHER_EMAIL): approves teachers and sees every course, student and payment. */
+  isAdmin: boolean("is_admin").notNull().default(false),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}).enableRLS();
+
+export type TeacherStatus = "pending" | "approved" | "rejected" | "suspended";
+
+/**
+ * A teacher's application and public profile. Signing up creates a student account plus a "pending" profile;
+ * the admin approves it, which makes the account a teacher. Suspending or rejecting turns it back into a student.
+ */
+export const teacherProfiles = pgTable("teacher_profiles", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  status: text("status").$type<TeacherStatus>().notNull().default("pending"),
+  /** The name students see, e.g. "Ada's Design School". Falls back to the person's name. */
+  brandName: text("brand_name").notNull().default(""),
+  /** Short line under the name, e.g. "Animator and illustrator". */
+  headline: text("headline").notNull().default(""),
+  bio: text("bio").notNull().default(""),
+  /** What they want to teach, from the application form. */
+  subjects: text("subjects").notNull().default(""),
+  website: text("website").notNull().default(""),
+  /** Hex colour used on their course pages, e.g. #1563d6. */
+  brandColor: text("brand_color").notNull().default("#1563d6"),
+  /** Uploaded images as data: URLs (small, resized in the browser); served by /teachers/[userId]/logo|photo. */
+  logo: text("logo"),
+  photo: text("photo"),
+  /** Bumped when an image changes, so browsers fetch the new one. */
+  imageVersion: integer("image_version").notNull().default(0),
+  /** A note from the admin, e.g. why an application was turned down. */
+  adminNote: text("admin_note").notNull().default(""),
+  appliedAt: timestamp("applied_at", { withTimezone: true }).notNull().defaultNow(),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
 }).enableRLS();
 
 export type CourseWeek = { week: number; title: string; summary: string };
@@ -59,6 +93,8 @@ export const courses = pgTable("courses", {
   accent: text("accent").$type<"blue" | "violet">().notNull().default("blue"),
   published: boolean("published").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
+  /** The teacher who runs the course. Null: a JTR Academy course, run by the admin. */
+  teacherId: uuid("teacher_id").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }).enableRLS();
 

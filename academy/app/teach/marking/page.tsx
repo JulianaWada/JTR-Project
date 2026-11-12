@@ -1,4 +1,6 @@
-import { desc, inArray, isNotNull, isNull } from "drizzle-orm";
+import { and, desc, inArray, isNotNull, isNull } from "drizzle-orm";
+import { requireTeacher } from "@/lib/auth";
+import { inCohorts, ownCohortIds } from "@/lib/teachers";
 import type { Metadata } from "next";
 import { Empty, Flash, PageTitle, Pill } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
@@ -27,10 +29,12 @@ async function withDetails(rows: (typeof schema.submissions.$inferSelect)[]) {
 }
 
 export default async function Marking({ searchParams }: PageProps<"/teach/marking">) {
+  const user = await requireTeacher();
   const db = await getDb();
-  const waiting = await withDetails(await db.query.submissions.findMany({ where: isNull(schema.submissions.grade), orderBy: schema.submissions.submittedAt }));
+  const mine = inCohorts(schema.submissions.cohortId, await ownCohortIds(db, user));
+  const waiting = await withDetails(await db.query.submissions.findMany({ where: and(isNull(schema.submissions.grade), mine), orderBy: schema.submissions.submittedAt }));
   const recent = await withDetails(
-    await db.query.submissions.findMany({ where: isNotNull(schema.submissions.grade), orderBy: desc(schema.submissions.markedAt), limit: 15 }),
+    await db.query.submissions.findMany({ where: and(isNotNull(schema.submissions.grade), mine), orderBy: desc(schema.submissions.markedAt), limit: 15 }),
   );
 
   return (

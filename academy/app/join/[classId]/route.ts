@@ -4,6 +4,7 @@ import { currentUser } from "@/lib/auth";
 import { checkCompletion } from "@/lib/certificates";
 import { OPENS_MINUTES_BEFORE, outsideLink, usesJtrRoom } from "@/lib/class-room";
 import { getDb, schema } from "@/lib/db";
+import { teachesCourse } from "@/lib/teachers";
 import { addMinutes } from "@/lib/time";
 import { asset } from "@/lib/assets";
 
@@ -22,7 +23,8 @@ export async function GET(_request: Request, { params }: RouteContext<"/join/[cl
   const room = `/learn/${cohort.id}/room`;
   const link = outsideLink(cohort, lesson);
 
-  if (user.role === "teacher") {
+  const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId), columns: { teacherId: true } });
+  if (course && teachesCourse(user, course)) {
     if (usesJtrRoom(cohort)) go(room);
     if (link) redirect(link);
     go(`/teach/cohorts/${cohort.id}`);

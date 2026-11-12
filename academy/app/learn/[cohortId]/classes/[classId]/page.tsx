@@ -112,7 +112,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
         )}
         {!locked && (
         <div className="card mt-6">
-          {lesson.notes.trim() ? <Markdown source={lesson.notes} /> : <p className="text-muted">Jules will add the notes for this class soon.</p>}
+          {lesson.notes.trim() ? <Markdown source={lesson.notes} /> : <p className="text-muted">Your teacher will add the notes for this class soon.</p>}
         </div>
         )}
       </article>
