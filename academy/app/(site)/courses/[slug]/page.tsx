@@ -174,12 +174,12 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             <ul className="mt-6 space-y-2 border-t border-line pt-4 text-sm text-muted">
               {recorded ? (
                 <>
-                  <li>✓ {course.outline.length} video lessons with Jules, watch any time</li>
+                  <li>✓ {course.outline.length} video lessons from skilled teachers, watch any time</li>
                   <li>✓ Notes, assignments and quizzes for every lesson</li>
                 </>
               ) : (
                 <>
-                  <li>✓ Live classes with Jules in the JTR online class room</li>
+                  <li>✓ Live classes with skilled teachers in the JTR online class room</li>
                   <li>✓ Recordings and notes after every class</li>
                 </>
               )}
