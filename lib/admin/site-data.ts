@@ -27,14 +27,25 @@ export async function listInterest(filter: { status?: LeadStatus } = {}) {
     .limit(500);
 }
 
+/** Returns the lead's name and old status (for the audit trail), or undefined when there is no such lead. */
 export async function setLeadStatus(id: string, status: LeadStatus) {
   const db = await getDb();
+  const [before] = await db.select({ name: schema.leads.name, status: schema.leads.status }).from(schema.leads).where(eq(schema.leads.id, id)).limit(1);
+  if (!before) return undefined;
   await db.update(schema.leads).set({ status }).where(eq(schema.leads.id, id));
+  return before;
 }
 
 export async function setInterestStatus(id: string, status: LeadStatus) {
   const db = await getDb();
+  const [before] = await db
+    .select({ name: schema.academyInterest.name, status: schema.academyInterest.status })
+    .from(schema.academyInterest)
+    .where(eq(schema.academyInterest.id, id))
+    .limit(1);
+  if (!before) return undefined;
   await db.update(schema.academyInterest).set({ status }).where(eq(schema.academyInterest.id, id));
+  return before;
 }
 
 export async function siteCounts() {

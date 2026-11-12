@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { PageTitle, Panel, Pill, Stat, Table, Td } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/roles";
+import { PageTitle, Panel, Pill, Stat, Table, Td, humanise, statusTone } from "@/components/admin/ui";
 import { StatusSelect } from "@/components/admin/StatusSelect";
 import { StatusTabs, parseStatus } from "@/components/admin/StatusTabs";
 import { formatDateTime } from "@/lib/admin/money";
@@ -21,7 +23,8 @@ const heardFromNames: Record<string, string> = {
 
 export default async function InterestPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const status = parseStatus((await searchParams).status);
-  const [entries, byCourse] = await Promise.all([listInterest({ status }), interestByCourse()]);
+  const [entries, byCourse, session] = await Promise.all([listInterest({ status }), interestByCourse(), requireAdmin()]);
+  const canEdit = can(session.role, "leads.update");
   return (
     <>
       <PageTitle
@@ -40,9 +43,11 @@ export default async function InterestPage({ searchParams }: { searchParams: Pro
             <Link href="/admin/academy" className="text-sm font-semibold text-muted hover:text-ink">
               Back to academy
             </Link>
-            <a href="/admin/export/interest" download className="text-sm font-semibold text-primary">
-              Download CSV
-            </a>
+            {can(session.role, "export") && (
+              <a href="/admin/export/interest" download className="text-sm font-semibold text-primary">
+                Download CSV
+              </a>
+            )}
           </>
         }
       />
@@ -75,7 +80,11 @@ export default async function InterestPage({ searchParams }: { searchParams: Pro
               </Td>
               <Td className="text-muted">{e.heardFrom ? heardFromNames[e.heardFrom] ?? e.heardFrom : "—"}</Td>
               <Td>
-                <StatusSelect id={e.id} value={e.status} options={leadStatuses} action={updateInterestStatus} label={`Status for ${e.name}`} />
+                {canEdit ? (
+                  <StatusSelect id={e.id} value={e.status} options={leadStatuses} action={updateInterestStatus} label={`Status for ${e.name}`} />
+                ) : (
+                  <Pill tone={statusTone(e.status)}>{humanise(e.status)}</Pill>
+                )}
               </Td>
             </tr>
           ))}

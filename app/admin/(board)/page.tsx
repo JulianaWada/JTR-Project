@@ -6,6 +6,8 @@ import { formatDateTime, formatMoney, formatNaira } from "@/lib/admin/money";
 import { dailyCounts, interestByCourse, listInterest, listLeads, siteCounts } from "@/lib/admin/site-data";
 import { academyMode, listCourses, listPayments } from "@/lib/admin/sources/academy";
 import { listBusinesses, recentPayments, whatsappMode } from "@/lib/admin/sources/whatsapp";
+import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/roles";
 import { cn } from "@/lib/cn";
 
 export const metadata = { title: "Overview" };
@@ -17,6 +19,7 @@ type Activity = { at: Date; icon: IconName; tone: string; title: string; detail:
 const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Lagos" });
 
 export default async function AdminOverview() {
+  const session = await requireAdmin();
   const [counts, leads, interest, byCourse, daily, courses, academyPayments, businesses, agentPayments] = await Promise.all([
     siteCounts(),
     listLeads(),
@@ -93,11 +96,13 @@ export default async function AdminOverview() {
         subtitle={`${today.format(new Date())} · times are Lagos time`}
         actions={
           <>
-            <a href="/admin/export/leads" download className={secondaryButtonClass}>
-              <Icon name="arrowUpRight" size={16} className="rotate-90" />
-              Leads CSV
-            </a>
-            {agentOn ? (
+            {can(session.role, "export") && (
+              <a href="/admin/export/leads" download className={secondaryButtonClass}>
+                <Icon name="arrowUpRight" size={16} className="rotate-90" />
+                Leads CSV
+              </a>
+            )}
+            {agentOn && can(session.role, "whatsapp.add") ? (
               <Link href="/admin/whatsapp/new" className={buttonClass}>
                 Add a business
               </Link>

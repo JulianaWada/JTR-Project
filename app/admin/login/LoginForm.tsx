@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { login, type LoginState } from "../actions";
 import { buttonClass, inputClass } from "@/components/admin/ui";
 
-export function LoginForm({ askEmail }: { askEmail: boolean }) {
+export function LoginForm({ askEmail, emailOptional }: { askEmail: boolean; emailOptional?: boolean }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});
   return (
     <form action={action} className="space-y-4">
@@ -13,7 +13,8 @@ export function LoginForm({ askEmail }: { askEmail: boolean }) {
           <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-ink">
             Email
           </label>
-          <input id="email" name="email" type="email" autoComplete="username" required autoFocus className={inputClass} />
+          <input id="email" name="email" type="email" autoComplete="username" required={!emailOptional} autoFocus className={inputClass} />
+          {emailOptional && <p className="mt-1 text-xs text-muted">Super admin: leave empty until ADMIN_EMAIL is set.</p>}
         </div>
       )}
       <div>

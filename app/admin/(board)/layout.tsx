@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { Icon } from "@/components/ui/Icon";
-import { requireAdmin } from "@/lib/admin/auth";
+import { requireAdmin, type AdminSession } from "@/lib/admin/auth";
+import { can, roleInfo } from "@/lib/admin/roles";
 import { siteCounts } from "@/lib/admin/site-data";
 import { databaseMode } from "@/lib/db";
 import { logout } from "../actions";
@@ -20,9 +21,18 @@ function Brand() {
   );
 }
 
-function SidebarFooter() {
+function SidebarFooter({ session }: { session: AdminSession }) {
   return (
     <div className="space-y-1 border-t border-white/10 pt-4">
+      <Link href="/admin/account" className="mb-2 flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-white/6" title="My account">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/12 text-xs font-bold text-white uppercase">
+          {session.name.slice(0, 1)}
+        </span>
+        <span className="min-w-0 leading-tight">
+          <span className="block truncate text-sm font-semibold text-white">{session.name}</span>
+          <span className="block text-xs text-white/55">{roleInfo[session.role].label}</span>
+        </span>
+      </Link>
       <Link href="/en" className="flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium text-white/65 hover:bg-white/6 hover:text-white">
         <Icon name="globe" size={18} />
         View website
@@ -38,7 +48,8 @@ function SidebarFooter() {
 }
 
 export default async function BoardLayout({ children }: { children: ReactNode }) {
-  await requireAdmin();
+  const session = await requireAdmin();
+  const show = { team: can(session.role, "team.manage"), audit: can(session.role, "audit.view") };
   const counts = await siteCounts();
   const badges = { "/admin/leads": counts.newLeads, "/admin/academy": counts.newInterest };
   const testMode = databaseMode() === "pglite";
@@ -53,9 +64,9 @@ export default async function BoardLayout({ children }: { children: ReactNode })
         </div>
         <div className="flex-1">
           <p className="mb-2 px-3 text-[0.7rem] font-semibold tracking-[0.14em] text-white/40 uppercase">Menu</p>
-          <AdminNav badges={badges} />
+          <AdminNav badges={badges} show={show} />
         </div>
-        <SidebarFooter />
+        <SidebarFooter session={session} />
       </aside>
       </div>
 
@@ -69,8 +80,8 @@ export default async function BoardLayout({ children }: { children: ReactNode })
           </span>
         </summary>
         <div className="space-y-4 px-4 pb-5">
-          <AdminNav badges={badges} />
-          <SidebarFooter />
+          <AdminNav badges={badges} show={show} />
+          <SidebarFooter session={session} />
         </div>
       </details>
 

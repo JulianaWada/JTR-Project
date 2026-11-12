@@ -1,4 +1,6 @@
-import { isAdmin } from "@/lib/admin/auth";
+import { getAdminSession } from "@/lib/admin/auth";
+import { recordAudit } from "@/lib/admin/audit";
+import { can } from "@/lib/admin/roles";
 import { listInterest, listLeads } from "@/lib/admin/site-data";
 
 // CSV downloads of leads and Academy sign-ups, for spreadsheets or WhatsApp broadcast lists.
@@ -23,8 +25,13 @@ function withoutInternal(row: Record<string, unknown>) {
 }
 
 export async function GET(_request: Request, { params }: { params: Promise<{ kind: string }> }) {
-  if (!(await isAdmin())) return new Response("Not signed in", { status: 401 });
+  const session = await getAdminSession();
+  if (!session) return new Response("Not signed in", { status: 401 });
   const { kind } = await params;
+  if (!can(session.role, "export")) {
+    await recordAudit(session, "permission.denied", `CSV: ${kind}`, { permission: "export" });
+    return new Response("Your role doesn't allow downloads. Ask the super admin if you need it.", { status: 403 });
+  }
   let rows: Record<string, unknown>[];
   if (kind === "leads") {
     rows = (await listLeads()).map(withoutInternal);
@@ -33,6 +40,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ kin
   } else {
     return new Response("Not found", { status: 404 });
   }
+  await recordAudit(session, "export.download", kind === "leads" ? "Leads" : "Academy sign-ups", { rows: rows.length });
   const date = new Date().toISOString().slice(0, 10);
   return new Response(`﻿${csv(rows)}`, {
     headers: {

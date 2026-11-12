@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import en from "@/messages/en.json";
 import { PageTitle, Panel, Pill, statusTone } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/roles";
 import { getAllProjects } from "@/lib/projects";
 import { moveProject } from "../../actions";
 import { ProjectForm } from "./ProjectRow";
@@ -11,7 +13,8 @@ export const metadata = { title: "Projects" };
 const items = en.projects.items as Record<string, { title: string; summary: string }>;
 
 export default async function ProjectsAdminPage() {
-  const projects = await getAllProjects();
+  const [projects, session] = await Promise.all([getAllProjects(), requireAdmin()]);
+  const canEdit = can(session.role, "projects.edit");
   return (
     <>
       <PageTitle
@@ -28,7 +31,11 @@ export default async function ProjectsAdminPage() {
           <Panel key={p.id} className={p.hidden ? "opacity-70" : undefined}>
             <div className="flex flex-col gap-4 p-5 sm:flex-row">
               <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-surface-2 sm:w-40">
-                {p.image ? <Image src={p.image} alt="" fill sizes="160px" className="object-cover" /> : <span className="absolute inset-0 grid place-items-center text-xs text-muted">Artwork</span>}
+                {p.image ? (
+                  <Image src={p.image} alt="" fill sizes="160px" className="object-cover" />
+                ) : (
+                  <span className="absolute inset-0 grid place-items-center text-xs text-muted">Artwork</span>
+                )}
               </div>
               <div className="min-w-0 flex-1 space-y-4">
                 <div className="flex items-start justify-between gap-4">
@@ -41,24 +48,26 @@ export default async function ProjectsAdminPage() {
                     </div>
                     <p className="mt-1 line-clamp-2 text-sm text-muted">{items[p.id]?.summary}</p>
                   </div>
-                  <div className="flex shrink-0 gap-1">
-                    {(["up", "down"] as const).map((direction) => (
-                      <form key={direction} action={moveProject}>
-                        <input type="hidden" name="id" value={p.id} />
-                        <input type="hidden" name="direction" value={direction} />
-                        <button
-                          type="submit"
-                          disabled={direction === "up" ? i === 0 : i === projects.length - 1}
-                          aria-label={`Move ${items[p.id]?.title ?? p.id} ${direction}`}
-                          className="grid size-9 place-items-center rounded-full border border-line text-ink hover:border-primary hover:text-primary disabled:opacity-30"
-                        >
-                          {direction === "up" ? "↑" : "↓"}
-                        </button>
-                      </form>
-                    ))}
-                  </div>
+                  {canEdit && (
+                    <div className="flex shrink-0 gap-1">
+                      {(["up", "down"] as const).map((direction) => (
+                        <form key={direction} action={moveProject}>
+                          <input type="hidden" name="id" value={p.id} />
+                          <input type="hidden" name="direction" value={direction} />
+                          <button
+                            type="submit"
+                            disabled={direction === "up" ? i === 0 : i === projects.length - 1}
+                            aria-label={`Move ${items[p.id]?.title ?? p.id} ${direction}`}
+                            className="grid size-9 place-items-center rounded-full border border-line text-ink hover:border-primary hover:text-primary disabled:opacity-30"
+                          >
+                            {direction === "up" ? "↑" : "↓"}
+                          </button>
+                        </form>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <ProjectForm project={p} />
+                <ProjectForm project={p} canEdit={canEdit} />
               </div>
             </div>
           </Panel>

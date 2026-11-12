@@ -151,6 +151,10 @@ Without `ACADEMY_DATABASE_URL` or `WHATSAPP_AGENT_DATABASE_URL` those pages say 
 
 **Login.** One email (optional) and password, checked on the server and kept in a signed, HTTP-only cookie limited to `/admin` for 12 hours. Changing `ADMIN_PASSWORD` signs out every session. After 8 wrong passwords from one address, logins pause for 15 minutes.
 
+**Roles and team.** The `ADMIN_EMAIL` / `ADMIN_PASSWORD` login is the **super admin** (optional display name `ADMIN_NAME`). From **Team & roles** the super admin gives other people their own login with a role: **Admin** (change leads, projects, WhatsApp businesses, download CSVs, read the audit trail), **Staff** (update lead and sign-up statuses only) or **Viewer** (look only). Passwords are generated, shown once, stored as scrypt hashes, and can be changed under **My account**. A role change, password reset or turned-off login signs that person out at once. Roles are in `lib/admin/roles.ts` and checked on the server in every action.
+
+**Audit trail.** `/admin/audit` (super admin and admins) lists every sign-in, failed sign-in, sign-out, change, CSV download, team change and refused action on the admin board, with who, when and IP address, filterable by person, action and period. Rows (table `admin_audit_log`) are only ever added. Changes made inside the academy or WhatsApp agent apps are not included.
+
 **Projects.** The public projects page and the home page refresh at most a minute after a change (straight away on the server that saved it).
 
 ## Privacy, cookies and analytics
