@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import { MeetLinkCard } from "@/components/meet-link-card";
 import { Flash, PageTitle, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { teachesCourse } from "@/lib/teachers";
 import { liveIntakes } from "@/lib/meet-links";
 import { money } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
@@ -21,6 +23,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
   const cohort = await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) });
   if (!cohort) notFound();
   const course = (await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId) }))!;
+  if (!teachesCourse(await requireTeacher(), course)) notFound();
   const lessons = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: asc(schema.classes.startsAt) });
   const enrolled = await db.query.enrolments.findMany({ where: eq(schema.enrolments.cohortId, cohortId) });
   const active = enrolled.filter((e) => e.status === "active");

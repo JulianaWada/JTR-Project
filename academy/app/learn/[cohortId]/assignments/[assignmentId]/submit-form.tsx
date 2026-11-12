@@ -15,7 +15,7 @@ export function SubmitForm({ cohortId, assignmentId, text, link, resubmit }: { c
       </div>
       <div>
         <label className="label" htmlFor="text">
-          Your answer or a note for Jules
+          Your answer or a note for your teacher
         </label>
         <textarea className="input min-h-40" id="text" name="text" defaultValue={text} />
       </div>

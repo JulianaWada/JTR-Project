@@ -6,7 +6,9 @@ import { needsLink } from "@/lib/class-room";
 import { MeetLinkCard } from "@/components/meet-link-card";
 import { Empty, Flash, Pill } from "@/components/ui";
 import { asset } from "@/lib/assets";
-import { getDb } from "@/lib/db";
+import { count, eq } from "drizzle-orm";
+import { requireTeacher } from "@/lib/auth";
+import { getDb, schema } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
 import { classState, untilText } from "@/lib/learn";
 import { naira, usd } from "@/lib/money";
@@ -41,11 +43,20 @@ const activityIcon: Record<Activity["kind"], { icon: IconName; chip: string }> =
 };
 
 export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
+  const user = await requireTeacher();
   const db = await getDb();
-  const d = await teacherDashboard(db);
-  const needLink = (await liveIntakes(db)).filter((i) => needsLink(i.cohort));
+  const d = await teacherDashboard(db, user);
+  const needLink = (await liveIntakes(db, undefined, user)).filter((i) => needsLink(i.cohort));
+  const applications = user.isAdmin
+    ? (await db.select({ value: count() }).from(schema.teacherProfiles).where(eq(schema.teacherProfiles.status, "pending")))[0].value
+    : 0;
   const change = d.incomeLastMonthKobo ? Math.round(((d.incomeThisMonthKobo - d.incomeLastMonthKobo) / d.incomeLastMonthKobo) * 100) : null;
   const todo = [
+    applications > 0 && {
+      href: "/teach/teachers",
+      icon: "users" as const,
+      text: `${applications} teacher ${applications === 1 ? "application" : "applications"} waiting for your approval`,
+    },
     d.toMark.length > 0 && { href: "/teach/marking", icon: "check" as const, text: `${d.toMark.length} ${d.toMark.length === 1 ? "piece" : "pieces"} of work to mark` },
     d.missingVideos.length > 0 && {
       href: `/teach/cohorts/${d.missingVideos[0].cohortId}`,
@@ -70,7 +81,7 @@ export default async function TeachHome({ searchParams }: PageProps<"/teach">) {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Overview</p>
-          <h1 className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">Good to see you, Jules</h1>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">Good to see you, {user.name.split(" ")[0]}</h1>
           <p className="mt-1 text-muted">Your students, income and teaching at a glance.</p>
         </div>
         <div className="flex gap-2">

@@ -1,4 +1,6 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
+import { requireTeacher } from "@/lib/auth";
+import { inCohorts, ownCohortIds } from "@/lib/teachers";
 import type { Metadata } from "next";
 import { Empty, PageTitle } from "@/components/ui";
 import { getDb, schema } from "@/lib/db";
@@ -7,9 +9,10 @@ import { formatDateTime } from "@/lib/time";
 export const metadata: Metadata = { title: "Tutor questions" };
 
 export default async function TutorQuestions() {
+  const user = await requireTeacher();
   const db = await getDb();
   const questions = await db.query.tutorMessages.findMany({
-    where: eq(schema.tutorMessages.role, "user"),
+    where: and(eq(schema.tutorMessages.role, "user"), inCohorts(schema.tutorMessages.cohortId, await ownCohortIds(db, user))),
     orderBy: desc(schema.tutorMessages.createdAt),
     limit: 100,
   });

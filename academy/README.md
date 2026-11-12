@@ -18,6 +18,17 @@ It is a separate Next.js app in this folder, served under `/academy` on the webs
 
 **Badges:** First class, Getting to work, Quiz ace, Halfway there, Perfect attendance, Project passed, Graduate.
 
+## Teachers
+
+Many teachers can run courses on the academy. A teacher registers at `/teach-with-us`; the application waits until the
+admin approves it in **Teacher > Teachers**, which opens the teacher dashboard for them. The admin is the
+`TEACHER_EMAIL` account (Jules): it sees every course, student and payment, makes JTR-wide discount codes and can hand
+a course to a teacher (course edit page, "Teacher"). Every other teacher sees and manages only their own courses and
+what's under them (intakes, classes, notes, slides, files, quizzes, marking, class chats, sales). Teachers set their
+logo, photo, bio and colour in **My profile & logo**; it shows on their course pages and their dashboard. Students still
+pay JTR's Paystack account. Suspending a teacher takes their courses off sale. Test-mode demo teachers:
+`bisi@example.com` (approved) and `kemi@example.com` (waiting), password `demo1234`.
+
 ## Run it locally
 
 ```bash

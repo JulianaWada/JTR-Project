@@ -9,7 +9,30 @@ import { asset } from "@/lib/assets";
 
 export type ShellItem = { href: string; label: string; icon: IconName; exact?: boolean; badge?: number };
 
-function Brand({ area }: { area: string }) {
+export type ShellBrand = { name: string; logo: string | null; color: string };
+
+/** A teacher's own logo and name at the top of their dashboard, with "on JTR Academy" underneath. */
+function TeacherBrand({ brand }: { brand: ShellBrand }) {
+  return (
+    <span className="inline-flex min-w-0 items-center gap-3">
+      {brand.logo ? (
+        // eslint-disable-next-line @next/next/no-img-element -- the teacher's uploaded logo, served by the academy
+        <img src={asset(brand.logo)} alt="" width={36} height={36} className="size-9 shrink-0 rounded-lg bg-white object-contain p-0.5" />
+      ) : (
+        <span className="grid size-9 shrink-0 place-items-center rounded-lg font-display text-sm font-bold text-white" style={{ background: brand.color }}>
+          {brand.name.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="truncate font-display text-base font-bold text-white">{brand.name}</span>
+        <span className="mt-1 text-[0.65rem] font-medium tracking-[0.18em] text-white/60 uppercase">on JTR Academy</span>
+      </span>
+    </span>
+  );
+}
+
+function Brand({ area, brand }: { area: string; brand?: ShellBrand }) {
+  if (brand) return <TeacherBrand brand={brand} />;
   return (
     <span className="inline-flex items-center gap-3">
       {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size brand mark */}
@@ -60,13 +83,16 @@ export function AppShell({
   children,
   home,
   area,
+  brand,
 }: {
-  user: { name: string; role: string };
+  user: { name: string; role: string; isAdmin?: boolean };
   items: ShellItem[];
   children: ReactNode;
   home: string;
   /** Shown under the logo, e.g. "Teaching". */
   area: string;
+  /** A teacher's own brand, shown instead of the JTR logo on their dashboard. */
+  brand?: ShellBrand;
 }) {
   const m = modes();
   const testServices = [m.paystack === "test" && "payments", m.claude === "test" && "AI tutor", m.email === "test" && "emails", m.video === "test" && "class video room"].filter(Boolean);
@@ -84,7 +110,7 @@ export function AppShell({
       <div className="hidden bg-sidebar lg:block">
         <aside className="sticky top-0 flex h-screen flex-col px-4 py-6">
           <Link href={home} className="mb-8 rounded-lg px-2">
-            <Brand area={area} />
+            <Brand area={area} brand={brand} />
           </Link>
           <Menu items={items} footer={footer} />
         </aside>
@@ -94,7 +120,7 @@ export function AppShell({
         {/* Phones and tablets: a navy bar with the same menu behind a button. */}
         <details className="group sticky top-0 z-40 bg-sidebar lg:hidden">
           <summary className="flex h-16 cursor-pointer list-none items-center justify-between px-4 [&::-webkit-details-marker]:hidden">
-            <Brand area={area} />
+            <Brand area={area} brand={brand} />
             <span className="inline-grid size-10 place-items-center rounded-xl text-white/80 group-open:bg-white/10" aria-label="Open the menu">
               <Icon name="menu" />
             </span>
@@ -115,7 +141,7 @@ export function AppShell({
             <span className="grid size-9 place-items-center rounded-full bg-primary-soft text-sm font-semibold text-primary">{initials}</span>
             <span className="hidden flex-col leading-tight sm:flex">
               <span className="text-sm font-semibold text-ink">{user.name}</span>
-              <span className="text-xs text-muted">{user.role === "teacher" ? "Teacher" : "Student"}</span>
+              <span className="text-xs text-muted">{user.isAdmin ? "Admin" : user.role === "teacher" ? "Teacher" : "Student"}</span>
             </span>
           </span>
         </header>

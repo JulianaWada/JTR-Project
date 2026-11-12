@@ -5,6 +5,7 @@ import { sendEmail } from "@/lib/email";
 import { env, url } from "@/lib/env";
 import { money, shortCode } from "@/lib/money";
 import { initializeTransaction } from "@/lib/paystack";
+import { brandFor } from "@/lib/teachers";
 import { formatDateTime } from "@/lib/time";
 
 type User = typeof usersTable.$inferSelect;
@@ -46,6 +47,8 @@ export async function startCheckout(
   if (!cohort) return { error: "That intake doesn't exist." };
   const course = (await db.query.courses.findFirst({ where: eq(courses.id, cohort.courseId) }))!;
   if (!cohort.enrolmentOpen || !course.published) return { error: "Enrollment for this intake is closed." };
+  // A suspended teacher's courses are off sale until the admin hands them to someone else.
+  if (course.teacherId && !(await brandFor(db, course.teacherId)).userId) return { error: "Enrollment for this intake is closed." };
 
   const existing = await db.query.enrolments.findFirst({
     where: and(eq(enrolments.userId, user.id), eq(enrolments.cohortId, cohortId)),

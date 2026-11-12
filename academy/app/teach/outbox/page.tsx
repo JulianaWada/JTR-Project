@@ -1,7 +1,7 @@
 import { desc } from "drizzle-orm";
 import type { Metadata } from "next";
 import { Empty, Flash, PageTitle, Pill } from "@/components/ui";
-import { requireTeacher } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { modes } from "@/lib/env";
 import { formatDateTime } from "@/lib/time";
@@ -10,7 +10,7 @@ import { sendTestEmail } from "../actions";
 export const metadata: Metadata = { title: "Emails" };
 
 export default async function Outbox({ searchParams }: PageProps<"/teach/outbox">) {
-  const user = await requireTeacher();
+  const user = await requireAdmin();
   const db = await getDb();
   const rows = await db.query.emails.findMany({ orderBy: desc(schema.emails.createdAt), limit: 100 });
   return (

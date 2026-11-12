@@ -61,9 +61,21 @@ export async function requireUser(next = "/learn") {
   return user;
 }
 
+/** An approved teacher or the admin. Anyone else goes to their application (if they applied) or their learning. */
 export async function requireTeacher() {
   const user = await requireUser("/teach");
-  if (user.role !== "teacher") redirect("/learn");
+  if (user.role !== "teacher") {
+    const db = await getDb();
+    const applied = await db.query.teacherProfiles.findFirst({ where: eq(schema.teacherProfiles.userId, user.id), columns: { status: true } });
+    redirect(applied ? "/teach-with-us" : "/learn");
+  }
+  return user;
+}
+
+/** Only the academy owner: approving teachers, every teacher's money, JTR-wide discount codes and emails. */
+export async function requireAdmin() {
+  const user = await requireTeacher();
+  if (!user.isAdmin) redirect("/teach");
   return user;
 }
 

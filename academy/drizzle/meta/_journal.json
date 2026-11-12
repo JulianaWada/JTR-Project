@@ -78,6 +78,13 @@
       "when": 1793995910879,
       "tag": "0010_class_room",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794483769189,
+      "tag": "0011_multi_teacher",
+      "breakpoints": true
     }
   ]
 }

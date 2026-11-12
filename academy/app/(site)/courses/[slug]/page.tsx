@@ -11,6 +11,8 @@ import { localPrice, visitorCountry } from "@/lib/location";
 import { money } from "@/lib/money";
 import { formatDate, formatTime } from "@/lib/time";
 import { lessonLabel } from "@/lib/lesson-unit";
+import { asset } from "@/lib/assets";
+import { brandFor, type TeacherBrand } from "@/lib/teachers";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,10 @@ async function load(slug: string) {
   const db = await getDb();
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.slug, slug) });
   if (!course || !course.published) return null;
-  return { course, intakes: await openCohorts(db, course.id) };
+  const teacher = await brandFor(db, course.teacherId);
+  // A course whose teacher was suspended is off sale until the admin hands it on.
+  if (course.teacherId && !teacher.userId) return null;
+  return { course, teacher, intakes: await openCohorts(db, course.id) };
 }
 
 export async function generateMetadata({ params }: PageProps<"/courses/[slug]">): Promise<Metadata> {
@@ -29,7 +34,7 @@ export async function generateMetadata({ params }: PageProps<"/courses/[slug]">)
 export default async function CoursePage({ params }: PageProps<"/courses/[slug]">) {
   const data = await load((await params).slug);
   if (!data) notFound();
-  const { course, intakes } = data;
+  const { course, intakes, teacher } = data;
   const local = localPrice(await visitorCountry(), course);
   const price = money(local.minor, local.currency);
   const violet = course.accent === "violet";
@@ -52,6 +57,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-ink sm:text-5xl">{course.title}</h1>
             <p className="mt-4 text-lg text-muted">{course.tagline}</p>
             <p className="mt-6 max-w-2xl leading-relaxed text-ink">{course.description}</p>
+            {teacher.userId && <TaughtBy teacher={teacher} />}
           </div>
           <div className="cut-corner overflow-hidden rounded-card border border-line">
             <CourseArt slug={course.slug} accent={course.accent} className="h-full min-h-56" />
@@ -190,5 +196,35 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
         </aside>
       </div>
     </>
+  );
+}
+
+/** The course's own teacher: their logo, name, line and bio, in their brand colour. */
+function TaughtBy({ teacher }: { teacher: TeacherBrand }) {
+  return (
+    <div className="mt-8 flex max-w-2xl gap-4 rounded-card border border-line bg-surface p-5" style={{ borderInlineStartColor: teacher.color, borderInlineStartWidth: 4 }}>
+      {teacher.logo ? (
+        // eslint-disable-next-line @next/next/no-img-element -- the teacher's uploaded logo
+        <img src={asset(teacher.logo)} alt="" className="size-14 shrink-0 rounded-xl border border-line bg-white object-contain p-0.5" />
+      ) : (
+        <span className="grid size-14 shrink-0 place-items-center rounded-xl font-display text-xl font-bold text-white" style={{ background: teacher.color }}>
+          {teacher.name.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      <div className="min-w-0">
+        <p className="text-xs font-semibold tracking-wide text-muted uppercase">Taught by</p>
+        <p className="font-display text-lg font-semibold text-ink">
+          {teacher.name}
+          {teacher.person && teacher.person !== teacher.name && <span className="font-sans text-sm font-normal text-muted"> · {teacher.person}</span>}
+        </p>
+        {teacher.headline && <p className="text-sm font-medium text-ink">{teacher.headline}</p>}
+        {teacher.bio && <p className="mt-2 text-sm whitespace-pre-line text-muted">{teacher.bio}</p>}
+        {teacher.website && (
+          <a href={teacher.website} target="_blank" rel="noopener noreferrer nofollow" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
+            Website →
+          </a>
+        )}
+      </div>
+    </div>
   );
 }

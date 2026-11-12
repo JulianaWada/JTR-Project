@@ -1,7 +1,9 @@
 import { desc, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { Flash, PageTitle, Pill, Stat } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { inCohorts, ownCourses } from "@/lib/teachers";
 import { env, modes } from "@/lib/env";
 import { money, naira, usd } from "@/lib/money";
 import { formatDateTime } from "@/lib/time";
@@ -10,13 +12,27 @@ import { createDiscount, toggleDiscount } from "../actions";
 export const metadata: Metadata = { title: "Payments" };
 
 export default async function Payments({ searchParams }: PageProps<"/teach/payments">) {
+  const user = await requireTeacher();
   const db = await getDb();
-  const rows = await db.query.payments.findMany({ orderBy: desc(schema.payments.createdAt), limit: 200 });
+  // Teachers see the sales of their own courses; the admin sees every payment into the academy's Paystack account.
+  const courses = await db.query.courses.findMany({ where: ownCourses(user) });
+  const cohorts = courses.length ? await db.query.cohorts.findMany({ where: inArray(schema.cohorts.courseId, courses.map((c) => c.id)) }) : [];
+  const ownEnrolments = user.isAdmin
+    ? null
+    : (await db.select({ id: schema.enrolments.id }).from(schema.enrolments).where(inCohorts(schema.enrolments.cohortId, cohorts.map((c) => c.id)))).map((e) => e.id);
+  const rows =
+    ownEnrolments && !ownEnrolments.length
+      ? []
+      : await db.query.payments.findMany({
+          where: ownEnrolments ? inArray(schema.payments.enrolmentId, ownEnrolments) : undefined,
+          orderBy: desc(schema.payments.createdAt),
+          limit: 200,
+        });
   const enrolments = rows.length ? await db.query.enrolments.findMany({ where: inArray(schema.enrolments.id, rows.map((r) => r.enrolmentId)) }) : [];
   const users = enrolments.length ? await db.query.users.findMany({ where: inArray(schema.users.id, enrolments.map((e) => e.userId)) }) : [];
-  const cohorts = await db.query.cohorts.findMany();
-  const courses = await db.query.courses.findMany();
-  const codes = await db.query.discountCodes.findMany({ orderBy: desc(schema.discountCodes.createdAt) });
+  const codes = (await db.query.discountCodes.findMany({ orderBy: desc(schema.discountCodes.createdAt) })).filter(
+    (c) => user.isAdmin || (c.courseId && courses.some((x) => x.id === c.courseId)),
+  );
   const paid = rows.filter((r) => r.status === "success" && r.currency === "NGN");
   const paidUsd = rows.filter((r) => r.status === "success" && r.currency === "USD");
   const usdTotal = paidUsd.reduce((s, p) => s + p.amountKobo, 0);
@@ -32,8 +48,10 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
 
   return (
     <>
-      <PageTitle eyebrow="Teacher" title="Payments">
-        {modes().paystack === "test"
+      <PageTitle eyebrow="Teacher" title={user.isAdmin ? "Payments" : "Sales"}>
+        {!user.isAdmin
+          ? "Students pay JTR Academy through Paystack. Here are the payments for your courses; JTR pays you your share."
+          : modes().paystack === "test"
           ? env.testPaymentsAllowed
             ? "Test mode: these are practice payments. Add your Paystack secret key to take real money."
             : "Checkout is closed: add your Paystack secret key (PAYSTACK_SECRET_KEY) so students can pay and get in."
@@ -146,8 +164,8 @@ export default async function Payments({ searchParams }: PageProps<"/teach/payme
             <label className="label" htmlFor="courseId">
               Course
             </label>
-            <select className="input" id="courseId" name="courseId" defaultValue="">
-              <option value="">Any course</option>
+            <select className="input" id="courseId" name="courseId" defaultValue={user.isAdmin ? "" : courses[0]?.id} required={!user.isAdmin}>
+              {user.isAdmin && <option value="">Any course</option>}
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.title}

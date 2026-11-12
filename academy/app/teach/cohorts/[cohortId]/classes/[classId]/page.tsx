@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClassForm } from "@/components/class-form";
 import { Flash, PageTitle } from "@/components/ui";
+import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
+import { canManageCohort } from "@/lib/teachers";
 import { deleteClass } from "../../../../actions";
 import { lessonLabel } from "@/lib/lesson-unit";
 
@@ -14,7 +16,7 @@ export default async function EditClass({ params, searchParams }: PageProps<"/te
   const { cohortId, classId } = await params;
   const db = await getDb();
   const lesson = await db.query.classes.findFirst({ where: and(eq(schema.classes.id, classId), eq(schema.classes.cohortId, cohortId)) });
-  if (!lesson) notFound();
+  if (!lesson || !(await canManageCohort(db, await requireTeacher(), cohortId))) notFound();
   const cohort = (await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, cohortId) }))!;
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId) });
   return (

@@ -19,7 +19,7 @@ export default async function ChatPage({ params }: PageProps<"/learn/[cohortId]/
       <div className="mt-3 mb-4">
         <h1 className="font-display text-2xl font-semibold text-ink">💬 Class chat</h1>
         <p className="text-sm text-muted">
-          {cohort.selfPaced ? `Everyone taking ${course.title}` : `Everyone in the ${cohort.name} intake of ${course.title}`}, and Jules. Share your work, ask
+          {cohort.selfPaced ? `Everyone taking ${course.title}` : `Everyone in the ${cohort.name} intake of ${course.title}`}, and your teacher. Share your work, ask
           questions and help each other. Please be kind: only classmates who have paid for this course can see this chat.
         </p>
       </div>

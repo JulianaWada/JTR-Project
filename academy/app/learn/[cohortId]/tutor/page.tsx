@@ -26,7 +26,7 @@ export default async function TutorPage({ params, searchParams }: PageProps<"/le
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">✨ AI tutor</h1>
           <p className="text-sm text-muted">
-            Answers from the {course.title} lessons{modes().claude === "test" ? " (test mode: answers are quoted from the notes)" : ", powered by Claude"}. Jules can see the
+            Answers from the {course.title} lessons{modes().claude === "test" ? " (test mode: answers are quoted from the notes)" : ", powered by Claude"}. Your teacher can see the
             questions asked, to improve the classes.
           </p>
         </div>

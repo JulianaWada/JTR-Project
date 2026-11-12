@@ -2,6 +2,7 @@ import { needsLink } from "@/lib/class-room";
 import { and, asc, desc, eq } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { certificates, classes, cohorts, courses, enrolments, submissions, tutorMessages } from "@/lib/db/schema";
+import { ownCourses, type Staff } from "@/lib/teachers";
 import { addMinutes } from "@/lib/time";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -9,16 +10,22 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 export type Activity = { at: Date; kind: "payment" | "submission" | "certificate" | "question"; text: string; href: string };
 
 /** Everything the teacher overview shows, in one pass over the (small) academy tables. */
-export async function teacherDashboard(db: Database, now = new Date()) {
+export async function teacherDashboard(db: Database, teacher: Staff, now = new Date()) {
   // One query at a time: Supabase's pooler allows only a few connections per server instance.
-  const courseRows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
-  const cohortRows = await db.query.cohorts.findMany();
-  const enrolmentRows = await db.query.enrolments.findMany();
-  const paymentRows = await db.query.payments.findMany();
-  const submissionRows = await db.query.submissions.findMany({ orderBy: desc(submissions.submittedAt) });
-  const certificateRows = await db.query.certificates.findMany({ orderBy: desc(certificates.issuedAt) });
-  const questionRows = await db.query.tutorMessages.findMany({ where: eq(tutorMessages.role, "user"), orderBy: desc(tutorMessages.createdAt), limit: 10 });
-  const classRows = await db.query.classes.findMany({ orderBy: asc(classes.startsAt) });
+  // Each teacher only sees their own courses and everything under them; the admin sees the whole academy.
+  const courseRows = await db.query.courses.findMany({ where: ownCourses(teacher), orderBy: asc(courses.sortOrder) });
+  const courseIds = new Set(courseRows.map((c) => c.id));
+  const cohortRows = (await db.query.cohorts.findMany()).filter((c) => courseIds.has(c.courseId));
+  const cohortIds = new Set(cohortRows.map((c) => c.id));
+  const enrolmentRows = (await db.query.enrolments.findMany()).filter((e) => cohortIds.has(e.cohortId));
+  const enrolmentIds = new Set(enrolmentRows.map((e) => e.id));
+  const paymentRows = (await db.query.payments.findMany()).filter((p) => enrolmentIds.has(p.enrolmentId));
+  const submissionRows = (await db.query.submissions.findMany({ orderBy: desc(submissions.submittedAt) })).filter((s) => cohortIds.has(s.cohortId));
+  const certificateRows = (await db.query.certificates.findMany({ orderBy: desc(certificates.issuedAt) })).filter((c) => cohortIds.has(c.cohortId));
+  const questionRows = (await db.query.tutorMessages.findMany({ where: eq(tutorMessages.role, "user"), orderBy: desc(tutorMessages.createdAt), limit: 200 }))
+    .filter((q) => cohortIds.has(q.cohortId))
+    .slice(0, 10);
+  const classRows = (await db.query.classes.findMany({ orderBy: asc(classes.startsAt) })).filter((c) => cohortIds.has(c.cohortId));
   const userRows = await db.query.users.findMany();
   const assignmentRows = await db.query.assignments.findMany();
   const userName = (id: string) => userRows.find((u) => u.id === id)?.name ?? "A student";
@@ -112,8 +119,8 @@ export async function teacherDashboard(db: Database, now = new Date()) {
   };
 }
 
-export async function courseWithCohorts(db: Database) {
-  const rows = await db.query.courses.findMany({ orderBy: asc(courses.sortOrder) });
+export async function courseWithCohorts(db: Database, teacher: Staff) {
+  const rows = await db.query.courses.findMany({ where: ownCourses(teacher), orderBy: asc(courses.sortOrder) });
   return Promise.all(
     rows.map(async (course) => {
       const list = await db.query.cohorts.findMany({ where: eq(cohorts.courseId, course.id), orderBy: [desc(cohorts.selfPaced), desc(cohorts.startsAt)] });

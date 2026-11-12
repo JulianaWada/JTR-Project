@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { formatDateTime } from "@/lib/time";
@@ -87,13 +87,20 @@ export async function pinChatMessage(db: Database, user: User, cohortId: string,
  * Student messages across all class chats in the last day, for the teacher's menu badge.
  * Never throws: a badge must not take the whole teacher dashboard down.
  */
-export async function recentStudentMessages(db: Database, now = new Date()): Promise<number> {
+export async function recentStudentMessages(db: Database, cohortIds: string[] | null = null, now = new Date()): Promise<number> {
+  if (cohortIds && !cohortIds.length) return 0;
   try {
     const [{ value }] = await db
       .select({ value: count() })
       .from(schema.chatMessages)
       .innerJoin(schema.users, eq(schema.users.id, schema.chatMessages.userId))
-      .where(and(eq(schema.users.role, "student"), gte(schema.chatMessages.createdAt, new Date(now.getTime() - 24 * 60 * 60 * 1000))));
+      .where(
+        and(
+          eq(schema.users.role, "student"),
+          gte(schema.chatMessages.createdAt, new Date(now.getTime() - 24 * 60 * 60 * 1000)),
+          cohortIds ? inArray(schema.chatMessages.cohortId, cohortIds) : undefined,
+        ),
+      );
     return value;
   } catch (err) {
     console.error("[chat] Couldn't count new chat messages:", err);

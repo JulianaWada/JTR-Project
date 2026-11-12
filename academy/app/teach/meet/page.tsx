@@ -3,13 +3,15 @@ import Link from "next/link";
 import { MeetLinkCard } from "@/components/meet-link-card";
 import { Empty, Flash, PageTitle, TestModeBanner } from "@/components/ui";
 import { modes } from "@/lib/env";
+import { requireTeacher } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
 
 export const metadata: Metadata = { title: "Class rooms" };
 
 export default async function MeetLinks({ searchParams }: PageProps<"/teach/meet">) {
-  const intakes = await liveIntakes(await getDb());
+  const user = await requireTeacher();
+  const intakes = await liveIntakes(await getDb(), undefined, user);
   return (
     <>
       <PageTitle eyebrow="Live classes" title="Class rooms">
