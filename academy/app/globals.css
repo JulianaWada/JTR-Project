@@ -3,28 +3,29 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Palette A "Steel & Electric Blue", the same tokens as the JTR website (app/globals.css there). */
+/* Day mode is a cool, low-glare blue-grey (Jules found plain white too bright, 2026-11-12). */
 :root {
-  --bg: #f5f7fa;
-  --surface: #ffffff;
-  --surface-2: #eef2f7;
+  --bg: #dfe6ef;
+  --surface: #edf2f7;
+  --surface-2: #d6dfea;
   --ink: #0a1a33;
-  --muted: #4b5a6e;
+  --muted: #44546a;
   --primary: #1563d6;
   --primary-ink: #ffffff;
-  --primary-soft: #e3eefc;
+  --primary-soft: #d4e3f7;
   --violet: #6d4aff;
-  --violet-soft: #ece8ff;
-  --silver: #c5ccd6;
-  --border: #dde3eb;
+  --violet-soft: #e0dbf7;
+  --silver: #b4bfcd;
+  --border: #c7d2de;
   --navy: #0a1a33;
   --ring: #1563d6;
   --success: #0f7b4a;
-  --success-soft: #e3f5ec;
+  --success-soft: #d5ede2;
   --warning: #9a5b00;
-  --warning-soft: #fff3dc;
+  --warning-soft: #f6ead2;
   --danger: #b42318;
   --sidebar: #0a1a33;
-  --card-shadow: 0 1px 2px rgb(10 26 51 / 0.04), 0 1px 3px rgb(10 26 51 / 0.04);
+  --card-shadow: 0 1px 2px rgb(10 26 51 / 0.06), 0 2px 6px rgb(10 26 51 / 0.05);
   color-scheme: light;
 }
 

@@ -15,7 +15,7 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
     <div
       className={cn("relative overflow-hidden border-b border-[#e6eaf0]", className ?? "h-40")}
       style={{
-        background: `radial-gradient(60% 90% at 85% 45%, ${soft}, transparent 70%), radial-gradient(${SILVER} 1px, transparent 1.3px) 0 0 / 14px 14px, linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%)`,
+        background: `radial-gradient(60% 90% at 85% 45%, ${soft}, transparent 70%), radial-gradient(${SILVER} 1px, transparent 1.3px) 0 0 / 14px 14px, linear-gradient(180deg, #f1f5f9 0%, #e7edf4 100%)`,
       }}
       aria-hidden
     >
