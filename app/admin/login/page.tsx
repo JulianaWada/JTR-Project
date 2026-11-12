@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { DEMO_ADMIN_PASSWORD, adminEmail, adminPassword, isAdmin, isDemoLogin } from "@/lib/admin/auth";
+import { DEMO_ADMIN_PASSWORD, adminEmail, adminPassword, isAdmin, isDemoLogin, teamSize } from "@/lib/admin/auth";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -9,6 +9,8 @@ export const metadata: Metadata = { title: "Sign in" };
 export default async function AdminLoginPage() {
   if (await isAdmin()) redirect("/admin");
   const open = Boolean(adminPassword());
+  // The email is asked for once ADMIN_EMAIL is set or there is a team, so everyone signs in as themselves.
+  const askEmail = Boolean(adminEmail()) || (open && (await teamSize().catch(() => 1)) > 0);
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm rounded-card border border-line bg-surface p-8 shadow-sm">
@@ -17,7 +19,7 @@ export default async function AdminLoginPage() {
         {open ? (
           <>
             <p className="mt-1 mb-6 text-sm text-muted">Leads, academy, WhatsApp agent and projects in one place.</p>
-            <LoginForm askEmail={Boolean(adminEmail())} />
+            <LoginForm askEmail={askEmail} emailOptional={!adminEmail()} />
             {isDemoLogin() && (
               <p className="mt-6 rounded-xl bg-surface-2 px-3.5 py-2.5 text-xs text-muted">
                 Test mode: the password is <code className="font-semibold text-ink">{DEMO_ADMIN_PASSWORD}</code>. Set ADMIN_PASSWORD to choose

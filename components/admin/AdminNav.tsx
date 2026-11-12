@@ -5,20 +5,22 @@ import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 
-const items: { href: string; label: string; icon: IconName }[] = [
+const items: { href: string; label: string; icon: IconName; needs?: "team" | "audit" }[] = [
   { href: "/admin", label: "Overview", icon: "trendingUp" },
   { href: "/admin/leads", label: "Leads", icon: "mail" },
   { href: "/admin/academy", label: "Academy", icon: "edtech" },
   { href: "/admin/whatsapp", label: "WhatsApp agent", icon: "whatsapp" },
   { href: "/admin/projects", label: "Projects", icon: "briefcase" },
+  { href: "/admin/team", label: "Team & roles", icon: "users", needs: "team" },
+  { href: "/admin/audit", label: "Audit trail", icon: "shield", needs: "audit" },
 ];
 
 /** The sidebar's links. Badges count items that are waiting for Jules. */
-export function AdminNav({ badges }: { badges: Partial<Record<string, number>> }) {
+export function AdminNav({ badges, show }: { badges: Partial<Record<string, number>>; show: { team: boolean; audit: boolean } }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Admin" className="space-y-1">
-      {items.map((item) => {
+      {items.filter((item) => !item.needs || show[item.needs]).map((item) => {
         const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
         const badge = badges[item.href];
         return (

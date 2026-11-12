@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { NotConnected, PageTitle, Panel, Pill, Stat, Table, Td, buttonClass, humanise, statusTone } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/roles";
 import { formatDate, formatDateTime, formatNaira } from "@/lib/admin/money";
 import { listBusinesses, recentOrders, recentPayments, whatsappAppUrl, whatsappMode } from "@/lib/admin/sources/whatsapp";
 
@@ -8,6 +10,7 @@ export const metadata = { title: "WhatsApp agent" };
 const kindNames = { salon: "Salon / bookings", food: "Food / orders", other: "Other" } as const;
 
 export default async function WhatsappPage() {
+  const session = await requireAdmin();
   let data;
   try {
     const [businesses, orders, payments] = await Promise.all([listBusinesses(), recentOrders(), recentPayments()]);
@@ -23,7 +26,7 @@ export default async function WhatsappPage() {
         title="WhatsApp sales agent"
         subtitle="Every business on the agent. Each owner manages their own chats, orders and bookings from their dashboard."
         actions={
-          whatsappMode() === "live" ? (
+          whatsappMode() === "live" && can(session.role, "whatsapp.add") ? (
             <Link href="/admin/whatsapp/new" className={buttonClass}>
               Add a business
             </Link>

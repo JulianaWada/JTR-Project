@@ -1,4 +1,6 @@
-import { PageTitle, Panel, Pill, Table, Td } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/admin/auth";
+import { can } from "@/lib/admin/roles";
+import { PageTitle, Panel, Pill, Table, Td, humanise, statusTone } from "@/components/admin/ui";
 import { StatusSelect } from "@/components/admin/StatusSelect";
 import { StatusTabs, parseStatus } from "@/components/admin/StatusTabs";
 import { formatDateTime } from "@/lib/admin/money";
@@ -13,16 +15,19 @@ const budgetLabel = (b: string) => b.replace("under-", "Under ").replace("over-"
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const status = parseStatus((await searchParams).status);
-  const leads = await listLeads({ status });
+  const [leads, session] = await Promise.all([listLeads({ status }), requireAdmin()]);
+  const canEdit = can(session.role, "leads.update");
   return (
     <>
       <PageTitle
         title="Leads"
         subtitle="Enquiries from the contact form and the JTR Assistant. Each one is also emailed to you once Resend is set up."
         actions={
-          <a href="/admin/export/leads" download className="text-sm font-semibold text-primary">
-            Download CSV
-          </a>
+          can(session.role, "export") ? (
+            <a href="/admin/export/leads" download className="text-sm font-semibold text-primary">
+              Download CSV
+            </a>
+          ) : undefined
         }
       />
       <Panel title={`${leads.length} ${leads.length === 1 ? "lead" : "leads"}`} action={<StatusTabs base="/admin/leads" current={status} />}>
@@ -58,7 +63,11 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                 </details>
               </Td>
               <Td>
-                <StatusSelect id={l.id} value={l.status} options={leadStatuses} action={updateLeadStatus} label={`Status for ${l.name}`} />
+                {canEdit ? (
+                  <StatusSelect id={l.id} value={l.status} options={leadStatuses} action={updateLeadStatus} label={`Status for ${l.name}`} />
+                ) : (
+                  <Pill tone={statusTone(l.status)}>{humanise(l.status)}</Pill>
+                )}
               </Td>
             </tr>
           ))}
