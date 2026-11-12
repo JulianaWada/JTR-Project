@@ -15,14 +15,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f7fa" },
-    { media: "(prefers-color-scheme: dark)", color: "#07111f" },
-  ],
+  themeColor: "#f5f7fa",
 };
 
-// Uses the same saved theme as the JTR website ("theme" in localStorage), so light/dark carries over.
-const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||((!t||t==="system")&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
+// Opens in light (day) mode by default, like the JTR website. Dark mode only when the
+// visitor has switched to it with the toggle ("theme" = "dark" in localStorage).
+const themeScript = `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
