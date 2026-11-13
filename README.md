@@ -184,7 +184,7 @@ Search the code for `TODO` to find each one.
 - [ ] Office street address and postal code (`siteConfig.headquarters`)
 - [x] Contact email (`siteConfig.contact`): hello@jtechright.com
 - [ ] Careers inbox (`siteConfig.contact.careersEmail`)
-- [ ] Google Maps embed URL for the Lagos office (`siteConfig.mapEmbedUrl`)
+- [ ] Google Maps embed URL for the Abuja office (`siteConfig.mapEmbedUrl`)
 - [ ] Social profile URLs, or remove the ones you don't use (`siteConfig.social`)
 
 **Portfolio, team and figures**

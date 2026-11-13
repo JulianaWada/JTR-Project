@@ -190,7 +190,7 @@
       },
       "clocks": "Nosso dia de trabalho, ao redor do mundo",
       "cities": {
-        "lagos": "Lagos",
+        "abuja": "Abuja",
         "london": "Londres",
         "dubai": "Dubai",
         "newYork": "Nova York"
@@ -227,7 +227,7 @@
       "title": "Nossa história",
       "paragraphs": [
         "A Jules TechRight (JTR) Ltd é uma empresa de tecnologia inovadora dedicada a desenvolver soluções digitais inteligentes, acessíveis e de impacto. Somos especialistas em sites e plataformas web, aplicativos móveis, IA agêntica, tecnologia educacional e transformação digital.",
-        "Fundada na África e com sede em Lagos, nascemos em torno de uma ideia simples: a boa tecnologia deve ser acessível a todos e deve resolver problemas reais. Atuar em mercados dinâmicos e mobile-first nos ensinou a criar produtos enxutos, resilientes e realmente úteis.",
+        "Fundada na África e com sede em Abuja, nascemos em torno de uma ideia simples: a boa tecnologia deve ser acessível a todos e deve resolver problemas reais. Atuar em mercados dinâmicos e mobile-first nos ensinou a criar produtos enxutos, resilientes e realmente úteis.",
         "Hoje trabalhamos com clientes na África, na Europa, na América do Norte, no Oriente Médio e em outras regiões, com entrega remota e com o rigor, a comunicação e a confiabilidade que você espera de um parceiro internacional de primeira linha."
       ]
     },
@@ -380,7 +380,7 @@
       "title": "Outras formas de falar conosco",
       "email": "E-mail",
       "hq": "Sede",
-      "mapTitle": "Mapa do nosso escritório em Lagos",
+      "mapTitle": "Mapa do nosso escritório em Abuja",
       "mapPlaceholder": "Mapa em breve"
     },
     "form": {
@@ -477,7 +477,7 @@
     "privacy": "Privacidade",
     "terms": "Termos",
     "rights": "© {year} Jules TechRight (JTR) Ltd. Todos os direitos reservados.",
-    "hq": "Sede em Lagos, atuação em todo o mundo"
+    "hq": "Sede em Abuja, atuação em todo o mundo"
   },
   "notFound": {
     "title": "Página não encontrada",

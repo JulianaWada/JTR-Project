@@ -189,7 +189,7 @@
       },
       "clocks": "Our working day, around the world",
       "cities": {
-        "lagos": "Lagos",
+        "abuja": "Abuja",
         "london": "London",
         "dubai": "Dubai",
         "newYork": "New York"
@@ -226,7 +226,7 @@
       "title": "Our story",
       "paragraphs": [
         "Jules TechRight (JTR) Ltd is an innovative technology company dedicated to developing smart, accessible, and impactful digital solutions. We specialise in websites and web platforms, mobile applications, agentic AI, educational technology and digital transformation.",
-        "Founded in Africa and headquartered in Lagos, we were built around a simple idea: great technology should be accessible to everyone, and it should solve real problems. Working in fast-moving, mobile-first markets taught us to build products that are lean, resilient and genuinely useful.",
+        "Founded in Africa and headquartered in Abuja, we were built around a simple idea: great technology should be accessible to everyone, and it should solve real problems. Working in fast-moving, mobile-first markets taught us to build products that are lean, resilient and genuinely useful.",
         "Today we work with clients across Africa, Europe, North America, the Middle East and beyond, delivering remotely with the craft, communication and reliability you'd expect from a leading international partner."
       ]
     },
@@ -379,7 +379,7 @@
       "title": "Other ways to reach us",
       "email": "Email",
       "hq": "Headquarters",
-      "mapTitle": "Map of our Lagos office",
+      "mapTitle": "Map of our Abuja office",
       "mapPlaceholder": "Map coming soon"
     },
     "form": {
@@ -476,7 +476,7 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "rights": "© {year} Jules TechRight (JTR) Ltd. All rights reserved.",
-    "hq": "Headquartered in Lagos, working worldwide"
+    "hq": "Headquartered in Abuja, working worldwide"
   },
   "notFound": {
     "title": "Page not found",
