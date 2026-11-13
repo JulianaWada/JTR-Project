@@ -190,7 +190,7 @@
       },
       "clocks": "Notre journée de travail, autour du monde",
       "cities": {
-        "lagos": "Lagos",
+        "abuja": "Abuja",
         "london": "Londres",
         "dubai": "Dubaï",
         "newYork": "New York"
@@ -227,7 +227,7 @@
       "title": "Notre histoire",
       "paragraphs": [
         "Jules TechRight (JTR) Ltd est une entreprise technologique innovante qui développe des solutions numériques intelligentes, accessibles et à fort impact. Nous sommes spécialisés dans les sites et plateformes web, les applications mobiles, l’IA agentique, les technologies éducatives et la transformation digitale.",
-        "Fondée en Afrique et basée à Lagos, notre entreprise est née d’une idée simple : une technologie de qualité doit être accessible à tous et résoudre de vrais problèmes. Travailler sur des marchés rapides et mobile-first nous a appris à concevoir des produits sobres, robustes et réellement utiles.",
+        "Fondée en Afrique et basée à Abuja, notre entreprise est née d’une idée simple : une technologie de qualité doit être accessible à tous et résoudre de vrais problèmes. Travailler sur des marchés rapides et mobile-first nous a appris à concevoir des produits sobres, robustes et réellement utiles.",
         "Aujourd’hui, nous accompagnons des clients en Afrique, en Europe, en Amérique du Nord, au Moyen-Orient et au-delà, à distance, avec le savoir-faire, la communication et la fiabilité que l’on attend d’un partenaire international de premier plan."
       ]
     },
@@ -380,7 +380,7 @@
       "title": "Autres moyens de nous joindre",
       "email": "E-mail",
       "hq": "Siège",
-      "mapTitle": "Carte de notre bureau de Lagos",
+      "mapTitle": "Carte de notre bureau d’Abuja",
       "mapPlaceholder": "Carte bientôt disponible"
     },
     "form": {
@@ -477,7 +477,7 @@
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "rights": "© {year} Jules TechRight (JTR) Ltd. Tous droits réservés.",
-    "hq": "Siège à Lagos, présence internationale"
+    "hq": "Siège à Abuja, présence internationale"
   },
   "notFound": {
     "title": "Page introuvable",
