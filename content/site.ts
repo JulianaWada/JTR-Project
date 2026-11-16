@@ -20,10 +20,10 @@ export const siteConfig = {
       : "https://www.jtechright.com"),
   foundingCountry: "NG",
   headquarters: {
-    // TODO: replace with the real office address.
+    // Head office is in Abuja (Jules, 2026-11-13). The street line stays hidden on the site while it is a TODO.
     street: "TODO: Street address",
-    city: "Lagos",
-    region: "Lagos State",
+    city: "Abuja",
+    region: "Federal Capital Territory",
     postalCode: "TODO",
     country: "Nigeria",
     countryCode: "NG",
@@ -34,7 +34,7 @@ export const siteConfig = {
     // TODO: replace with the real careers inbox.
     careersEmail: "careers@jtechright.com",
   },
-  // TODO: replace with a real Google Maps embed URL for the Lagos office.
+  // TODO: replace with a real Google Maps embed URL for the Abuja office.
   mapEmbedUrl: "",
   social: [
     // TODO: Facebook profile ID is cut off in the screenshot Jules sent; replace with the full link.
@@ -74,7 +74,7 @@ export const reachFigures = [
 
 /** Time zones the team covers, shown in the Global reach section. */
 export const timeZoneCoverage = [
-  { city: "lagos", tz: "Africa/Lagos" },
+  { city: "abuja", tz: "Africa/Lagos" },
   { city: "london", tz: "Europe/London" },
   { city: "dubai", tz: "Asia/Dubai" },
   { city: "newYork", tz: "America/New_York" },
