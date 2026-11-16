@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 const items: { href: string; label: string; icon: IconName; needs?: "team" | "audit" }[] = [
   { href: "/admin", label: "Overview", icon: "trendingUp" },
   { href: "/admin/leads", label: "Leads", icon: "mail" },
+  { href: "/admin/members", label: "Members", icon: "users" },
   { href: "/admin/academy", label: "Academy", icon: "edtech" },
   { href: "/admin/whatsapp", label: "WhatsApp agent", icon: "whatsapp" },
   { href: "/admin/projects", label: "Projects", icon: "briefcase" },

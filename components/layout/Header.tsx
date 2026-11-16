@@ -7,6 +7,7 @@ import { NavLinks } from "./NavLinks";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
+import { AccountLink } from "./AccountLink";
 
 export async function Header() {
   const t = await getTranslations();
@@ -22,6 +23,7 @@ export async function Header() {
         <div className="flex items-center gap-1">
           <LanguageSwitcher />
           <ThemeToggle />
+          <AccountLink />
           <ButtonLink href="/contact" className="ms-2 hidden sm:inline-flex">
             {t("nav.startProject")}
           </ButtonLink>

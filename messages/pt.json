@@ -556,5 +556,158 @@
         "consent": "Confirme que concorda para podermos contactá-lo."
       }
     }
+  },
+  "account": {
+    "nav": {
+      "signIn": "Entrar",
+      "myAccount": "Minha conta"
+    },
+    "meta": {
+      "signup": "Crie sua conta",
+      "signupDescription": "Junte-se à Jules TechRight para receber novidades, ofertas e acesso antecipado às aulas da JTR Academy.",
+      "login": "Entrar",
+      "account": "Minha conta",
+      "forgot": "Esqueci a senha",
+      "reset": "Escolha uma nova senha",
+      "unsubscribe": "Cancelar inscrição"
+    },
+    "signup": {
+      "eyebrow": "Junte-se à JTR",
+      "title": "Crie sua conta gratuita",
+      "subtitle": "Receba dicas de tecnologia, ofertas especiais e seja o primeiro a saber das novas aulas da JTR Academy.",
+      "submit": "Criar minha conta",
+      "sending": "Criando sua conta…",
+      "signInInstead": "Entrar na sua conta",
+      "haveAccount": "Já tem uma conta? <link>Entrar</link>",
+      "terms": "Ao criar uma conta, você concorda que a JTR guarde estes dados para gerir sua conta, conforme descrito na nossa <link>política de privacidade</link>.",
+      "perksTitle": "Por que se juntar?",
+      "perks": {
+        "updates": {
+          "title": "Dicas práticas de tecnologia",
+          "body": "Ideias curtas sobre sites, aplicativos e IA que ajudam seu negócio a crescer."
+        },
+        "offers": {
+          "title": "Ofertas para membros",
+          "body": "Preços especiais e campanhas, partilhados primeiro com os membros."
+        },
+        "academy": {
+          "title": "JTR Academy em primeira mão",
+          "body": "Saiba das novas aulas ao vivo antes de as vagas abrirem para todos."
+        }
+      },
+      "perksNote": "Gratuito, e você escolhe o que enviamos. Mude de ideia quando quiser."
+    },
+    "login": {
+      "eyebrow": "Sua conta",
+      "title": "Bem-vindo de volta",
+      "subtitle": "Entre para gerir seus dados e suas escolhas.",
+      "submit": "Entrar",
+      "sending": "Entrando…",
+      "forgot": "Esqueceu a senha?",
+      "noAccount": "Novo por aqui? <link>Crie uma conta gratuita</link>"
+    },
+    "fields": {
+      "name": "Nome completo",
+      "email": "Endereço de e-mail",
+      "password": "Senha",
+      "passwordHint": "Pelo menos {min} caracteres.",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "phone": "Número de telefone ou WhatsApp",
+      "phoneHint": "Necessário apenas se quiser receber novidades no WhatsApp.",
+      "countryCode": "Código do país",
+      "optional": "opcional",
+      "interestsLegend": "Sobre o que você quer saber?",
+      "consentLegend": "Fique em contato",
+      "marketingEmail": "Sim, envie-me por e-mail novidades, dicas e ofertas da JTR.",
+      "marketingWhatsapp": "Sim, envie-me novidades e ofertas da JTR no WhatsApp.",
+      "consentNote": "Ambos são opcionais. Pode desativá-los a qualquer momento na sua conta ou pelo link de cancelamento em cada e-mail."
+    },
+    "interests": {
+      "websites": "Sites",
+      "apps": "Aplicativos móveis",
+      "ai": "IA agêntica",
+      "academy": "Aulas da JTR Academy",
+      "news": "Notícias e dicas de tecnologia"
+    },
+    "dashboard": {
+      "eyebrow": "Minha conta",
+      "title": "Olá, {name}",
+      "memberSince": "membro desde {date}",
+      "welcomeTitle": "Sua conta está pronta.",
+      "welcomeBody": "Obrigado por se juntar à JTR. Pode alterar seus dados e escolhas abaixo a qualquer momento.",
+      "profileTitle": "Seus dados e escolhas",
+      "profileIntro": "Diga-nos o que lhe interessa e como prefere receber notícias nossas.",
+      "save": "Salvar alterações",
+      "saving": "Salvando…",
+      "saved": "Salvo",
+      "statusTitle": "Novidades da JTR",
+      "marketingEmail": "E-mail",
+      "marketingWhatsapp": "WhatsApp",
+      "on": "Ativado",
+      "off": "Desativado",
+      "signOut": "Sair",
+      "deleteTitle": "Excluir conta",
+      "deleteBody": "Isto remove sua conta e seus dados da JTR imediatamente.",
+      "deleteButton": "Excluir minha conta",
+      "deleteConfirmText": "Excluir sua conta definitivamente? Não é possível desfazer.",
+      "deleteConfirm": "Sim, excluir",
+      "deleteCancel": "Manter minha conta"
+    },
+    "forgot": {
+      "title": "Esqueceu a senha?",
+      "subtitle": "Digite seu e-mail e enviaremos um link para escolher uma nova.",
+      "submit": "Enviar link",
+      "sending": "Enviando…",
+      "sentTitle": "Verifique seu e-mail.",
+      "sentBody": "Se houver uma conta com este endereço, um link de redefinição está a caminho. Ele vale por uma hora.",
+      "back": "Voltar para entrar"
+    },
+    "reset": {
+      "title": "Escolha uma nova senha",
+      "subtitle": "Você entrará na conta assim que ela for salva.",
+      "newPassword": "Nova senha",
+      "submit": "Salvar nova senha",
+      "sending": "Salvando…",
+      "newLink": "Pedir um novo link"
+    },
+    "unsubscribe": {
+      "eyebrow": "Preferências de e-mail",
+      "title": "Cancelar e-mails da JTR",
+      "subtitle": "Deixaremos de enviar novidades e ofertas por e-mail. Sua conta continua aberta.",
+      "button": "Cancelar inscrição",
+      "sending": "Atualizando…",
+      "doneTitle": "Inscrição cancelada.",
+      "doneBody": "Você não receberá mais e-mails de marketing da JTR. Pode reativá-los na sua conta.",
+      "manage": "Prefere escolher o que recebe? <link>Abrir sua conta</link>"
+    },
+    "errors": {
+      "required": "Este campo é obrigatório.",
+      "email": "Digite um endereço de e-mail válido.",
+      "tooLong": "Este texto é longo demais.",
+      "passwordShort": "Use pelo menos 8 caracteres.",
+      "phone": "Digite um número de telefone válido.",
+      "phoneForWhatsapp": "Adicione seu número de WhatsApp para receber novidades no WhatsApp.",
+      "exists": "Já existe uma conta com este e-mail.",
+      "invalid": "Verifique os campos destacados.",
+      "wrong": "O e-mail e a senha não correspondem. Tente novamente.",
+      "tooMany": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+      "server": "Algo deu errado do nosso lado. Tente novamente daqui a pouco.",
+      "badLink": "Este link não é válido ou expirou."
+    },
+    "emails": {
+      "hello": "Olá {name},",
+      "welcomeSubject": "Bem-vindo à Jules TechRight",
+      "welcomeBody": "Sua conta JTR está pronta. Obrigado por se juntar a nós.",
+      "welcomeOptedIn": "Você pediu para manter contato, por isso enviaremos dicas práticas de tecnologia, ofertas para membros e novidades sobre as aulas da JTR Academy. Pode parar quando quiser.",
+      "welcomeNotOptedIn": "Você não escolheu receber novidades e ofertas. Se mudar de ideia, pode ativá-las na sua conta.",
+      "openAccount": "Abrir minha conta",
+      "unsubscribe": "Cancelar inscrição",
+      "footer": "Jules TechRight (JTR) Ltd, Abuja, Nigéria.",
+      "resetSubject": "Redefina sua senha JTR",
+      "resetBody": "Recebemos um pedido para redefinir a senha da sua conta JTR. O link abaixo vale por uma hora.",
+      "resetIgnore": "Se não foi você que pediu, ignore este e-mail e sua senha continua a mesma.",
+      "resetButton": "Escolher nova senha"
+    }
   }
 }

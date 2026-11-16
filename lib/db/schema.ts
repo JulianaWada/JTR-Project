@@ -106,6 +106,66 @@ export const adminAuditLog = pgTable(
   (t) => [index("admin_audit_log_at_idx").on(t.at), index("admin_audit_log_action_idx").on(t.action)],
 ).enableRLS();
 
+/**
+ * Website accounts (/account/signup). Visitors sign up so JTR can keep in touch and run campaigns.
+ * Marketing is opt-in per channel and can be withdrawn at any time from /account or the unsubscribe link.
+ * Passwords are scrypt hashes, never plain text.
+ */
+export const members = pgTable(
+  "members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Always stored in lower case. */
+    email: text("email").notNull().unique(),
+    name: text("name").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    phone: text("phone"),
+    /** What the person wants to hear about, e.g. ["websites", "ai"] (see lib/members/schema.ts). */
+    interests: jsonb("interests").$type<string[]>().notNull().default([]),
+    locale: text("locale").notNull(),
+    /** Opted in to news and offers by email. */
+    marketingEmail: boolean("marketing_email").notNull().default(false),
+    /** Opted in to news and offers on WhatsApp (needs a phone number). */
+    marketingWhatsapp: boolean("marketing_whatsapp").notNull().default(false),
+    /** When either marketing choice was last given or changed: the consent record. */
+    consentUpdatedAt: timestamp("consent_updated_at", { withTimezone: true }),
+    /** The campaign that brought them, from ?utm_source=…&utm_medium=…&utm_campaign=… on the link they followed. */
+    utmSource: text("utm_source"),
+    utmMedium: text("utm_medium"),
+    utmCampaign: text("utm_campaign"),
+    /** Secret for the one-click unsubscribe link in marketing emails. */
+    unsubscribeToken: text("unsubscribe_token").notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  },
+  (t) => [index("members_created_idx").on(t.createdAt)],
+).enableRLS();
+
+/** Signed-in browsers. Only a SHA-256 hash of each cookie token is stored. */
+export const memberSessions = pgTable(
+  "member_sessions",
+  {
+    tokenHash: text("token_hash").primaryKey(),
+    memberId: uuid("member_id")
+      .notNull()
+      .references(() => members.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("member_sessions_member_idx").on(t.memberId)],
+).enableRLS();
+
+/** "Forgot password" links, valid for one hour and usable once. Only a hash of the token is stored. */
+export const memberPasswordResets = pgTable("member_password_resets", {
+  tokenHash: text("token_hash").primaryKey(),
+  memberId: uuid("member_id")
+    .notNull()
+    .references(() => members.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+}).enableRLS();
+
+export type MemberRow = typeof members.$inferSelect;
 export type AdminUserRow = typeof adminUsers.$inferSelect;
 export type AdminAuditRow = typeof adminAuditLog.$inferSelect;
 export type LeadRow = typeof leads.$inferSelect;
