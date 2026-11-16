@@ -7,6 +7,7 @@ import { academyNav, mainNav } from "@/lib/nav";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { AccountLink } from "./AccountLink";
 
 export function MobileMenu() {
   const t = useTranslations();
@@ -76,6 +77,9 @@ export function MobileMenu() {
                 <Icon name="sparkle" size={20} className="text-primary" />
                 {t("nav.assistant")}
               </Link>
+            </li>
+            <li>
+              <AccountLink variant="menu" />
             </li>
           </ul>
           <Link href="/contact" className={buttonClasses("primary", "lg", "mt-8 w-full")}>

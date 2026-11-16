@@ -555,5 +555,158 @@
         "consent": "Please confirm you agree so we can contact you."
       }
     }
+  },
+  "account": {
+    "nav": {
+      "signIn": "Sign in",
+      "myAccount": "My account"
+    },
+    "meta": {
+      "signup": "Create your account",
+      "signupDescription": "Join Jules TechRight for news, offers and early access to JTR Academy classes.",
+      "login": "Sign in",
+      "account": "My account",
+      "forgot": "Forgot password",
+      "reset": "Choose a new password",
+      "unsubscribe": "Unsubscribe"
+    },
+    "signup": {
+      "eyebrow": "Join JTR",
+      "title": "Create your free account",
+      "subtitle": "Get tech tips, special offers and first notice of new JTR Academy classes.",
+      "submit": "Create my account",
+      "sending": "Creating your account…",
+      "signInInstead": "Sign in to your account instead",
+      "haveAccount": "Already have an account? <link>Sign in</link>",
+      "terms": "By creating an account you agree that JTR stores these details to run your account, as described in our <link>privacy policy</link>.",
+      "perksTitle": "Why join?",
+      "perks": {
+        "updates": {
+          "title": "Practical tech tips",
+          "body": "Short ideas on websites, apps and AI that help your business grow."
+        },
+        "offers": {
+          "title": "Member offers",
+          "body": "Special prices and campaigns, shared with members first."
+        },
+        "academy": {
+          "title": "JTR Academy first",
+          "body": "Hear about new live classes before seats are opened to everyone."
+        }
+      },
+      "perksNote": "Free, and you choose what we send. Change your mind at any time."
+    },
+    "login": {
+      "eyebrow": "Your account",
+      "title": "Welcome back",
+      "subtitle": "Sign in to manage your details and choices.",
+      "submit": "Sign in",
+      "sending": "Signing in…",
+      "forgot": "Forgot your password?",
+      "noAccount": "New here? <link>Create a free account</link>"
+    },
+    "fields": {
+      "name": "Full name",
+      "email": "Email address",
+      "password": "Password",
+      "passwordHint": "At least {min} characters.",
+      "show": "Show",
+      "hide": "Hide",
+      "phone": "Phone or WhatsApp number",
+      "phoneHint": "Needed only if you'd like updates on WhatsApp.",
+      "countryCode": "Country code",
+      "optional": "optional",
+      "interestsLegend": "What would you like to hear about?",
+      "consentLegend": "Keep in touch",
+      "marketingEmail": "Yes, email me JTR news, tips and offers.",
+      "marketingWhatsapp": "Yes, send me JTR news and offers on WhatsApp.",
+      "consentNote": "Both are optional. You can switch them off at any time in your account or with the unsubscribe link in every email."
+    },
+    "interests": {
+      "websites": "Websites",
+      "apps": "Mobile apps",
+      "ai": "Agentic AI",
+      "academy": "JTR Academy classes",
+      "news": "Tech news and tips"
+    },
+    "dashboard": {
+      "eyebrow": "My account",
+      "title": "Hello, {name}",
+      "memberSince": "member since {date}",
+      "welcomeTitle": "Your account is ready.",
+      "welcomeBody": "Thanks for joining JTR. You can change your details and choices below at any time.",
+      "profileTitle": "Your details and choices",
+      "profileIntro": "Tell us what interests you, and how you'd like to hear from us.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "statusTitle": "Updates from JTR",
+      "marketingEmail": "Email",
+      "marketingWhatsapp": "WhatsApp",
+      "on": "On",
+      "off": "Off",
+      "signOut": "Sign out",
+      "deleteTitle": "Delete account",
+      "deleteBody": "This removes your account and details from JTR straight away.",
+      "deleteButton": "Delete my account",
+      "deleteConfirmText": "Delete your account for good? This can't be undone.",
+      "deleteConfirm": "Yes, delete it",
+      "deleteCancel": "Keep my account"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a link to choose a new one.",
+      "submit": "Send reset link",
+      "sending": "Sending…",
+      "sentTitle": "Check your email.",
+      "sentBody": "If an account uses this address, a reset link is on its way. It works for one hour.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "subtitle": "You'll be signed in once it's saved.",
+      "newPassword": "New password",
+      "submit": "Save new password",
+      "sending": "Saving…",
+      "newLink": "Ask for a new link"
+    },
+    "unsubscribe": {
+      "eyebrow": "Email preferences",
+      "title": "Unsubscribe from JTR emails",
+      "subtitle": "We'll stop sending you news and offers by email. Your account stays open.",
+      "button": "Unsubscribe me",
+      "sending": "Updating…",
+      "doneTitle": "You're unsubscribed.",
+      "doneBody": "You won't get any more marketing emails from JTR. You can turn them back on in your account.",
+      "manage": "Want to choose what you get instead? <link>Open your account</link>"
+    },
+    "errors": {
+      "required": "This field is required.",
+      "email": "Enter a valid email address.",
+      "tooLong": "This is too long.",
+      "passwordShort": "Use at least 8 characters.",
+      "phone": "Enter a valid phone number.",
+      "phoneForWhatsapp": "Add your WhatsApp number to get updates on WhatsApp.",
+      "exists": "An account already uses this email address.",
+      "invalid": "Please check the highlighted fields.",
+      "wrong": "That email and password don't match. Please try again.",
+      "tooMany": "Too many tries. Please wait a few minutes and try again.",
+      "server": "Something went wrong on our side. Please try again in a moment.",
+      "badLink": "This link is not valid or has expired."
+    },
+    "emails": {
+      "hello": "Hello {name},",
+      "welcomeSubject": "Welcome to Jules TechRight",
+      "welcomeBody": "Your JTR account is ready. Thank you for joining us.",
+      "welcomeOptedIn": "You asked us to keep in touch, so we'll send you practical tech tips, member offers and news about JTR Academy classes. You can stop these at any time.",
+      "welcomeNotOptedIn": "You haven't chosen to get news and offers. If you change your mind, you can switch them on in your account.",
+      "openAccount": "Open my account",
+      "unsubscribe": "Unsubscribe",
+      "footer": "Jules TechRight (JTR) Ltd, Abuja, Nigeria.",
+      "resetSubject": "Reset your JTR password",
+      "resetBody": "We got a request to reset the password for your JTR account. The link below works for one hour.",
+      "resetIgnore": "If you didn't ask for this, you can ignore this email and your password stays the same.",
+      "resetButton": "Choose a new password"
+    }
   }
 }

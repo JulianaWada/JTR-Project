@@ -3,7 +3,7 @@ import { siteConfig } from "@/content/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/", "/admin"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/", "/admin", "/*/account", "/*/unsubscribe"] }],
     sitemap: `${siteConfig.url}/sitemap.xml`,
     host: siteConfig.url,
   };
