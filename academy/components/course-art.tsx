@@ -9,6 +9,7 @@ const SILVER = "#c5ccd6";
  */
 /** Courses with their own cover picture (a 16:9 thumbnail in public/courses), shown instead of the drawn art. */
 const COVERS: Record<string, string> = {
+  "boost-sales-with-ai": "/academy/courses/boost-sales-with-ai.webp",
   "ai-agents-without-code": "/academy/courses/ai-agents-without-code.webp",
 };
 
