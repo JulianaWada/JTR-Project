@@ -5,6 +5,8 @@ export type NarrationStep = {
   say: string;
   /** Optional recorded voice for this step (for example the teacher's own voice). Without it the browser reads `say` aloud. */
   audio?: string;
+  /** Length of `audio` in seconds (used to time the clean video render). */
+  seconds?: number;
 };
 
 export type SceneProps = {

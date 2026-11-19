@@ -532,7 +532,7 @@ export function Boutique({ dim = false }: { dim?: boolean }) {
         <rect x="146" y="12" width="8" height="176" fill="#8a5330" />
       </g>
       {/* shop sign */}
-      <g transform="translate(300 22)">
+      <g transform="translate(400 22)">
         <rect width="260" height="56" rx="14" fill="#0a1a33" />
         <text x="130" y="38" fontSize="26" fontWeight={700} fill="#ffd45c" textAnchor="middle" fontFamily="var(--font-heading)">
           Amaka&apos;s Styles

@@ -3,9 +3,9 @@
  * "<course slug>/<lesson number>". The lesson page shows the animated lesson first and keeps any
  * video in a second tab. Keep in step with components/animated-lesson/registry.ts.
  */
-export const ANIMATED_LESSON_IDS = ["boost-sales-with-ai/2"] as const;
+export const ANIMATED_LESSON_IDS = [1, 2, 3, 4, 5, 6].map((n) => `boost-sales-with-ai/${n}`);
 
 export function animatedLessonId(courseSlug: string, week: number): string | null {
   const id = `${courseSlug}/${week}`;
-  return (ANIMATED_LESSON_IDS as readonly string[]).includes(id) ? id : null;
+  return ANIMATED_LESSON_IDS.includes(id) ? id : null;
 }
