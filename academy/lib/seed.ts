@@ -332,6 +332,25 @@ export async function ensureDemoData(db: Database) {
 }
 
 /**
+ * Courses added after launch (every starter template after the first two): each is created once, by its slug,
+ * on the next start, so the live academy gets it without a hand-written migration. Runs on every start.
+ * To hide one of these courses, untick Published in Teach > Courses rather than deleting it, or it comes back.
+ */
+export async function ensureAddedCourses(db: Database) {
+  const [{ value }] = await db.select({ value: count() }).from(courses);
+  if (value === 0) return [];
+  const added = [];
+  for (const [i, t] of courseTemplates.entries()) {
+    if (i < 2) continue;
+    const existing = await db.query.courses.findFirst({ where: eq(courses.slug, t.slug) });
+    if (existing) continue;
+    added.push(await insertCourse(db, t, i));
+    console.info(`[seed] Added the course "${t.title}".`);
+  }
+  return added;
+}
+
+/**
  * Makes sure Jules can log in as the teacher, on every start. The account is TEACHER_EMAIL (default jules@julestechright.com).
  * Missing: it is created with TEACHER_PASSWORD (or the demo password outside production).
  * Already the teacher: its password is kept in step with TEACHER_PASSWORD, when that is set.

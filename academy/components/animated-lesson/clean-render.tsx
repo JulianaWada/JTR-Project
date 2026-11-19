@@ -26,6 +26,9 @@ export function CleanLessonRender({ lessonId }: { lessonId: string }) {
 
   useEffect(() => {
     (window as unknown as { startLesson: () => void }).startLesson = () => setStartedAt(performance.now());
+    // ?step=N shows the Nth narration step (counted from 0) without playing, for checking scenes.
+    const at = Number(new URLSearchParams(window.location.search).get("step"));
+    if (at > 0) setI(at);
   }, []);
 
   useEffect(() => {
