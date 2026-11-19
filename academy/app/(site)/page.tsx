@@ -9,30 +9,71 @@ import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
-const steps = [
-  { title: "Choose a course and pay", body: "Pick a course and pay securely with Paystack: card, bank transfer or USSD." },
-  {
-    title: "Watch or join your classes",
-    body: "Video courses: watch each lesson whenever it suits you. Live courses: classes with our skilled teachers in the JTR online class room, weekly or on consecutive days, with a reminder the day before.",
-  },
-  { title: "Practise with your AI tutor", body: "Notes, recordings, assignments and quizzes after every class, plus an AI tutor that knows the course and answers any time." },
-  { title: "Earn badges and your certificate", body: "Collect badges as you go. Finish the course and get a certificate anyone can verify online." },
-];
+/** The home page text follows which kinds of course are on sale, so hiding the live course (or bringing it back) needs no copy change. */
+function steps(hasLive: boolean, hasVideo: boolean) {
+  const join = !hasLive
+    ? { title: "Watch your lessons", body: "Watch each video lesson whenever it suits you, on your phone or laptop, and pick up where you left off." }
+    : !hasVideo
+      ? {
+          title: "Join your classes",
+          body: "Classes with our skilled teachers in the JTR online class room, weekly or on consecutive days, with a reminder the day before.",
+        }
+      : {
+          title: "Watch or join your classes",
+          body: "Video courses: watch each lesson whenever it suits you. Live courses: classes with our skilled teachers in the JTR online class room, weekly or on consecutive days, with a reminder the day before.",
+        };
+  return [
+    { title: "Choose a course and pay", body: "Pick a course and pay securely with Paystack: card, bank transfer or USSD." },
+    join,
+    {
+      title: "Practise with your AI tutor",
+      body: hasLive
+        ? "Notes, recordings, assignments and quizzes after every class, plus an AI tutor that knows the course and answers any time."
+        : "Notes, assignments and quizzes with every lesson, plus an AI tutor that knows the course and answers any time.",
+    },
+    { title: "Earn badges and your certificate", body: "Collect badges as you go. Finish the course and get a certificate anyone can verify online." },
+  ];
+}
 
-const faqs = [
-  { q: "Do I need any technical background?", a: "No. If you can use WhatsApp and a web browser, you can follow both courses. Everything is shown step by step in class." },
-  { q: "What's the difference between a video course and a live course?", a: "A video course has recorded lessons you watch at your own pace, starting any day. A live course has classes with a skilled teacher in a small group on set dates, recorded in case you miss one." },
-  {
-    q: "How do I get the certificate?",
-    a: "Watch every lesson of a video course, or attend at least 80% of a live course's classes, and pass the final project. Your certificate is issued automatically, as a PDF with a link anyone can use to check it.",
-  },
-  { q: "How do I pay?", a: "Online with Paystack, by card, bank transfer or USSD, in naira. You get a receipt by email and access straight away." },
-  { q: "What do I need for the classes?", a: "A phone or laptop with internet. A laptop is best for the animation course." },
-];
+function faqs(hasLive: boolean, hasVideo: boolean, hasAnimation: boolean, count: number) {
+  return [
+    {
+      q: "Do I need any technical background?",
+      a: `No. If you can use WhatsApp and a web browser, you can follow ${count === 1 ? "the course" : count === 2 ? "both courses" : "our courses"}. Everything is shown step by step.`,
+    },
+    ...(hasLive && hasVideo
+      ? [
+          {
+            q: "What's the difference between a video course and a live course?",
+            a: "A video course has recorded lessons you watch at your own pace, starting any day. A live course has classes with a skilled teacher in a small group on set dates, recorded in case you miss one.",
+          },
+        ]
+      : []),
+    {
+      q: "How do I get the certificate?",
+      a: [
+        hasVideo && "Watch every lesson of a video course",
+        hasLive && `${hasVideo ? "or attend" : "Attend"} at least 80% of a live course's classes`,
+      ]
+        .filter(Boolean)
+        .join(", ")
+        .concat(", and pass the final project. Your certificate is issued automatically, as a PDF with a link anyone can use to check it."),
+    },
+    { q: "How do I pay?", a: "Online with Paystack, by card, bank transfer or USSD, in naira. You get a receipt by email and access straight away." },
+    {
+      q: hasLive ? "What do I need for the classes?" : "What do I need for the lessons?",
+      a: `A phone or laptop with internet.${hasAnimation ? " A laptop is best for the animation course." : ""}`,
+    },
+  ];
+}
 
 export default async function AcademyHome() {
   const courses = await publishedCourses(await getDb());
   const country = await visitorCountry();
+  const hasLive = courses.some((c) => c.format === "live");
+  const hasVideo = courses.some((c) => c.format === "recorded");
+  const hasAnimation = courses.some((c) => c.slug === "animation-videos-with-ai");
+  const video = courses.find((c) => c.format === "recorded");
   return (
     <>
       <section className="relative overflow-hidden border-b border-line">
@@ -44,8 +85,9 @@ export default async function AcademyHome() {
               Learn practical AI skills from skilled teachers.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
-              For business owners and creators: grow your sales with AI in a video course you take at your own pace, or make animated videos with AI in
-              a five-day live class. An AI tutor between lessons, and a certificate at the end.
+              {hasAnimation
+                ? "For business owners and creators: grow your sales with AI in a video course you take at your own pace, or make animated videos with AI in a five-day live class. An AI tutor between lessons, and a certificate at the end."
+                : "For business owners and creators: grow your sales with AI in a video course you take at your own pace, starting any day. An AI tutor between lessons, and a certificate at the end."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#courses" className="btn-primary h-12 px-7 text-base">
@@ -58,16 +100,23 @@ export default async function AcademyHome() {
             <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-6">
               <div>
                 <dt className="text-xs text-muted">Format</dt>
-                <dd className="mt-1 font-display font-semibold text-ink">Video + live</dd>
+                <dd className="mt-1 font-display font-semibold text-ink">{hasLive && hasVideo ? "Video + live" : hasLive ? "Live classes" : "Video lessons"}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Length</dt>
-                <dd className="mt-1 font-display font-semibold text-ink">6 lessons</dd>
+                <dd className="mt-1 font-display font-semibold text-ink">{video ? `${video.outline.length} lessons` : "6 lessons"}</dd>
               </div>
-              <div>
-                <dt className="text-xs text-muted">Live class size</dt>
-                <dd className="mt-1 font-display font-semibold text-ink">Up to 30</dd>
-              </div>
+              {hasLive ? (
+                <div>
+                  <dt className="text-xs text-muted">Live class size</dt>
+                  <dd className="mt-1 font-display font-semibold text-ink">Up to 30</dd>
+                </div>
+              ) : (
+                <div>
+                  <dt className="text-xs text-muted">Start</dt>
+                  <dd className="mt-1 font-display font-semibold text-ink">Any day</dd>
+                </div>
+              )}
             </dl>
           </div>
           <div className="card relative">
@@ -93,7 +142,8 @@ export default async function AcademyHome() {
 
       <section id="courses" className="mx-auto max-w-site scroll-mt-20 px-4 py-16 sm:px-6">
         <p className="eyebrow">Courses</p>
-        <h2 className="mt-2 font-display text-3xl font-semibold text-ink">Start with one of our first two courses</h2>
+        <h2 className="mt-2 font-display text-3xl font-semibold text-ink">{courses.length === 1 ? "Start with our first course" : courses.length === 2 ? "Start with one of our first two courses" : "Choose a course"}
+        </h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} nextCohort={course.nextCohort} currency={currencyFor(country, course)} teacher={course.teacher} />
@@ -106,7 +156,7 @@ export default async function AcademyHome() {
           <p className="eyebrow">How it works</p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-ink">From sign-up to certificate</h2>
           <ol className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {steps.map((step, i) => (
+            {steps(hasLive, hasVideo).map((step, i) => (
               <li key={step.title} className="rounded-card border border-line bg-bg p-6">
                 <span className="grid size-9 place-items-center rounded-full bg-primary font-display font-semibold text-primary-ink">{i + 1}</span>
                 <h3 className="mt-4 font-display text-lg font-semibold text-ink">{step.title}</h3>
@@ -127,7 +177,7 @@ export default async function AcademyHome() {
             </p>
           </div>
           <div className="divide-y divide-line rounded-card border border-line bg-surface">
-            {faqs.map((f) => (
+            {faqs(hasLive, hasVideo, hasAnimation, courses.length).map((f) => (
               <details key={f.q} className="group p-5">
                 <summary className="cursor-pointer list-none font-medium text-ink marker:hidden">
                   <span className="flex items-center justify-between gap-4">

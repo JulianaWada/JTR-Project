@@ -85,6 +85,13 @@
       "when": 1794483769189,
       "tag": "0011_multi_teacher",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795023082000,
+      "tag": "0012_hide_live_course",
+      "breakpoints": true
     }
   ]
 }

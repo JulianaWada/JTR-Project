@@ -19,7 +19,9 @@ export const dynamic = "force-dynamic";
 async function load(slug: string) {
   const db = await getDb();
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.slug, slug) });
-  if (!course || !course.published) return null;
+  if (!course) return null;
+  // A hidden (unpublished) course keeps its address, so old links and flyer QR codes land on a "not open right now" note instead of an error.
+  if (!course.published) return { closed: course } as const;
   const teacher = await brandFor(db, course.teacherId);
   // A course whose teacher was suspended is off sale until the admin hands it on.
   if (course.teacherId && !teacher.userId) return null;
@@ -28,12 +30,14 @@ async function load(slug: string) {
 
 export async function generateMetadata({ params }: PageProps<"/courses/[slug]">): Promise<Metadata> {
   const data = await load((await params).slug);
+  if (data?.closed) return { title: data.closed.title, robots: { index: false } };
   return data ? { title: data.course.title, description: data.course.tagline } : {};
 }
 
 export default async function CoursePage({ params }: PageProps<"/courses/[slug]">) {
   const data = await load((await params).slug);
   if (!data) notFound();
+  if (data.closed) return <CourseClosed title={data.closed.title} />;
   const { course, intakes, teacher } = data;
   const local = localPrice(await visitorCountry(), course);
   const price = money(local.minor, local.currency);
@@ -226,5 +230,23 @@ function TaughtBy({ teacher }: { teacher: TeacherBrand }) {
         )}
       </div>
     </div>
+  );
+}
+
+function CourseClosed({ title }: { title: string }) {
+  return (
+    <section className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6">
+      <Pill>Not open right now</Pill>
+      <h1 className="mt-4 font-display text-3xl font-semibold text-balance text-ink sm:text-4xl">{title}</h1>
+      <p className="mt-4 text-lg text-muted">This course isn&apos;t taking students at the moment. Have a look at the courses that are open now.</p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link href="/#courses" className="btn-primary h-12 px-7 text-base">
+          See the courses
+        </Link>
+        <a href={`${env.websiteUrl}/contact`} className="btn-secondary h-12 px-7 text-base">
+          Contact JTR
+        </a>
+      </div>
+    </section>
   );
 }
