@@ -58,8 +58,8 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
               <Pill>{recorded ? `${course.outline.length} lessons · learn at your own pace` : course.lessonUnit === "day" ? `${course.outline.length} days · 1 class a day` : `${course.outline.length} weeks · 1 class a week`}</Pill>
               <Pill>Certificate</Pill>
             </div>
-            <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-ink sm:text-5xl">{course.title}</h1>
-            <p className="mt-4 text-lg text-muted">{course.tagline}</p>
+            <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-primary sm:text-5xl">{course.title}</h1>
+            <p className="mt-4 text-lg font-medium text-primary">{course.tagline}</p>
             <p className="mt-6 max-w-2xl leading-relaxed text-ink">{course.description}</p>
             {teacher.userId && <TaughtBy teacher={teacher} />}
           </div>
@@ -72,7 +72,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
       <div className="mx-auto grid max-w-site gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-10">
           <section>
-            <h2 className="font-display text-2xl font-semibold text-ink">What you&apos;ll be able to do</h2>
+            <h2 className="heading-accent font-display text-2xl font-semibold text-primary">What you&apos;ll be able to do</h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {lines(course.outcomes).map((o) => (
                 <li key={o} className="flex gap-3 rounded-xl border border-line bg-surface p-4 text-sm text-ink">
@@ -86,15 +86,15 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-semibold text-ink">{recorded ? "Lesson by lesson" : `${lessonLabel(course)} by ${lessonLabel(course).toLowerCase()}`}</h2>
+            <h2 className="heading-accent font-display text-2xl font-semibold text-primary">{recorded ? "Lesson by lesson" : `${lessonLabel(course)} by ${lessonLabel(course).toLowerCase()}`}</h2>
             <ol className="mt-4 divide-y divide-line rounded-card border border-line bg-surface">
               {course.outline.map((w) => (
                 <li key={w.week} className="flex gap-4 p-5">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 font-display text-sm font-semibold text-ink">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold-soft font-display text-sm font-semibold text-gold-ink ring-1 ring-gold">
                     {w.week}
                   </span>
                   <div>
-                    <h3 className="font-semibold text-ink">{w.title}</h3>
+                    <h3 className="font-semibold text-primary">{w.title}</h3>
                     <p className="mt-1 text-sm text-muted">{w.summary}</p>
                   </div>
                 </li>
@@ -103,7 +103,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           </section>
 
           <section>
-            <h2 className="font-display text-2xl font-semibold text-ink">Who it&apos;s for</h2>
+            <h2 className="heading-accent font-display text-2xl font-semibold text-primary">Who it&apos;s for</h2>
             <ul className="mt-4 list-disc space-y-2 ps-5 text-ink">
               {lines(course.audience).map((a) => (
                 <li key={a}>{a}</li>
@@ -112,7 +112,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           </section>
 
           <section className="rounded-card border border-line bg-surface p-6">
-            <h2 className="font-display text-xl font-semibold text-ink">Earning your certificate</h2>
+            <h2 className="heading-accent font-display text-xl font-semibold text-primary">Earning your certificate</h2>
             <p className="mt-2 text-muted">
               {recorded
                 ? course.completionAttendancePercent >= 100
@@ -128,7 +128,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card">
             <p className="text-sm text-muted">Course fee</p>
-            <p className="font-display text-4xl font-semibold text-ink">{price}</p>
+            <p className="font-display text-4xl font-semibold text-primary">{price}</p>
             <p className="mt-1 text-xs text-muted">
               {local.currency === "USD" ? "Pay by card in US dollars via Paystack." : "Pay with card, bank transfer or USSD via Paystack."}
             </p>
@@ -146,7 +146,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
               )
             ) : (
               <>
-                <h2 className="mt-6 text-sm font-semibold text-ink">Choose your intake</h2>
+                <h2 className="mt-6 text-sm font-semibold text-primary">Choose your intake</h2>
                 {intakes.length === 0 ? (
                   <div className="mt-3 rounded-xl bg-surface-2 p-4 text-sm text-muted">
                     <p>No intake is open right now.</p>

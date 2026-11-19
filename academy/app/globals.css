@@ -26,6 +26,10 @@
   --danger: #b42318;
   --sidebar: #0a1a33;
   --card-shadow: 0 1px 2px rgb(10 26 51 / 0.06), 0 2px 6px rgb(10 26 51 / 0.05);
+  /* A touch of yellow, used as an accent (bars, number badges), never as text on the light background. */
+  --gold: #f5b800;
+  --gold-soft: #fbe7a1;
+  --gold-ink: #3d2c00;
   color-scheme: light;
 }
 
@@ -51,6 +55,9 @@
   --danger: #ff7a6e;
   --sidebar: #050c18;
   --card-shadow: none;
+  --gold: #ffc83d;
+  --gold-soft: #3a2d08;
+  --gold-ink: #ffd76b;
   color-scheme: dark;
 }
 
@@ -74,6 +81,9 @@
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
   --color-sidebar: var(--sidebar);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-ink: var(--gold-ink);
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
@@ -354,4 +364,15 @@
     transform: translate(390px, -150px) scale(0.6);
     opacity: 0;
   }
+}
+
+/* Course page section headings: brand blue text with a short yellow bar beneath (Jules, 2026-11-19). */
+.heading-accent::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 0.25rem;
+  margin-top: 0.5rem;
+  border-radius: 9999px;
+  background: var(--gold);
 }
