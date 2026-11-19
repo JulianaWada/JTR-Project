@@ -29,6 +29,7 @@ import { applyAsTeacher, reviewTeacher } from "@/lib/teacher-applications";
 import { brandFor, canManageCohort, canManageCourse, cleanImage, JTR_BRAND, ownCohortIds, teachesCourse } from "@/lib/teachers";
 import { teacherDashboard } from "@/lib/teacher";
 import { publishedCourses } from "@/lib/catalog";
+import { canReview, ownReview, publicName, publicReviews, ratingSummaries } from "@/lib/reviews";
 
 let db: Database;
 let seeded: Awaited<ReturnType<typeof seedCourses>>;
@@ -756,5 +757,64 @@ describe("How to Build AI Agents Without Code", () => {
   it("is not added to an empty database (the first start seeds it instead)", async () => {
     const empty = await createInMemoryDb();
     expect(await ensureAddedCourses(empty)).toEqual([]);
+  });
+});
+
+describe("course ratings and reviews", () => {
+  async function review(userId: string, cohortId: string, courseId: string, rating: number, comment = "", status: "published" | "hidden" = "published") {
+    await db.insert(schema.courseReviews).values({ userId, cohortId, courseId, rating, comment, status });
+  }
+
+  it("lets a video-course student rate only after watching every lesson", async () => {
+    const { cohort, classes } = seeded.salesSelfPaced;
+    await enrolAndPay(cohort.id);
+    expect(await canReview(db, student.id, cohort.id)).toBe(false);
+    await db.insert(schema.attendance).values(classes.slice(0, -1).map((c) => ({ classId: c.id, userId: student.id, source: "watched" as const })));
+    expect(await canReview(db, student.id, cohort.id)).toBe(false);
+    await db.insert(schema.attendance).values({ classId: classes.at(-1)!.id, userId: student.id, source: "watched" });
+    expect(await canReview(db, student.id, cohort.id)).toBe(true);
+  });
+
+  it("lets a live-course student rate once the last class has ended", async () => {
+    expect(await canReview(db, student.id, seeded.animationNext.cohort.id)).toBe(false);
+    expect(await canReview(db, student.id, seeded.animationDone!.cohort.id)).toBe(true);
+    const last = seeded.animationNext.classes.at(-1)!;
+    expect(await canReview(db, student.id, seeded.animationNext.cohort.id, addMinutes(last.startsAt, last.durationMinutes + 1))).toBe(true);
+  });
+
+  it("averages published reviews only and shows written ones with a short name", async () => {
+    const course = seeded.salesCourse;
+    const cohortId = seeded.salesSelfPaced.cohort.id;
+    const others = await db
+      .insert(schema.users)
+      .values(["Bola Ade", "Chidi Nwosu", "Efe"].map((name, i) => ({ email: `r${i}@example.com`, name, passwordHash: "x" })))
+      .returning();
+    await review(student.id, cohortId, course.id, 5, "Changed how I sell on WhatsApp.");
+    await review(others[0].id, cohortId, course.id, 4);
+    await review(others[1].id, cohortId, course.id, 3, "Good but fast.");
+    await review(others[2].id, cohortId, course.id, 1, "Spam", "hidden");
+
+    const summary = (await ratingSummaries(db, [course.id])).get(course.id)!;
+    expect(summary).toEqual({ average: 4, count: 3 });
+    const page = await publicReviews(db, course.id);
+    expect(page.total).toBe(3);
+    expect(page.breakdown.find((b) => b.stars === 1)!.count).toBe(0);
+    expect(page.reviews.map((r) => r.name)).toEqual(["Amaka O.", "Chidi N."]);
+    expect(page.reviews[0].intake).toBeNull();
+    expect((await publishedCourses(db)).find((c) => c.id === course.id)!.rating).toEqual({ average: 4, count: 3 });
+    expect((await ownReview(db, others[2].id, course.id))?.status).toBe("hidden");
+  });
+
+  it("keeps one review per student per course", async () => {
+    const cohortId = seeded.salesSelfPaced.cohort.id;
+    await review(student.id, cohortId, seeded.salesCourse.id, 5);
+    await expect(review(student.id, cohortId, seeded.salesCourse.id, 4)).rejects.toThrow();
+  });
+
+  it("shortens names for the public page", () => {
+    expect(publicName("Ada Okafor")).toBe("Ada O.");
+    expect(publicName("  Efe ")).toBe("Efe");
+    expect(publicName("Mary Jane van dyke")).toBe("Mary D.");
+    expect(publicName("")).toBe("A student");
   });
 });

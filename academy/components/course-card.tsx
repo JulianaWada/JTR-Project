@@ -2,26 +2,32 @@ import Link from "next/link";
 import type { CohortRow, CourseRow } from "@/lib/catalog";
 import { asset } from "@/lib/assets";
 import { money } from "@/lib/money";
+import { formatRating, type RatingSummary } from "@/lib/rating-format";
 import type { TeacherBrand } from "@/lib/teachers";
 import { formatDate } from "@/lib/time";
 import { accentClasses, Pill } from "./ui";
 import { CourseArt } from "./course-art";
+import { Stars } from "./stars";
 
 /** `currency` is the visitor's (from their location): naira in Nigeria, dollars elsewhere when the course has a dollar price. */
 export function CourseCard({
   course,
   nextCohort,
+  rating,
   currency = "NGN",
   teacher,
 }: {
-  course: CourseRow;
+  course: CourseRow & { rating?: RatingSummary | null };
   /** Shown as "by …" when the course has its own teacher. */
   teacher?: TeacherBrand;
   nextCohort: (CohortRow & { seatsLeft: number }) | null;
+  /** Students' average stars; defaults to the one on `course` (from publishedCourses). Hidden when nobody has rated it yet. */
+  rating?: RatingSummary | null;
   currency?: "NGN" | "USD";
 }) {
   const accent = accentClasses(course.accent);
   const recorded = course.format === "recorded";
+  const stars = rating === undefined ? course.rating : rating;
   return (
     <Link
       href={`/courses/${course.slug}`}
@@ -35,6 +41,15 @@ export function CourseCard({
           <Pill>Certificate</Pill>
         </div>
         <h3 className="mt-4 font-display text-xl font-semibold text-ink group-hover:text-primary">{course.title}</h3>
+        {stars && stars.count > 0 && (
+          <p className="mt-2 flex items-center gap-2 text-sm">
+            <span className="font-semibold text-ink">{formatRating(stars.average)}</span>
+            <Stars value={stars.average} />
+            <span className="text-muted">
+              ({stars.count} {stars.count === 1 ? "rating" : "ratings"})
+            </span>
+          </p>
+        )}
         {teacher?.userId && (
           <p className="mt-2 flex items-center gap-2 text-sm text-muted">
             {teacher.logo ? (

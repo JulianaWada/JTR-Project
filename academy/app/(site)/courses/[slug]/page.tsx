@@ -13,6 +13,8 @@ import { formatDate, formatTime } from "@/lib/time";
 import { lessonLabel } from "@/lib/lesson-unit";
 import { asset } from "@/lib/assets";
 import { brandFor, type TeacherBrand } from "@/lib/teachers";
+import { Stars } from "@/components/stars";
+import { formatRating, publicReviews } from "@/lib/reviews";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,7 @@ async function load(slug: string) {
   const teacher = await brandFor(db, course.teacherId);
   // A course whose teacher was suspended is off sale until the admin hands it on.
   if (course.teacherId && !teacher.userId) return null;
-  return { course, teacher, intakes: await openCohorts(db, course.id) };
+  return { course, teacher, intakes: await openCohorts(db, course.id), reviews: await publicReviews(db, course.id) };
 }
 
 export async function generateMetadata({ params }: PageProps<"/courses/[slug]">): Promise<Metadata> {
@@ -38,7 +40,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
   const data = await load((await params).slug);
   if (!data) notFound();
   if (data.closed) return <CourseClosed title={data.closed.title} />;
-  const { course, intakes, teacher } = data;
+  const { course, intakes, teacher, reviews } = data;
   const local = localPrice(await visitorCountry(), course);
   const price = money(local.minor, local.currency);
   const violet = course.accent === "violet";
@@ -60,6 +62,15 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
             </div>
             <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-primary sm:text-5xl">{course.title}</h1>
             <p className="mt-4 text-lg font-medium text-primary">{course.tagline}</p>
+            {reviews.total > 0 && (
+              <a href="#reviews" className="mt-4 inline-flex items-center gap-2 text-sm hover:underline">
+                <span className="font-semibold text-ink">{formatRating(reviews.average)}</span>
+                <Stars value={reviews.average} className="text-base" />
+                <span className="text-muted">
+                  {reviews.total} student {reviews.total === 1 ? "rating" : "ratings"}
+                </span>
+              </a>
+            )}
             <p className="mt-6 max-w-2xl leading-relaxed text-ink">{course.description}</p>
             {teacher.userId && <TaughtBy teacher={teacher} />}
           </div>
@@ -110,6 +121,8 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
               ))}
             </ul>
           </section>
+
+          {reviews.total > 0 && <StudentReviews reviews={reviews} />}
 
           <section className="rounded-card border border-line bg-surface p-6">
             <h2 className="heading-accent font-display text-xl font-semibold text-primary">Earning your certificate</h2>
@@ -200,6 +213,52 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
         </aside>
       </div>
     </>
+  );
+}
+
+/** Average stars, how many gave each number of stars, and the latest written reviews. */
+function StudentReviews({ reviews }: { reviews: Awaited<ReturnType<typeof publicReviews>> }) {
+  return (
+    <section id="reviews" className="scroll-mt-24">
+      <h2 className="heading-accent font-display text-2xl font-semibold text-primary">What students say</h2>
+      <div className="mt-4 grid gap-6 rounded-card border border-line bg-surface p-6 sm:grid-cols-[auto_1fr] sm:items-center">
+        <div className="text-center sm:pe-6">
+          <p className="font-display text-5xl font-semibold text-ink">{formatRating(reviews.average)}</p>
+          <Stars value={reviews.average} className="mt-2 text-xl" />
+          <p className="mt-1 text-sm text-muted">
+            {reviews.total} {reviews.total === 1 ? "rating" : "ratings"}
+          </p>
+        </div>
+        <ul className="space-y-1.5">
+          {reviews.breakdown.map((b) => (
+            <li key={b.stars} className="flex items-center gap-3 text-sm">
+              <span className="w-12 shrink-0 text-muted">{b.stars} star</span>
+              <span className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
+                <span className="block h-full rounded-full bg-gold" style={{ width: `${(b.count / reviews.total) * 100}%` }} />
+              </span>
+              <span className="w-6 shrink-0 text-end text-muted">{b.count}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {reviews.reviews.length > 0 && (
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+          {reviews.reviews.map((r) => (
+            <li key={r.id} className="flex flex-col rounded-card border border-line bg-surface p-5">
+              <Stars value={r.rating} className="text-base" />
+              <p className="mt-3 flex-1 text-sm leading-relaxed whitespace-pre-line text-ink">&ldquo;{r.comment}&rdquo;</p>
+              <p className="mt-4 text-sm font-semibold text-ink">
+                {r.name}
+                <span className="font-normal text-muted">
+                  {" "}
+                  · {r.intake ? `${r.intake} intake` : "Verified student"} · {formatDate(r.date)}
+                </span>
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
