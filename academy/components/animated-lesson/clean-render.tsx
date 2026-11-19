@@ -20,11 +20,12 @@ export function CleanLessonRender({ lessonId }: { lessonId: string }) {
   const lesson = ANIMATED_LESSONS[lessonId];
   const flat = useMemo(() => (lesson?.scenes ?? []).flatMap((s, scene) => s.steps.map((st, step) => ({ scene, step, secs: stepSeconds(st) }))), [lesson]);
   const [i, setI] = useState(0);
-  const [running, setRunning] = useState(false);
+  const [startedAt, setStartedAt] = useState(0);
+  const running = startedAt > 0;
   const [quietAt, setQuietAt] = useState(-1);
 
   useEffect(() => {
-    (window as unknown as { startLesson: () => void }).startLesson = () => setRunning(true);
+    (window as unknown as { startLesson: () => void }).startLesson = () => setStartedAt(performance.now());
   }, []);
 
   useEffect(() => {
@@ -34,13 +35,16 @@ export function CleanLessonRender({ lessonId }: { lessonId: string }) {
       document.title = "done";
       return;
     }
-    const a = setTimeout(() => setQuietAt(i), cur.secs * 1000);
-    const b = setTimeout(() => setI((n) => n + 1), (cur.secs + STEP_GAP_SECONDS) * 1000);
+    // Time each step from the start, so small timer delays never add up and drift from the audio track.
+    const begin = flat.slice(0, i).reduce((t, s) => t + s.secs + STEP_GAP_SECONDS, 0) * 1000;
+    const now = performance.now() - startedAt;
+    const a = setTimeout(() => setQuietAt(i), begin + cur.secs * 1000 - now);
+    const b = setTimeout(() => setI((n) => n + 1), begin + (cur.secs + STEP_GAP_SECONDS) * 1000 - now);
     return () => {
       clearTimeout(a);
       clearTimeout(b);
     };
-  }, [running, i, flat]);
+  }, [running, startedAt, i, flat]);
 
   if (!lesson) return null;
   const cur = flat[Math.min(i, flat.length - 1)];
