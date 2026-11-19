@@ -11,6 +11,7 @@ import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { lessonLabel } from "@/lib/lesson-unit";
+import { animatedLessonId } from "@/lib/animated-lessons";
 
 export const metadata: Metadata = { title: "Course" };
 
@@ -156,6 +157,8 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
                       {selfPaced ? (
                         attended.has(l.id) ? (
                           <Pill tone="success">Done</Pill>
+                        ) : animatedLessonId(course.slug, l.week) ? (
+                          <Pill tone="primary">✨ Animated lesson</Pill>
                         ) : l.recordingUrl ? (
                           <Pill tone="primary">Video</Pill>
                         ) : (
