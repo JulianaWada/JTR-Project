@@ -7,7 +7,24 @@ const SILVER = "#c5ccd6";
  * Branded cover picture for a course: a clean white design with navy line work and the course's accent colour.
  * Drawn in SVG so it needs no image files, and it stays white in dark mode too (it is a picture, like a photo).
  */
+/** Courses with their own cover picture (a 16:9 thumbnail in public/courses), shown instead of the drawn art. */
+const COVERS: Record<string, string> = {
+  "ai-agents-without-code": "/academy/courses/ai-agents-without-code.webp",
+};
+
 export function CourseArt({ slug, accent, className }: { slug: string; accent: "blue" | "violet"; className?: string }) {
+  const cover = COVERS[slug];
+  if (cover) {
+    // The whole picture stays visible at any card height: a soft blurred copy fills the sides.
+    return (
+      <div className={cn("relative overflow-hidden border-b border-[#e6eaf0] bg-[#0a1a33]", className ?? "h-40")}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static file, no optimisation needed */}
+        <img src={cover} alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-70 blur-xl" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- static file, no optimisation needed */}
+        <img src={cover} alt="" aria-hidden className="relative mx-auto h-full w-auto max-w-full object-contain" />
+      </div>
+    );
+  }
   const color = accent === "violet" ? "#6d4aff" : "#1563d6";
   const soft = accent === "violet" ? "#ece8ff" : "#e4eefb";
   const sales = slug.includes("sales");
