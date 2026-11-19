@@ -16,7 +16,12 @@ const nextConfig: NextConfig = {
   // This app lives in a folder of the website's repository; keep Next from treating the repo root as the project.
   turbopack: { root: import.meta.dirname },
   outputFileTracingRoot: import.meta.dirname,
-  outputFileTracingIncludes: { "/**": ["./drizzle/**", "./public/brand/**"] },
+  outputFileTracingIncludes: {
+    "/**": ["./drizzle/**", "./public/brand/**"],
+    // Paid course files are kept out of public/ and served only to students who paid (lib/course-files.ts).
+    "/lessons/[...path]": ["./private/lessons/**"],
+    "/slides/[...path]": ["./private/slides/**"],
+  },
   // Visiting the academy's own address without /academy would otherwise be a 404.
   async redirects() {
     return [{ source: "/", destination: "/academy", basePath: false, permanent: false }];

@@ -19,6 +19,8 @@ import { lessonLabel } from "@/lib/lesson-unit";
 import { animatedLessonId } from "@/lib/animated-lessons";
 import { AnimatedLessonPlayer } from "@/components/animated-lesson/player";
 import { MediaTabs } from "@/components/animated-lesson/media-tabs";
+import { ProtectedVideo } from "@/components/protected-content";
+import { signedFileUrl } from "@/lib/course-files";
 
 export const metadata: Metadata = { title: "Class" };
 
@@ -52,19 +54,15 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
     : [];
   const nextLesson = lessons[lessons.findIndex((l) => l.id === lesson.id) + 1];
   const animated = selfPaced ? animatedLessonId(course.slug, lesson.week) : null;
+  // Content protection: students see their own name and email over the lesson and get no download links.
+  const teaching = user.role === "teacher";
+  const watermark = teaching ? null : `${user.name} · ${user.email}`;
+  const slidesFile = lesson.slides?.file.startsWith("/") ? `${env.appUrl}${signedFileUrl(lesson.slides.file)}` : lesson.slides ? slidesFileUrl(lesson.slides, env.appUrl) : null;
 
   const video = (
     <>
             {embed ? (
-              <div className="aspect-video overflow-hidden rounded-card border border-line bg-black">
-                <iframe
-                  src={embed}
-                  title={lesson.title}
-                  className="size-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                  allowFullScreen
-                />
-              </div>
+              <ProtectedVideo src={embed} title={lesson.title} watermark={watermark} />
             ) : lesson.recordingUrl ? (
               <a href={lesson.recordingUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
                 ▶ Watch the video
@@ -95,7 +93,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
             {animated ? (
               <MediaTabs
                 tabs={[
-                  { label: "✨ Animated lesson", content: <AnimatedLessonPlayer lessonId={animated} /> },
+                  { label: "✨ Animated lesson", content: <AnimatedLessonPlayer lessonId={animated} watermark={watermark} /> },
                   ...(lesson.recordingUrl ? [{ label: "▶ Video", content: video }] : []),
                 ]}
               />
@@ -116,15 +114,17 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
               Lesson slides
             </h2>
             {lesson.slides.images.length > 0 ? (
-              <SlideViewer title={lesson.title} images={lesson.slides.images} fileUrl={lesson.slides.file} />
+              <SlideViewer title={lesson.title} images={lesson.slides.images} fileUrl={teaching ? lesson.slides.file : null} watermark={watermark} />
             ) : (
               <>
-                <div className="aspect-video overflow-hidden rounded-card border border-line bg-surface-2">
-                  <iframe src={officeViewerUrl(slidesFileUrl(lesson.slides, env.appUrl))} title={`${lesson.title} slides`} className="size-full" allowFullScreen />
+                <div className="aspect-video overflow-hidden rounded-card border border-line bg-surface-2 print:hidden">
+                  <iframe src={officeViewerUrl(slidesFile!)} title={`${lesson.title} slides`} className="size-full" allowFullScreen />
                 </div>
-                <a href={slidesFileUrl(lesson.slides, env.appUrl)} download className="btn-secondary mt-3 text-sm">
-                  ↓ Download the PowerPoint
-                </a>
+                {teaching && (
+                  <a href={slidesFileUrl(lesson.slides, env.appUrl)} download className="btn-secondary mt-3 text-sm">
+                    ↓ Download the PowerPoint
+                  </a>
+                )}
               </>
             )}
           </section>

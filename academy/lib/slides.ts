@@ -1,6 +1,6 @@
 import type { LessonSlides } from "@/lib/db/schema";
 
-/** A PowerPoint link the teacher can give a lesson: a web address, or a file in this site's public/slides folder. */
+/** A PowerPoint link the teacher can give a lesson: a web address, or a file in this site's private/slides folder. */
 function isSlidesLink(file: string) {
   return /^https:\/\/\S+$/.test(file) || /^\/academy\/slides\/[\w./-]+$/.test(file);
 }

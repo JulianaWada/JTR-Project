@@ -25,7 +25,7 @@ export type CourseTemplate = {
   quizzes: { week: number; title: string; questions: QuizQuestion[] }[];
 };
 
-/** A lesson's branded slides: the PowerPoint and one image per slide, in public/slides/<course>/<lesson>. */
+/** A lesson's branded slides: the PowerPoint and one image per slide, in private/slides/<course>/<lesson>. */
 function deck(course: string, lesson: string, count: number): LessonSlides {
   const dir = `/academy/slides/${course}/${lesson}`;
   return { file: `${dir}.pptx`, images: Array.from({ length: count }, (_, i) => `${dir}/${String(i + 1).padStart(2, "0")}.webp`) };
