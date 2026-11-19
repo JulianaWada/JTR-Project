@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { BrandBadge } from "./cartoon";
-import { ANIMATED_LESSONS } from "./registry";
+import { useAnimatedLesson } from "./load";
+import type { AnimatedLesson } from "./types";
 
 /** Silence after each step, matching the player and the audio track built for the video. */
 export const STEP_GAP_SECONDS = 0.7;
@@ -17,7 +18,11 @@ export function stepSeconds(step: { say: string; seconds?: number }) {
  * Playback starts when the recorder calls window.startLesson(); the title becomes "done" at the end.
  */
 export function CleanLessonRender({ lessonId }: { lessonId: string }) {
-  const lesson = ANIMATED_LESSONS[lessonId];
+  const lesson = useAnimatedLesson(lessonId);
+  return lesson ? <CleanRender lesson={lesson} /> : null;
+}
+
+function CleanRender({ lesson }: { lesson: AnimatedLesson }) {
   const flat = useMemo(() => (lesson?.scenes ?? []).flatMap((s, scene) => s.steps.map((st, step) => ({ scene, step, secs: stepSeconds(st) }))), [lesson]);
   const [i, setI] = useState(0);
   const [startedAt, setStartedAt] = useState(0);

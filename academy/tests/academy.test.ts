@@ -29,6 +29,7 @@ import { applyAsTeacher, reviewTeacher } from "@/lib/teacher-applications";
 import { brandFor, canManageCohort, canManageCourse, cleanImage, JTR_BRAND, ownCohortIds, teachesCourse } from "@/lib/teachers";
 import { teacherDashboard } from "@/lib/teacher";
 import { publishedCourses } from "@/lib/catalog";
+import { canOpenCourseFile, courseFilePath, signedFileUrl, validSignature } from "@/lib/course-files";
 import { canReview, ownReview, publicName, publicReviews, ratingSummaries } from "@/lib/reviews";
 
 let db: Database;
@@ -255,7 +256,7 @@ describe("recorded course", () => {
       expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
         counts.map((n, i) => [i + 1, `/academy/slides/boost-sales-with-ai/lesson-${i + 1}.pptx`, n]),
       );
-      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "private/"))).toBe(true);
     };
     check(seeded.salesSelfPaced.classes);
 
@@ -277,7 +278,7 @@ describe("recorded course", () => {
       expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
         counts.map((n, i) => [i + 1, `/academy/slides/animation-videos-with-ai/day-${i + 1}.pptx`, n]),
       );
-      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "private/"))).toBe(true);
     };
     const cohortId = seeded.animationNext.cohort.id;
     const byDay = () => db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
@@ -816,5 +817,65 @@ describe("course ratings and reviews", () => {
     expect(publicName("  Efe ")).toBe("Efe");
     expect(publicName("Mary Jane van dyke")).toBe("Mary D.");
     expect(publicName("")).toBe("A student");
+  });
+});
+
+describe("paid course files", () => {
+  const audio = "/academy/lessons/boost-sales-with-ai/1/step-01.mp3";
+  const slide = "/academy/slides/boost-sales-with-ai/lesson-1/01.webp";
+  const animationSlide = "/academy/slides/animation-videos-with-ai/day-1/01.webp";
+
+  it("keeps lesson audio and slides out of the public folder", () => {
+    expect(existsSync("public/lessons")).toBe(false);
+    expect(existsSync("public/slides")).toBe(false);
+    expect(existsSync("private/lessons/boost-sales-with-ai/1/step-01.mp3")).toBe(true);
+  });
+
+  it("only gives them to the course's paid students and its teacher", async () => {
+    expect(await canOpenCourseFile(db, null, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "boost-sales-with-ai", slide)).toBe(false);
+
+    // Checkout started but not paid: still no.
+    await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+
+    const reference = await enrolAndPay(seeded.salesSelfPaced.cohort.id);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(true);
+    expect(await canOpenCourseFile(db, student, "slides", "boost-sales-with-ai", slide)).toBe(true);
+    // Paying for one course doesn't open another.
+    expect(await canOpenCourseFile(db, student, "lessons", "ai-agents-without-code", "/academy/lessons/ai-agents-without-code/1/step-01.mp3")).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide)).toBe(false);
+
+    // A full refund takes the files away again.
+    const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    await markPaymentRefunded(db, reference, payment!.amountKobo);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+
+    expect(await canOpenCourseFile(db, { id: "x", role: "teacher", isAdmin: true }, "slides", "animation-videos-with-ai", animationSlide)).toBe(true);
+  });
+
+  it("opens a live class's slides on the class day, like its other resources", async () => {
+    await enrolAndPay(seeded.animationNext.cohort.id);
+    const day1 = seeded.animationNext.classes.find((c) => c.week === 1)!;
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide, unlocksAt(day1))).toBe(true);
+  });
+
+  it("refuses anything that isn't a plain course file", () => {
+    expect(courseFilePath("lessons", ["boost-sales-with-ai", "1", "step-01.mp3"])).toMatch(/private\/lessons\/boost-sales-with-ai\/1\/step-01\.mp3$/);
+    expect(courseFilePath("lessons", ["..", "..", "lib", "env.ts"])).toBeNull();
+    expect(courseFilePath("slides", ["boost-sales-with-ai", "..%2F..%2Fsecret.pptx"])).toBeNull();
+    expect(courseFilePath("slides", ["boost-sales-with-ai", "notes.txt"])).toBeNull();
+  });
+
+  it("signs short-lived links for the PowerPoint viewer and rejects tampered or expired ones", () => {
+    const file = "/academy/slides/boost-sales-with-ai/lesson-1.pptx";
+    const now = Date.now();
+    const q = new URL(signedFileUrl(file, now), "https://academy.test").searchParams;
+    expect(validSignature(file, q.get("expires"), q.get("sig"), now)).toBe(true);
+    expect(validSignature("/academy/slides/boost-sales-with-ai/lesson-2.pptx", q.get("expires"), q.get("sig"), now)).toBe(false);
+    expect(validSignature(file, q.get("expires"), "forged", now)).toBe(false);
+    expect(validSignature(file, q.get("expires"), q.get("sig"), now + 11 * 60_000)).toBe(false);
   });
 });

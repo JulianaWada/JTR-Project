@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Watermark, noCopyProps } from "@/components/protected-content";
 
 /**
  * The lesson's slides, clicked through inside the page like the video: previous and next buttons,
- * arrow keys, swiping on phones, full screen, and a download link for the PowerPoint file.
+ * arrow keys, swiping on phones and full screen. Students see the student's watermark and no download link
+ * (content protection); the teacher also gets the PowerPoint file.
  */
-export function SlideViewer({ title, images, fileUrl }: { title: string; images: string[]; fileUrl: string }) {
+export function SlideViewer({ title, images, fileUrl = null, watermark = null }: { title: string; images: string[]; fileUrl?: string | null; watermark?: string | null }) {
   const [index, setIndex] = useState(0);
   const frame = useRef<HTMLDivElement>(null);
   const touchX = useRef<number | null>(null);
@@ -43,6 +45,7 @@ export function SlideViewer({ title, images, fileUrl }: { title: string; images:
         ref={frame}
         tabIndex={0}
         onKeyDown={onKey}
+        {...noCopyProps}
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
           if (touchX.current === null) return;
@@ -50,12 +53,13 @@ export function SlideViewer({ title, images, fileUrl }: { title: string; images:
           if (Math.abs(dx) > 40) go(index + (dx < 0 ? 1 : -1));
           touchX.current = null;
         }}
-        className="group relative aspect-video overflow-hidden rounded-card border border-line bg-[#0b1a33] outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group relative aspect-video select-none overflow-hidden rounded-card border border-line bg-[#0b1a33] outline-none print:hidden focus-visible:ring-2 focus-visible:ring-primary"
         aria-roledescription="slide viewer"
         aria-label={`${title} slides`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- plain images keep the slides crisp at any size */}
-        <img src={images[index]} alt={`${title}, slide ${index + 1} of ${images.length}`} className="size-full object-contain" />
+        <img src={images[index]} alt={`${title}, slide ${index + 1} of ${images.length}`} className="size-full object-contain" draggable={false} />
+        {watermark && <Watermark text={watermark} />}
         {/* Click areas over the slide. They never take focus, so no focus outline is drawn across the slide
             (the buttons below and the arrow keys do the same job for keyboard users). */}
         <button
@@ -89,9 +93,11 @@ export function SlideViewer({ title, images, fileUrl }: { title: string; images:
           <button type="button" className="btn-secondary text-sm" onClick={fullScreen}>
             ⛶ Full screen
           </button>
-          <a href={fileUrl} download className="btn-secondary text-sm">
-            ↓ PowerPoint
-          </a>
+          {fileUrl && (
+            <a href={fileUrl} download className="btn-secondary text-sm">
+              ↓ PowerPoint
+            </a>
+          )}
         </div>
       </div>
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
