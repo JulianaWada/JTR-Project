@@ -1,3 +1,10 @@
+import { withCourseFrame } from "./lessons/ai-agents-frame";
+import { aiAgentsLesson1 } from "./lessons/ai-agents-1";
+import { aiAgentsLesson2 } from "./lessons/ai-agents-2";
+import { aiAgentsLesson3 } from "./lessons/ai-agents-3";
+import { aiAgentsLesson4 } from "./lessons/ai-agents-4";
+import { aiAgentsLesson5 } from "./lessons/ai-agents-5";
+import { aiAgentsLesson6 } from "./lessons/ai-agents-6";
 import { boostSalesLesson1 } from "./lessons/boost-sales-1";
 import { boostSalesLesson2 } from "./lessons/boost-sales-2";
 import { boostSalesLesson3 } from "./lessons/boost-sales-3";
@@ -30,5 +37,5 @@ function withVoice(lesson: AnimatedLesson): AnimatedLesson {
 
 /** Every animated lesson, by "<course slug>/<lesson number>". Keep in step with lib/animated-lessons.ts. */
 export const ANIMATED_LESSONS: Record<string, AnimatedLesson> = Object.fromEntries(
-  [boostSalesLesson1, boostSalesLesson2, boostSalesLesson3, boostSalesLesson4, boostSalesLesson5, boostSalesLesson6].map((l) => [l.id, withVoice(l)]),
+  [boostSalesLesson1, boostSalesLesson2, boostSalesLesson3, boostSalesLesson4, boostSalesLesson5, boostSalesLesson6, ...[aiAgentsLesson1, aiAgentsLesson2, aiAgentsLesson3, aiAgentsLesson4, aiAgentsLesson5, aiAgentsLesson6].map(withCourseFrame)].map((l) => [l.id, withVoice(l)]),
 );

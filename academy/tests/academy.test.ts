@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { needsLink, openClass, outsideLink, roomName, roomPass, usesJtrRoom } from "@/lib/class-room";
-import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
+import { ensureAddedCourses, ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
@@ -729,6 +729,34 @@ describe("many teachers", () => {
     const role = teachesCourse(bisi, seeded.animationCourse) ? "teacher" : "student";
     expect(role).toBe("student");
     expect(isLocked(lesson, seeded.animationNext.cohort, { role }, new Date(lesson.startsAt.getTime() - 3 * 86400000))).toBe(true);
+  });
+});
+
+describe("How to Build AI Agents Without Code", () => {
+  it("is added once to an academy that already has courses, as a recorded course with six lessons", async () => {
+    const [added] = await ensureAddedCourses(db);
+    expect(added).toMatchObject({ slug: "ai-agents-without-code", format: "recorded", priceKobo: 1_500_000, priceUsdCents: 3900, teacherId: null, published: true });
+    expect(await ensureAddedCourses(db)).toEqual([]);
+
+    const [selfPaced] = await ensureSelfPacedCohorts(db);
+    expect(selfPaced.cohort.courseId).toBe(added.id);
+    expect(selfPaced.classes.map((c) => c.title)).toEqual([
+      "What an AI agent can do for your business",
+      "Write your assistant's brain sheet",
+      "Set up your accounts",
+      "Build the assistant",
+      "Take orders and payments",
+      "Test, launch and improve",
+    ]);
+    expect(selfPaced.classes[2].notes).toContain("Botpress");
+    const final = await db.query.assignments.findFirst({ where: and(eq(schema.assignments.courseId, added.id), eq(schema.assignments.isFinalProject, true)) });
+    expect(final?.week).toBe(6);
+    expect((await publishedCourses(db)).some((c) => c.slug === "ai-agents-without-code")).toBe(true);
+  });
+
+  it("is not added to an empty database (the first start seeds it instead)", async () => {
+    const empty = await createInMemoryDb();
+    expect(await ensureAddedCourses(empty)).toEqual([]);
   });
 });
 
