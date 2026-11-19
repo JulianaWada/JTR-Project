@@ -101,7 +101,7 @@ describe("enrolment and payment", () => {
   it("lets students abroad pay the dollar price, with discount codes, and checks the currency", async () => {
     const cohortId = seeded.animationNext.cohort.id;
     expect(seeded.animationCourse.priceUsdCents).toBe(3500);
-    expect(seeded.salesCourse.priceUsdCents).toBe(3500);
+    expect(seeded.salesCourse.priceUsdCents).toBe(3900);
     // A course the teacher left without a dollar price can only be paid in naira.
     await db.update(schema.courses).set({ priceUsdCents: null }).where(eq(schema.courses.id, seeded.salesCourse.id));
     expect(await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null, "USD")).toEqual({ error: expect.stringContaining("naira") });
@@ -370,6 +370,31 @@ describe("prices by location", () => {
     expect(localPrice("GB", both)).toEqual({ currency: "USD", minor: 3500 });
     expect(localPrice("US", both)).toEqual({ currency: "USD", minor: 3500 });
     expect(currencyFor("GB", { priceUsdCents: null })).toBe("NGN");
+  });
+});
+
+describe("Boost Sales with AI launch price", () => {
+  it("costs N15,000 in Nigeria and $39 abroad, and the 80% student code still works", async () => {
+    const course = seeded.salesCourse;
+    expect(localPrice("NG", course)).toEqual({ currency: "NGN", minor: 1_500_000 });
+    expect(localPrice("GB", course)).toEqual({ currency: "USD", minor: 3900 });
+    expect(localPrice("US", course)).toEqual({ currency: "USD", minor: 3900 });
+
+    await db.insert(schema.discountCodes).values({ code: "STUDENT80", percentOff: 80, courseId: course.id });
+    expect(await priceFor(db, course.id, course.priceKobo, "student80")).toEqual({ amountKobo: 300_000, code: "STUDENT80" });
+    const result = await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, "student80", "USD");
+    const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;
+    const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    expect(payment).toMatchObject({ amountKobo: 780, listPriceKobo: 3900, currency: "USD", discountCode: "STUDENT80" });
+  });
+
+  it("migration 0013 moves the live course from the old price to the launch price", async () => {
+    await db.update(schema.courses).set({ priceKobo: 5_000_000, priceUsdCents: 3500 }).where(eq(schema.courses.id, seeded.salesCourse.id));
+    await db.execute(readFileSync("drizzle/0013_boost_sales_price.sql", "utf8"));
+    const sales = await db.query.courses.findFirst({ where: eq(schema.courses.id, seeded.salesCourse.id) });
+    expect(sales).toMatchObject({ priceKobo: 1_500_000, priceUsdCents: 3900 });
+    const animation = await db.query.courses.findFirst({ where: eq(schema.courses.id, seeded.animationCourse.id) });
+    expect(animation).toMatchObject({ priceKobo: 5_000_000, priceUsdCents: 3500 });
   });
 });
 
