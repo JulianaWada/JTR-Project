@@ -25,7 +25,13 @@ async function createPglite(dataDir?: string): Promise<DbState> {
 
 function createPostgres(url: string): DbState {
   // `prepare: false` keeps it compatible with Supabase's transaction pooler (port 6543).
-  const client = drizzlePostgres(postgres(url, { prepare: false, max: 5 }), { schema });
+  // Vercel keeps a warm server alive for hours between visits, while Supabase's pooler drops connections that sit idle.
+  // Reusing such a dropped connection made the first page after a quiet spell fail with "a server error occurred".
+  // So idle connections are closed after 20 s, none lives longer than 5 minutes, and a stuck connect gives up after 10 s.
+  const client = drizzlePostgres(
+    postgres(url, { prepare: false, max: 5, idle_timeout: 20, max_lifetime: 60 * 5, connect_timeout: 10 }),
+    { schema },
+  );
   const db = client as unknown as Database;
   // Migrations run at build time (scripts/migrate.ts). As a safety net, a cold start also applies any the build missed
   // (already-applied ones are skipped, so this is one quick query). A failure here is logged, never fatal.
@@ -48,12 +54,18 @@ export async function getDb(): Promise<Database> {
     pending ??= (async () => {
       const state = env.databaseUrl ? createPostgres(env.databaseUrl) : await createPglite(env.pgliteDir);
       await state.ready;
+      // Start-up housekeeping (demo data, Jules's teacher login, self-paced intakes) must never take the page down:
+      // a hiccup here is logged and tried again on the next cold start, and the visitor still gets their page.
+      try {
+        const { ensureDemoData, ensureTeacherAccount } = await import("@/lib/seed");
+        await ensureDemoData(state.db);
+        await ensureTeacherAccount(state.db);
+        const { ensureSelfPacedCohorts } = await import("@/lib/self-paced");
+        await ensureSelfPacedCohorts(state.db);
+      } catch (err) {
+        console.error("[db] Start-up housekeeping failed, carrying on:", err);
+      }
       globalForDb.__jtrAcademyDb = state;
-      const { ensureDemoData, ensureTeacherAccount } = await import("@/lib/seed");
-      await ensureDemoData(state.db);
-      await ensureTeacherAccount(state.db);
-      const { ensureSelfPacedCohorts } = await import("@/lib/self-paced");
-      await ensureSelfPacedCohorts(state.db);
       return state;
     })();
     // A failed start (e.g. the database is unreachable) is retried on the next request.
