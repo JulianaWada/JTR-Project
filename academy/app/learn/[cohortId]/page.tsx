@@ -12,6 +12,8 @@ import { formatDate, formatDateTime } from "@/lib/time";
 import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { lessonLabel } from "@/lib/lesson-unit";
 import { animatedLessonId } from "@/lib/animated-lessons";
+import { Stars } from "@/components/stars";
+import { canReview, ownReview } from "@/lib/reviews";
 
 export const metadata: Metadata = { title: "Course" };
 
@@ -63,6 +65,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
   const locked = lockedWeeks(lessons, cohort, user);
   const shortDate = (d: Date) => formatDate(d).replace(/ \d{4}$/, "");
   const nextToWatch = selfPaced ? lessons.find((l) => !attended.has(l.id)) : undefined;
+  // At the end of the course, students are asked to rate it.
+  const reviewOpen = user.role !== "teacher" && (await canReview(db, user.id, cohortId));
+  const myReview = reviewOpen ? await ownReview(db, user.id, course.id) : null;
 
   return (
     <>
@@ -250,6 +255,27 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
         </div>
 
         <aside className="space-y-6">
+          {reviewOpen &&
+            (myReview ? (
+              <section className="card">
+                <h2 className="font-display text-lg font-semibold text-ink">Your review</h2>
+                <Stars value={myReview.rating} className="mt-2 text-xl" />
+                {myReview.comment && <p className="mt-2 line-clamp-3 text-sm text-ink">&ldquo;{myReview.comment}&rdquo;</p>}
+                <Link href={`/learn/${cohortId}/review`} className="btn-secondary btn-sm mt-4">
+                  Edit my review
+                </Link>
+              </section>
+            ) : (
+              <section className="card border-gold bg-gold-soft/40">
+                <p className="eyebrow">You made it to the end 🎉</p>
+                <h2 className="mt-1 font-display text-lg font-semibold text-ink">How was this course?</h2>
+                <p className="mt-1 text-sm text-muted">Rate it and leave a short review. It takes a minute and helps other students choose.</p>
+                <Stars value={0} className="mt-3 text-2xl" label="Not rated yet" />
+                <Link href={`/learn/${cohortId}/review`} className="btn-primary btn-sm mt-4 flex w-fit">
+                  Rate this course
+                </Link>
+              </section>
+            ))}
           <section className="card">
             <h2 className="font-display text-lg font-semibold text-ink">Your certificate</h2>
             {progress.certificateCode ? (
