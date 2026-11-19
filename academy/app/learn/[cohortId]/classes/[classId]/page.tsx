@@ -16,6 +16,9 @@ import { env } from "@/lib/env";
 import { officeViewerUrl, slidesFileUrl } from "@/lib/slides";
 import { setLessonWatched } from "./actions";
 import { lessonLabel } from "@/lib/lesson-unit";
+import { animatedLessonId } from "@/lib/animated-lessons";
+import { AnimatedLessonPlayer } from "@/components/animated-lesson/player";
+import { MediaTabs } from "@/components/animated-lesson/media-tabs";
 
 export const metadata: Metadata = { title: "Class" };
 
@@ -48,22 +51,10 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
       })
     : [];
   const nextLesson = lessons[lessons.findIndex((l) => l.id === lesson.id) + 1];
+  const animated = selfPaced ? animatedLessonId(course.slug, lesson.week) : null;
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-      <article>
-        <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
-          ← {course.title}
-        </Link>
-        <p className="eyebrow mt-4">{`${lessonLabel(course, selfPaced)} ${lesson.week}`}</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{lesson.title}</h1>
-        {!selfPaced && (
-          <p className="mt-2 text-muted">
-            {formatDateTime(lesson.startsAt)} Lagos time · {lesson.durationMinutes} minutes
-          </p>
-        )}
-        {selfPaced && (
-          <div className="mt-6">
+  const video = (
+    <>
             {embed ? (
               <div className="aspect-video overflow-hidden rounded-card border border-line bg-black">
                 <iframe
@@ -82,6 +73,34 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
               <div className="grid aspect-video place-items-center rounded-card border border-dashed border-line bg-surface-2 p-6 text-center text-muted">
                 The video for this lesson is coming soon. The notes below are ready now.
               </div>
+            )}
+    </>
+  );
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <article>
+        <Link href={`/learn/${cohortId}`} className="text-sm text-muted hover:text-primary">
+          ← {course.title}
+        </Link>
+        <p className="eyebrow mt-4">{`${lessonLabel(course, selfPaced)} ${lesson.week}`}</p>
+        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">{lesson.title}</h1>
+        {!selfPaced && (
+          <p className="mt-2 text-muted">
+            {formatDateTime(lesson.startsAt)} Lagos time · {lesson.durationMinutes} minutes
+          </p>
+        )}
+        {selfPaced && (
+          <div className="mt-6">
+            {animated ? (
+              <MediaTabs
+                tabs={[
+                  { label: "✨ Animated lesson", content: <AnimatedLessonPlayer lessonId={animated} /> },
+                  ...(lesson.recordingUrl ? [{ label: "▶ Video", content: video }] : []),
+                ]}
+              />
+            ) : (
+              video
             )}
           </div>
         )}
@@ -139,7 +158,7 @@ export default async function ClassPage({ params }: PageProps<"/learn/[cohortId]
               </>
             ) : (
               <>
-                <p className="mt-2 text-sm text-muted">Finished the video? Mark it done. Every lesson counts towards your certificate.</p>
+                <p className="mt-2 text-sm text-muted">Finished the lesson? Mark it done. Every lesson counts towards your certificate.</p>
                 {user.role !== "teacher" && (
                   <form action={setLessonWatched.bind(null, cohortId, lesson.id, true)}>
                     <button className="btn-primary mt-3 w-full">✓ Mark lesson as done</button>
