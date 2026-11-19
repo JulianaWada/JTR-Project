@@ -60,7 +60,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
               <Pill>{recorded ? `${course.outline.length} lessons · learn at your own pace` : course.lessonUnit === "day" ? `${course.outline.length} days · 1 class a day` : `${course.outline.length} weeks · 1 class a week`}</Pill>
               <Pill>Certificate</Pill>
             </div>
-            <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-primary sm:text-5xl">{course.title}</h1>
+            <h1 className="mt-4 font-display text-4xl font-semibold text-balance text-navy sm:text-5xl dark:text-ink">{course.title}</h1>
             <p className="mt-4 text-lg font-medium text-primary">{course.tagline}</p>
             {reviews.total > 0 && (
               <a href="#reviews" className="mt-4 inline-flex items-center gap-2 text-sm hover:underline">
