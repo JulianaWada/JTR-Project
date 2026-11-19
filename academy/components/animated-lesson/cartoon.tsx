@@ -18,7 +18,7 @@ export const SKIN = {
 } satisfies Record<string, Skin>;
 
 export type Pose = "idle" | "wave" | "point" | "cheer" | "present" | "hold";
-export type Mood = "happy" | "neutral" | "worried" | "surprised";
+export type Mood = "happy" | "thinking" | "excited";
 export type Hair = "gele" | "puff" | "short" | "bun" | "braids";
 
 type CharacterProps = {
@@ -43,6 +43,8 @@ type CharacterProps = {
   faded?: boolean;
   /** Something held in the right hand (drawn at the hand). */
   holding?: ReactNode;
+  /** A short, neat beard. */
+  beard?: boolean;
 };
 
 const ARM_ANGLES: Record<Pose, [number, number]> = {
@@ -72,6 +74,7 @@ export function Character({
   talking = false,
   faded = false,
   holding,
+  beard = false,
 }: CharacterProps) {
   const id = useId().replace(/:/g, "");
   const shade = outfitDark ?? darken(outfit);
@@ -168,6 +171,7 @@ export function Character({
           </>
         )}
 
+        {beard && <path d="M-48 -292 Q-46 -236 0 -232 Q46 -236 48 -292 Q40 -258 0 -252 Q-40 -258 -48 -292Z" fill={hairColor} opacity="0.9" />}
         <Face mood={mood} talking={talking} lashes={hair !== "short"} />
 
         {/* front arm */}
@@ -246,9 +250,15 @@ function HairFront({ hair, fill, stroke }: { hair: Hair; fill: string; stroke: s
   return null;
 }
 
+/**
+ * Faces are always friendly (Jules: no sad or angry faces). "thinking" looks up with a soft smile,
+ * "excited" has raised brows and a big open smile.
+ */
 function Face({ mood, talking, lashes }: { mood: Mood; talking: boolean; lashes: boolean }) {
-  const brow =
-    mood === "worried" ? ["M-34 -316 Q-22 -322 -10 -312", "M10 -312 Q22 -322 34 -316"] : mood === "surprised" ? ["M-34 -320 Q-22 -330 -10 -322", "M10 -322 Q22 -330 34 -320"] : ["M-34 -314 Q-22 -322 -10 -316", "M10 -316 Q22 -322 34 -314"];
+  // Soft arches, the inner ends a little higher than the outer ends, so the look is warm, never cross.
+  const lift = mood === "excited" ? -6 : mood === "thinking" ? -3 : 0;
+  const brow = [`M-34 ${-315 + lift} Q-22 ${-327 + lift} -10 ${-320 + lift}`, `M10 ${-320 + lift} Q22 ${-327 + lift} 34 ${-315 + lift}`];
+  const look = mood === "thinking" ? -4 : 0;
   return (
     <g>
       {brow.map((d) => (
@@ -257,31 +267,27 @@ function Face({ mood, talking, lashes }: { mood: Mood; talking: boolean; lashes:
       <g className="ac-blink">
         {[-21, 21].map((ex) => (
           <g key={ex}>
-            <ellipse cx={ex} cy="-293" rx="12" ry={mood === "surprised" ? 16 : 14} fill="#fff" />
-            <circle cx={ex + 1} cy="-290" r="8.5" fill="#2a1a10" />
-            <circle cx={ex + 1} cy="-290" r="4" fill="#000" />
-            <circle cx={ex + 4} cy="-294" r="3" fill="#fff" />
+            <ellipse cx={ex} cy="-293" rx="12" ry={mood === "excited" ? 15 : 14} fill="#fff" />
+            <circle cx={ex + 1} cy={-290 + look} r="8.5" fill="#2a1a10" />
+            <circle cx={ex + 1} cy={-290 + look} r="4" fill="#000" />
+            <circle cx={ex + 4} cy={-294 + look} r="3" fill="#fff" />
             {lashes && <path d={`M${ex - 12} -300 l-5 -4 M${ex + 12} -300 l5 -4`} stroke="#1b120d" strokeWidth="2.5" strokeLinecap="round" />}
           </g>
         ))}
       </g>
-      <ellipse cx="-36" cy="-270" rx="9" ry="5" fill="#ff6b5b" opacity="0.28" />
-      <ellipse cx="36" cy="-270" rx="9" ry="5" fill="#ff6b5b" opacity="0.28" />
+      <ellipse cx="-36" cy="-270" rx="9" ry="5" fill="#ff6b5b" opacity="0.3" />
+      <ellipse cx="36" cy="-270" rx="9" ry="5" fill="#ff6b5b" opacity="0.3" />
       <path d="M-6 -274 Q0 -268 6 -274" stroke="#3a2015" strokeWidth="3" fill="none" strokeLinecap="round" />
       {talking ? (
         <g className="ac-talk">
-          <ellipse cx="0" cy="-254" rx="12" ry="9" fill="#4a1612" />
-          <ellipse cx="0" cy="-249" rx="7" ry="3.5" fill="#d9615a" />
+          <path d="M-13 -260 Q0 -238 13 -260Z" fill="#4a1612" />
+          <ellipse cx="0" cy="-249" rx="6" ry="3" fill="#d9615a" />
         </g>
-      ) : mood === "worried" ? (
-        <path d="M-12 -252 Q0 -262 12 -252" stroke="#3a1a10" strokeWidth="4" fill="none" strokeLinecap="round" />
-      ) : mood === "surprised" ? (
-        <ellipse cx="0" cy="-254" rx="8" ry="10" fill="#4a1612" />
-      ) : mood === "neutral" ? (
-        <path d="M-12 -256 Q0 -252 12 -256" stroke="#3a1a10" strokeWidth="4" fill="none" strokeLinecap="round" />
+      ) : mood === "thinking" ? (
+        <path d="M-12 -258 Q0 -248 12 -258" stroke="#3a1a10" strokeWidth="4" fill="none" strokeLinecap="round" />
       ) : (
         <>
-          <path d="M-17 -262 Q0 -238 17 -262Z" fill="#4a1612" />
+          <path d={mood === "excited" ? "M-19 -263 Q0 -232 19 -263Z" : "M-17 -262 Q0 -238 17 -262Z"} fill="#4a1612" />
           <path d="M-13 -261 Q0 -256 13 -261 L12 -258 Q0 -253 -12 -258Z" fill="#fff" />
         </>
       )}
@@ -309,6 +315,8 @@ export const Amaka = (p: CastProps) => <Character skin={SKIN.brown} hair="gele" 
 export const Tolu = (p: CastProps) => <Character skin={SKIN.warm} hair="puff" hairColor="#20140e" outfit="#2f6fde" body="dress" {...p} />;
 /** Kemi, a make-up artist, Amaka's partner business. */
 export const Kemi = (p: CastProps) => <Character skin={SKIN.deep} hair="braids" hairColor="#1b120d" outfit="#8a3fd1" print="#f2a7ff" {...p} />;
+/** Chidi looks after Amaka's WhatsApp and Instagram orders. */
+export const Chidi = (p: CastProps) => <Character skin={SKIN.deep} hair="short" outfit="#1d4e89" print="#7fb3ff" body="shirt" trousers="#2b2f38" beard {...p} />;
 /** Emeka, a delivery rider. */
 export const Emeka = (p: CastProps) => <Character skin={SKIN.deep} hair="short" outfit="#1f9d6b" body="shirt" trousers="#26364f" {...p} />;
 
@@ -524,7 +532,7 @@ export function Boutique({ dim = false }: { dim?: boolean }) {
         <rect x="146" y="12" width="8" height="176" fill="#8a5330" />
       </g>
       {/* shop sign */}
-      <g transform="translate(620 22)">
+      <g transform="translate(300 22)">
         <rect width="260" height="56" rx="14" fill="#0a1a33" />
         <text x="130" y="38" fontSize="26" fontWeight={700} fill="#ffd45c" textAnchor="middle" fontFamily="var(--font-heading)">
           Amaka&apos;s Styles
@@ -583,6 +591,24 @@ export function SceneTitle({ text }: { text: string }) {
       <rect width={36 + text.length * 12.2} height="46" rx="23" fill="#0a1a33" />
       <text x="20" y="31" fontSize="21" fontWeight={700} fill="#fff" fontFamily="var(--font-heading)">
         {text}
+      </text>
+    </g>
+  );
+}
+
+/** The JTR Academy badge in the top right corner of every scene (emblem without "LTD"). */
+export function BrandBadge() {
+  return (
+    <g transform="translate(776 14)" aria-label="JTR Academy">
+      <rect x="2" y="4" width="170" height="52" rx="26" fill="#0a1a33" opacity="0.18" />
+      <rect width="170" height="52" rx="26" fill="#0a1a33" />
+      {/* Served from /public under the app's /academy base path. */}
+      <image href="/academy/brand/jtr-emblem.png" x="6" y="4" width="44" height="44" />
+      <text x="58" y="25" fontSize="18" fontWeight={800} fill="#ffffff" letterSpacing="2" fontFamily="var(--font-heading)">
+        JTR
+      </text>
+      <text x="58" y="42" fontSize="11" fontWeight={600} fill="#b4bfcd" letterSpacing="2.5">
+        ACADEMY
       </text>
     </g>
   );

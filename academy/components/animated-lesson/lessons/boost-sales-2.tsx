@@ -1,6 +1,6 @@
 "use client";
 
-import { Amaka, Appear, Boutique, Bubble, Character, Chip, Emeka, Kemi, Laptop, Phone, SKIN, SceneTitle, Studio, Tick, Tolu, Typed } from "../cartoon";
+import { Amaka, Appear, Boutique, Bubble, Character, Chidi, Chip, Emeka, Kemi, Laptop, Phone, SKIN, SceneTitle, Studio, Tick, Tolu, Typed } from "../cartoon";
 import type { AnimatedLesson, SceneProps } from "../types";
 
 /*
@@ -15,6 +15,9 @@ function Welcome({ step, talking }: SceneProps) {
     <g>
       <Boutique />
       <SceneTitle text="Know your customer" />
+      <Appear show from="left" delay={400}>
+        <Chidi x={215} y={510} scale={0.92} pose={step === 0 ? "wave" : "idle"} />
+      </Appear>
       <Appear show from="left">
         <Amaka x={430} y={505} pose={step === 0 ? "wave" : step === 2 ? "point" : "present"} talking={talking} />
       </Appear>
@@ -101,7 +104,7 @@ function Everybody({ step, talking }: SceneProps) {
         y={505}
         scale={0.9}
         pose={step <= 1 ? "point" : "present"}
-        mood={step === 1 ? "worried" : "happy"}
+        mood={step === 1 ? "thinking" : "happy"}
         talking={talking}
         holding={
           step <= 1 ? (
@@ -128,7 +131,7 @@ function Everybody({ step, talking }: SceneProps) {
                 outfit={CROWD_COLOURS[i % CROWD_COLOURS.length]}
                 body={i % 4 === 0 ? "shirt" : "dress"}
                 faded={step >= 1}
-                mood={step >= 1 ? "neutral" : "happy"}
+                mood={step >= 1 ? "thinking" : "happy"}
                 flip={i % 2 === 0}
               />
               <Appear show={step === 1} from="down" delay={i * 60}>
@@ -276,7 +279,7 @@ function Chats({ step, talking }: SceneProps) {
         </Appear>
       </Phone>
 
-      <Amaka x={355} y={520} scale={0.58} pose={step >= 4 ? "cheer" : "present"} mood={step >= 4 ? "surprised" : "happy"} talking={talking} />
+      <Chidi x={355} y={520} scale={0.58} pose={step >= 4 ? "cheer" : "present"} mood={step >= 4 ? "excited" : "happy"} talking={talking} />
 
       <Laptop x={470} y={120} scale={1.08}>
         <Appear show={step >= 2} from="pop" delay={900}>
@@ -348,7 +351,7 @@ function Objections({ step, talking }: SceneProps) {
           </Appear>
         ))}
       </Laptop>
-      <Tolu x={800} y={510} scale={0.85} flip mood={step >= 2 ? "happy" : "worried"} talking={false} holding={step >= 2 ? <ShoppingBag /> : undefined} />
+      <Tolu x={800} y={510} scale={0.85} flip mood={step >= 2 ? "excited" : "thinking"} talking={false} holding={step >= 2 ? <ShoppingBag /> : undefined} />
       {OBJECTIONS.map(([worry, answer], i) => (
         <g key={worry}>
           <Appear show={step >= 1} from="pop" delay={i * 600}>
@@ -626,7 +629,7 @@ export const boostSalesLesson2: AnimatedLesson = {
       heading: "Know your customer",
       Scene: Welcome,
       steps: [
-        { say: "Welcome back! Meet Amaka. She sells ready-to-wear outfits from her boutique in Yaba, Lagos." },
+        { say: "Welcome back! Meet Amaka. She sells ready-to-wear outfits from her boutique in Yaba, Lagos. And this is Chidi, who answers her WhatsApp and Instagram orders." },
         { say: "In lesson one, you learned the golden rule: give AI context." },
         { say: "Today, Amaka will use AI to understand the most important person in her business: her customer." },
         { say: "When you know exactly who you are selling to, selling becomes much easier." },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BrandBadge } from "./cartoon";
 import { ANIMATED_LESSONS } from "./registry";
 
 type Position = { scene: number; step: number };
@@ -129,6 +130,7 @@ export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
             <g key={pos.scene} className="ac-scene-in">
               <Scene step={pos.step} talking={talking && playing} />
             </g>
+            <BrandBadge />
           </svg>
         </button>
 
