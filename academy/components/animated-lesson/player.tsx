@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BrandBadge } from "./cartoon";
-import { ANIMATED_LESSONS } from "./registry";
+import { Watermark, noCopyProps } from "@/components/protected-content";
+import { useAnimatedLesson } from "./load";
+import type { AnimatedLesson } from "./types";
 
 type Position = { scene: number; step: number };
 
@@ -12,8 +14,16 @@ type Position = { scene: number; step: number };
  * the device has one), or a recorded audio file when a step has one. There are no captions on the
  * picture; a transcript is available below it for anyone who needs it.
  */
-export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
-  const lesson = ANIMATED_LESSONS[lessonId];
+export function AnimatedLessonPlayer({ lessonId, watermark = null }: { lessonId: string; watermark?: string | null }) {
+  const lesson = useAnimatedLesson(lessonId);
+  if (lesson === undefined) {
+    return <div className="grid aspect-video place-items-center rounded-card border border-line bg-[#0b1a33] text-sm text-white/70">Loading the lesson…</div>;
+  }
+  if (!lesson) return null;
+  return <Player lesson={lesson} watermark={watermark} />;
+}
+
+function Player({ lesson, watermark }: { lesson: AnimatedLesson; watermark: string | null }) {
   const [pos, setPos] = useState<Position>({ scene: 0, step: 0 });
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -24,7 +34,7 @@ export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
   const frame = useRef<HTMLDivElement>(null);
   const voice = useVoice();
 
-  const scenes = useMemo(() => lesson?.scenes ?? [], [lesson]);
+  const scenes = lesson.scenes;
   const scene = scenes[pos.scene];
   const minutes = useMemo(() => {
     const words = scenes.reduce((n, s) => n + s.steps.reduce((m, st) => m + st.say.split(/\s+/).length, 0), 0);
@@ -64,7 +74,7 @@ export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
 
   useEffect(() => () => stopSpeech(), []);
 
-  if (!lesson || !scene) return null;
+  if (!scene) return null;
   const { Scene } = scene;
 
   function start() {
@@ -120,7 +130,8 @@ export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
         ref={frame}
         tabIndex={0}
         onKeyDown={onKey}
-        className="relative overflow-hidden rounded-card border border-line bg-[#0b1a33] outline-none focus-visible:ring-2 focus-visible:ring-primary [&:fullscreen]:flex [&:fullscreen]:flex-col [&:fullscreen]:justify-center"
+        {...noCopyProps}
+        className="relative overflow-hidden rounded-card border border-line bg-[#0b1a33] outline-none print:hidden focus-visible:ring-2 focus-visible:ring-primary [&:fullscreen]:flex [&:fullscreen]:flex-col [&:fullscreen]:justify-center"
         aria-roledescription="animated lesson"
         aria-label={`${lesson.title}, animated lesson`}
       >
@@ -133,6 +144,7 @@ export function AnimatedLessonPlayer({ lessonId }: { lessonId: string }) {
             <BrandBadge />
           </svg>
         </button>
+        {watermark && <Watermark text={watermark} />}
 
         {!started && (
           <div className="absolute inset-0 grid place-items-center bg-[#0a1a33]/55 p-4 text-center backdrop-blur-[2px]">

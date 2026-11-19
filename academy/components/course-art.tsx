@@ -7,11 +7,30 @@ const SILVER = "#c5ccd6";
  * Branded cover picture for a course: a clean white design with navy line work and the course's accent colour.
  * Drawn in SVG so it needs no image files, and it stays white in dark mode too (it is a picture, like a photo).
  */
+/** Courses with their own cover picture (a 16:9 thumbnail in public/courses), shown instead of the drawn art. */
+const COVERS: Record<string, string> = {
+  "boost-sales-with-ai": "/academy/courses/boost-sales-with-ai.webp",
+  "ai-agents-without-code": "/academy/courses/ai-agents-without-code.webp",
+};
+
 export function CourseArt({ slug, accent, className }: { slug: string; accent: "blue" | "violet"; className?: string }) {
+  const cover = COVERS[slug];
+  if (cover) {
+    // The whole picture stays visible at any card height: a soft blurred copy fills the sides.
+    return (
+      <div className={cn("relative overflow-hidden border-b border-[#e6eaf0] bg-[#0a1a33]", className ?? "h-40")}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static file, no optimisation needed */}
+        <img src={cover} alt="" aria-hidden className="absolute inset-0 size-full scale-110 object-cover opacity-70 blur-xl" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- static file, no optimisation needed */}
+        <img src={cover} alt="" aria-hidden className="relative mx-auto h-full w-auto max-w-full object-contain" />
+      </div>
+    );
+  }
   const color = accent === "violet" ? "#6d4aff" : "#1563d6";
   const soft = accent === "violet" ? "#ece8ff" : "#e4eefb";
   const sales = slug.includes("sales");
   const animation = !sales && slug.includes("animation");
+  const agents = !sales && !animation && slug.includes("agent");
   return (
     <div
       className={cn("relative overflow-hidden border-b border-[#e6eaf0]", className ?? "h-40")}
@@ -48,6 +67,39 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
               <circle r="15" fill={soft} stroke={color} strokeWidth="2" />
               <text y="5" textAnchor="middle" fontSize="15" fontWeight="700" fill={color} fontFamily="system-ui, sans-serif">+</text>
             </g>
+          </g>
+        ) : agents ? (
+          <g>
+            {/* phone with an AI assistant chatting to a customer */}
+            <rect x="230" y="16" width="96" height="132" rx="14" fill={NAVY} />
+            <rect x="236" y="26" width="84" height="116" rx="8" fill="#fff" />
+            <rect x="236" y="26" width="84" height="18" rx="8" fill={color} />
+            <circle cx="246" cy="35" r="4.5" fill="#fff" />
+            <rect x="254" y="33" width="34" height="4" rx="2" fill="#fff" opacity="0.85" />
+            <rect x="242" y="52" width="50" height="14" rx="6" fill="#eef1f6" />
+            <rect x="262" y="72" width="52" height="22" rx="6" fill={soft} />
+            <rect x="268" y="78" width="38" height="3.5" rx="1.75" fill={color} />
+            <rect x="268" y="85" width="26" height="3.5" rx="1.75" fill={color} opacity="0.6" />
+            <rect x="242" y="100" width="40" height="14" rx="6" fill="#eef1f6" />
+            <rect x="262" y="120" width="52" height="14" rx="6" fill={color} />
+            <text x="288" y="130.5" fontSize="8" fontWeight="700" fill="#fff" textAnchor="middle" fontFamily="system-ui, sans-serif">Pay</text>
+            {/* friendly robot */}
+            <g transform="translate(168 60)">
+              <line x1="22" y1="0" x2="22" y2="-10" stroke={NAVY} strokeWidth="2.5" />
+              <circle cx="22" cy="-12" r="4" fill={color} />
+              <rect width="44" height="36" rx="10" fill={NAVY} />
+              <circle cx="14" cy="16" r="4.5" fill="#fff" />
+              <circle cx="30" cy="16" r="4.5" fill="#fff" />
+              <path d="M14 26 q8 6 16 0" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+              <rect x="6" y="40" width="32" height="26" rx="8" fill={color} />
+            </g>
+            {/* speech bubble with a tick */}
+            <g transform="translate(336 54)">
+              <rect width="40" height="28" rx="9" fill="#fff" stroke="#e1e6ee" />
+              <circle cx="20" cy="14" r="8" fill="#16a34a" />
+              <path d="M16 14 l3 3 l5 -6" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+            <path d="M372 112 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z" fill={color} />
           </g>
         ) : !animation ? (
           <g>
@@ -105,7 +157,7 @@ export function CourseArt({ slug, accent, className }: { slug: string; accent: "
         className="absolute bottom-4 left-5 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase"
         style={{ color: NAVY, background: "rgba(255,255,255,0.85)", boxShadow: `inset 0 0 0 1px ${SILVER}` }}
       >
-        {sales ? "AI for sales" : animation ? "AI animation" : "Online course"}
+        {sales ? "AI for sales" : animation ? "AI animation" : agents ? "AI agents" : "Online course"}
       </span>
     </div>
   );

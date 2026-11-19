@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
 import { needsLink, openClass, outsideLink, roomName, roomPass, usesJtrRoom } from "@/lib/class-room";
-import { ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
+import { ensureAddedCourses, ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
@@ -29,6 +29,8 @@ import { applyAsTeacher, reviewTeacher } from "@/lib/teacher-applications";
 import { brandFor, canManageCohort, canManageCourse, cleanImage, JTR_BRAND, ownCohortIds, teachesCourse } from "@/lib/teachers";
 import { teacherDashboard } from "@/lib/teacher";
 import { publishedCourses } from "@/lib/catalog";
+import { canOpenCourseFile, courseFilePath, signedFileUrl, validSignature } from "@/lib/course-files";
+import { canReview, ownReview, publicName, publicReviews, ratingSummaries } from "@/lib/reviews";
 
 let db: Database;
 let seeded: Awaited<ReturnType<typeof seedCourses>>;
@@ -101,7 +103,7 @@ describe("enrolment and payment", () => {
   it("lets students abroad pay the dollar price, with discount codes, and checks the currency", async () => {
     const cohortId = seeded.animationNext.cohort.id;
     expect(seeded.animationCourse.priceUsdCents).toBe(3500);
-    expect(seeded.salesCourse.priceUsdCents).toBe(3500);
+    expect(seeded.salesCourse.priceUsdCents).toBe(3900);
     // A course the teacher left without a dollar price can only be paid in naira.
     await db.update(schema.courses).set({ priceUsdCents: null }).where(eq(schema.courses.id, seeded.salesCourse.id));
     expect(await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null, "USD")).toEqual({ error: expect.stringContaining("naira") });
@@ -254,7 +256,7 @@ describe("recorded course", () => {
       expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
         counts.map((n, i) => [i + 1, `/academy/slides/boost-sales-with-ai/lesson-${i + 1}.pptx`, n]),
       );
-      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "private/"))).toBe(true);
     };
     check(seeded.salesSelfPaced.classes);
 
@@ -276,7 +278,7 @@ describe("recorded course", () => {
       expect(rows.map((c) => [c.week, c.slides?.file, c.slides?.images.length])).toEqual(
         counts.map((n, i) => [i + 1, `/academy/slides/animation-videos-with-ai/day-${i + 1}.pptx`, n]),
       );
-      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "public/"))).toBe(true);
+      for (const c of rows) for (const f of [c.slides!.file, ...c.slides!.images]) expect(existsSync(f.replace("/academy/", "private/"))).toBe(true);
     };
     const cohortId = seeded.animationNext.cohort.id;
     const byDay = () => db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: schema.classes.week });
@@ -370,6 +372,31 @@ describe("prices by location", () => {
     expect(localPrice("GB", both)).toEqual({ currency: "USD", minor: 3500 });
     expect(localPrice("US", both)).toEqual({ currency: "USD", minor: 3500 });
     expect(currencyFor("GB", { priceUsdCents: null })).toBe("NGN");
+  });
+});
+
+describe("Boost Sales with AI launch price", () => {
+  it("costs N15,000 in Nigeria and $39 abroad, and the 80% student code still works", async () => {
+    const course = seeded.salesCourse;
+    expect(localPrice("NG", course)).toEqual({ currency: "NGN", minor: 1_500_000 });
+    expect(localPrice("GB", course)).toEqual({ currency: "USD", minor: 3900 });
+    expect(localPrice("US", course)).toEqual({ currency: "USD", minor: 3900 });
+
+    await db.insert(schema.discountCodes).values({ code: "STUDENT80", percentOff: 80, courseId: course.id });
+    expect(await priceFor(db, course.id, course.priceKobo, "student80")).toEqual({ amountKobo: 300_000, code: "STUDENT80" });
+    const result = await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, "student80", "USD");
+    const reference = (result as { redirectTo: string }).redirectTo.split("/").pop()!;
+    const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    expect(payment).toMatchObject({ amountKobo: 780, listPriceKobo: 3900, currency: "USD", discountCode: "STUDENT80" });
+  });
+
+  it("migration 0013 moves the live course from the old price to the launch price", async () => {
+    await db.update(schema.courses).set({ priceKobo: 5_000_000, priceUsdCents: 3500 }).where(eq(schema.courses.id, seeded.salesCourse.id));
+    await db.execute(readFileSync("drizzle/0013_boost_sales_price.sql", "utf8"));
+    const sales = await db.query.courses.findFirst({ where: eq(schema.courses.id, seeded.salesCourse.id) });
+    expect(sales).toMatchObject({ priceKobo: 1_500_000, priceUsdCents: 3900 });
+    const animation = await db.query.courses.findFirst({ where: eq(schema.courses.id, seeded.animationCourse.id) });
+    expect(animation).toMatchObject({ priceKobo: 5_000_000, priceUsdCents: 3500 });
   });
 });
 
@@ -703,5 +730,152 @@ describe("many teachers", () => {
     const role = teachesCourse(bisi, seeded.animationCourse) ? "teacher" : "student";
     expect(role).toBe("student");
     expect(isLocked(lesson, seeded.animationNext.cohort, { role }, new Date(lesson.startsAt.getTime() - 3 * 86400000))).toBe(true);
+  });
+});
+
+describe("How to Build AI Agents Without Code", () => {
+  it("is added once to an academy that already has courses, as a recorded course with six lessons", async () => {
+    const [added] = await ensureAddedCourses(db);
+    expect(added).toMatchObject({ slug: "ai-agents-without-code", format: "recorded", priceKobo: 1_500_000, priceUsdCents: 3900, teacherId: null, published: true });
+    expect(await ensureAddedCourses(db)).toEqual([]);
+
+    const [selfPaced] = await ensureSelfPacedCohorts(db);
+    expect(selfPaced.cohort.courseId).toBe(added.id);
+    expect(selfPaced.classes.map((c) => c.title)).toEqual([
+      "What an AI agent can do for your business",
+      "Write your assistant's brain sheet",
+      "Set up your accounts",
+      "Build the assistant",
+      "Take orders and payments",
+      "Test, launch and improve",
+    ]);
+    expect(selfPaced.classes[2].notes).toContain("Botpress");
+    const final = await db.query.assignments.findFirst({ where: and(eq(schema.assignments.courseId, added.id), eq(schema.assignments.isFinalProject, true)) });
+    expect(final?.week).toBe(6);
+    expect((await publishedCourses(db)).some((c) => c.slug === "ai-agents-without-code")).toBe(true);
+  });
+
+  it("is not added to an empty database (the first start seeds it instead)", async () => {
+    const empty = await createInMemoryDb();
+    expect(await ensureAddedCourses(empty)).toEqual([]);
+  });
+});
+
+describe("course ratings and reviews", () => {
+  async function review(userId: string, cohortId: string, courseId: string, rating: number, comment = "", status: "published" | "hidden" = "published") {
+    await db.insert(schema.courseReviews).values({ userId, cohortId, courseId, rating, comment, status });
+  }
+
+  it("lets a video-course student rate only after watching every lesson", async () => {
+    const { cohort, classes } = seeded.salesSelfPaced;
+    await enrolAndPay(cohort.id);
+    expect(await canReview(db, student.id, cohort.id)).toBe(false);
+    await db.insert(schema.attendance).values(classes.slice(0, -1).map((c) => ({ classId: c.id, userId: student.id, source: "watched" as const })));
+    expect(await canReview(db, student.id, cohort.id)).toBe(false);
+    await db.insert(schema.attendance).values({ classId: classes.at(-1)!.id, userId: student.id, source: "watched" });
+    expect(await canReview(db, student.id, cohort.id)).toBe(true);
+  });
+
+  it("lets a live-course student rate once the last class has ended", async () => {
+    expect(await canReview(db, student.id, seeded.animationNext.cohort.id)).toBe(false);
+    expect(await canReview(db, student.id, seeded.animationDone!.cohort.id)).toBe(true);
+    const last = seeded.animationNext.classes.at(-1)!;
+    expect(await canReview(db, student.id, seeded.animationNext.cohort.id, addMinutes(last.startsAt, last.durationMinutes + 1))).toBe(true);
+  });
+
+  it("averages published reviews only and shows written ones with a short name", async () => {
+    const course = seeded.salesCourse;
+    const cohortId = seeded.salesSelfPaced.cohort.id;
+    const others = await db
+      .insert(schema.users)
+      .values(["Bola Ade", "Chidi Nwosu", "Efe"].map((name, i) => ({ email: `r${i}@example.com`, name, passwordHash: "x" })))
+      .returning();
+    await review(student.id, cohortId, course.id, 5, "Changed how I sell on WhatsApp.");
+    await review(others[0].id, cohortId, course.id, 4);
+    await review(others[1].id, cohortId, course.id, 3, "Good but fast.");
+    await review(others[2].id, cohortId, course.id, 1, "Spam", "hidden");
+
+    const summary = (await ratingSummaries(db, [course.id])).get(course.id)!;
+    expect(summary).toEqual({ average: 4, count: 3 });
+    const page = await publicReviews(db, course.id);
+    expect(page.total).toBe(3);
+    expect(page.breakdown.find((b) => b.stars === 1)!.count).toBe(0);
+    expect(page.reviews.map((r) => r.name)).toEqual(["Amaka O.", "Chidi N."]);
+    expect(page.reviews[0].intake).toBeNull();
+    expect((await publishedCourses(db)).find((c) => c.id === course.id)!.rating).toEqual({ average: 4, count: 3 });
+    expect((await ownReview(db, others[2].id, course.id))?.status).toBe("hidden");
+  });
+
+  it("keeps one review per student per course", async () => {
+    const cohortId = seeded.salesSelfPaced.cohort.id;
+    await review(student.id, cohortId, seeded.salesCourse.id, 5);
+    await expect(review(student.id, cohortId, seeded.salesCourse.id, 4)).rejects.toThrow();
+  });
+
+  it("shortens names for the public page", () => {
+    expect(publicName("Ada Okafor")).toBe("Ada O.");
+    expect(publicName("  Efe ")).toBe("Efe");
+    expect(publicName("Mary Jane van dyke")).toBe("Mary D.");
+    expect(publicName("")).toBe("A student");
+  });
+});
+
+describe("paid course files", () => {
+  const audio = "/academy/lessons/boost-sales-with-ai/1/step-01.mp3";
+  const slide = "/academy/slides/boost-sales-with-ai/lesson-1/01.webp";
+  const animationSlide = "/academy/slides/animation-videos-with-ai/day-1/01.webp";
+
+  it("keeps lesson audio and slides out of the public folder", () => {
+    expect(existsSync("public/lessons")).toBe(false);
+    expect(existsSync("public/slides")).toBe(false);
+    expect(existsSync("private/lessons/boost-sales-with-ai/1/step-01.mp3")).toBe(true);
+  });
+
+  it("only gives them to the course's paid students and its teacher", async () => {
+    expect(await canOpenCourseFile(db, null, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "boost-sales-with-ai", slide)).toBe(false);
+
+    // Checkout started but not paid: still no.
+    await startCheckout(db, student, seeded.salesSelfPaced.cohort.id, null);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+
+    const reference = await enrolAndPay(seeded.salesSelfPaced.cohort.id);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(true);
+    expect(await canOpenCourseFile(db, student, "slides", "boost-sales-with-ai", slide)).toBe(true);
+    // Paying for one course doesn't open another.
+    expect(await canOpenCourseFile(db, student, "lessons", "ai-agents-without-code", "/academy/lessons/ai-agents-without-code/1/step-01.mp3")).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide)).toBe(false);
+
+    // A full refund takes the files away again.
+    const payment = await db.query.payments.findFirst({ where: eq(schema.payments.reference, reference) });
+    await markPaymentRefunded(db, reference, payment!.amountKobo);
+    expect(await canOpenCourseFile(db, student, "lessons", "boost-sales-with-ai", audio)).toBe(false);
+
+    expect(await canOpenCourseFile(db, { id: "x", role: "teacher", isAdmin: true }, "slides", "animation-videos-with-ai", animationSlide)).toBe(true);
+  });
+
+  it("opens a live class's slides on the class day, like its other resources", async () => {
+    await enrolAndPay(seeded.animationNext.cohort.id);
+    const day1 = seeded.animationNext.classes.find((c) => c.week === 1)!;
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide)).toBe(false);
+    expect(await canOpenCourseFile(db, student, "slides", "animation-videos-with-ai", animationSlide, unlocksAt(day1))).toBe(true);
+  });
+
+  it("refuses anything that isn't a plain course file", () => {
+    expect(courseFilePath("lessons", ["boost-sales-with-ai", "1", "step-01.mp3"])).toMatch(/private\/lessons\/boost-sales-with-ai\/1\/step-01\.mp3$/);
+    expect(courseFilePath("lessons", ["..", "..", "lib", "env.ts"])).toBeNull();
+    expect(courseFilePath("slides", ["boost-sales-with-ai", "..%2F..%2Fsecret.pptx"])).toBeNull();
+    expect(courseFilePath("slides", ["boost-sales-with-ai", "notes.txt"])).toBeNull();
+  });
+
+  it("signs short-lived links for the PowerPoint viewer and rejects tampered or expired ones", () => {
+    const file = "/academy/slides/boost-sales-with-ai/lesson-1.pptx";
+    const now = Date.now();
+    const q = new URL(signedFileUrl(file, now), "https://academy.test").searchParams;
+    expect(validSignature(file, q.get("expires"), q.get("sig"), now)).toBe(true);
+    expect(validSignature("/academy/slides/boost-sales-with-ai/lesson-2.pptx", q.get("expires"), q.get("sig"), now)).toBe(false);
+    expect(validSignature(file, q.get("expires"), "forged", now)).toBe(false);
+    expect(validSignature(file, q.get("expires"), q.get("sig"), now + 11 * 60_000)).toBe(false);
   });
 });

@@ -25,7 +25,7 @@ export type CourseTemplate = {
   quizzes: { week: number; title: string; questions: QuizQuestion[] }[];
 };
 
-/** A lesson's branded slides: the PowerPoint and one image per slide, in public/slides/<course>/<lesson>. */
+/** A lesson's branded slides: the PowerPoint and one image per slide, in private/slides/<course>/<lesson>. */
 function deck(course: string, lesson: string, count: number): LessonSlides {
   const dir = `/academy/slides/${course}/${lesson}`;
   return { file: `${dir}.pptx`, images: Array.from({ length: count }, (_, i) => `${dir}/${String(i + 1).padStart(2, "0")}.webp`) };
@@ -52,8 +52,8 @@ export const salesCourse: CourseTemplate = {
     "Follow up leads and close more sales",
     "Leave with a written AI sales plan for your own business",
   ],
-  priceNaira: 50000,
-  priceUsd: 35,
+  priceNaira: 15000,
+  priceUsd: 39,
   format: "recorded",
   accent: "blue",
   outline: [
@@ -391,4 +391,214 @@ Keep the AI tutor for questions, and share your next videos with the group.`,
   ],
 };
 
-export const courseTemplates = [salesCourse, animationCourse];
+export const agentsCourse: CourseTemplate = {
+  slug: "ai-agents-without-code",
+  title: "How to Build AI Agents Without Code",
+  tagline: "Set up a WhatsApp or Instagram assistant that answers your customers, day and night.",
+  description:
+    "A practical video course for business owners, in six short lessons you watch whenever it suits you. You build your own AI assistant for WhatsApp or Instagram that answers customer questions, takes orders and sends a payment link, the same way JTR's own WhatsApp sales agent works. No coding: you use Botpress, which is free to start (ManyChat is shown as an easier paid option). If you can use WhatsApp, you can do this course.",
+  audience: [
+    "Small business owners who get many questions on WhatsApp or Instagram",
+    "Shop, salon and food business owners who miss sales at night",
+    "Social media managers and freelancers who want to set up assistants for clients",
+  ],
+  outcomes: [
+    "Understand what an AI agent can and can't do for your business",
+    "Write a clear 'brain sheet' your assistant answers from",
+    "Connect your WhatsApp or Instagram account to Botpress, a free no-code tool",
+    "Build an assistant that answers questions in English and Pidgin",
+    "Take orders and send a Paystack payment link, without code",
+    "Test, launch and improve your assistant safely",
+  ],
+  priceNaira: 15000,
+  priceUsd: 39,
+  format: "recorded",
+  accent: "blue",
+  outline: [
+    { week: 1, title: "What an AI agent can do for your business", summary: "Auto-replies versus AI agents, a tour of JTR's WhatsApp agent, and choosing WhatsApp or Instagram." },
+    { week: 2, title: "Write your assistant's brain sheet", summary: "Your prices, hours, delivery, policies, tone and what must go to a person." },
+    { week: 3, title: "Set up your accounts", summary: "Meta Business, your Instagram or WhatsApp number, and Botpress (free), or ManyChat if you prefer to pay." },
+    { week: 4, title: "Build the assistant", summary: "Give the AI your brain sheet, a greeting, quick answers and a 'talk to a person' option." },
+    { week: 5, title: "Take orders and payments", summary: "Collect order details, send a Paystack payment link and get alerted for each order." },
+    { week: 6, title: "Test, launch and improve", summary: "Test with friends, fix wrong answers, read chats weekly and keep customer data safe." },
+  ],
+  lessons: [
+    {
+      week: 1,
+      title: "What an AI agent can do for your business",
+      notes: `## Auto-reply or AI agent?
+- An **auto-reply** sends the same message to everyone ("Thanks, we'll get back to you").
+- An **AI agent** reads the customer's question and answers it from your own business details, like a trained sales assistant. It can also take an order, send a payment link and pass the chat to you.
+
+## What JTR's WhatsApp agent does
+JTR built a WhatsApp sales agent for small businesses. It answers questions from the business's details only, takes bookings and food orders, sends a Paystack payment link, reminds customers, and hands the chat to a person when a customer complains or asks for a discount. In this course you build a simpler version yourself, without code.
+
+## What an agent should not do
+- Make up prices, stock or promises.
+- Handle refunds, complaints or discounts: those go to you.
+- Pretend to be a person. Customers must be told they are talking to an AI.
+
+## WhatsApp or Instagram?
+Start where most of your customers already message you. Both work with Botpress. WhatsApp needs a phone number that is not already on the WhatsApp or WhatsApp Business app; Instagram needs a professional account.
+
+## Exercise
+List the 10 questions customers ask you most, with your answer to each.`,
+      resources: [
+        { label: "Botpress", url: "https://botpress.com" },
+        { label: "ManyChat (easier, paid)", url: "https://manychat.com" },
+      ],
+    },
+    {
+      week: 2,
+      title: "Write your assistant's brain sheet",
+      notes: `## The brain sheet
+Your assistant is only as good as what you tell it. A "brain sheet" is one page with everything it needs:
+- **Business**: name, what you sell, location, opening hours.
+- **Products and prices**: your menu or price list, sizes, what's in stock.
+- **Delivery**: areas, fees, how long it takes, pickup option.
+- **Payment**: how customers pay (for example a Paystack link or transfer).
+- **Policies**: returns, swaps, deposits, cancellations.
+- **Tone**: friendly, short replies, English or Pidgin (reply in the language the customer uses).
+- **Hand to a person**: complaints, refunds, discounts, custom orders, anything not on the sheet.
+
+## Let AI help you write it
+Paste your notes into ChatGPT or Claude and ask: "Turn this into a clear brain sheet for a customer service assistant. Use short headings and bullet points. Don't add anything I didn't say."
+
+## Rules for the assistant
+Add these lines at the top:
+- "Only answer from this sheet. If you don't know, say a person will reply soon."
+- "Never invent prices or promise delivery times not on this sheet."
+- "Tell the customer in your first reply that you are an AI assistant."
+
+## Exercise
+Finish your brain sheet and test it: paste it into ChatGPT or Claude, ask it to act as your assistant, and ask your 10 questions.`,
+      resources: [
+        { label: "ChatGPT", url: "https://chatgpt.com" },
+        { label: "Claude", url: "https://claude.ai" },
+      ],
+    },
+    {
+      week: 3,
+      title: "Set up your accounts",
+      notes: `## What you need
+- A **Facebook account** and a free **Meta Business portfolio** (business.facebook.com).
+- For Instagram: an Instagram **professional account** (Business or Creator), linked to a Facebook Page.
+- For WhatsApp: a phone number that is **not** on the WhatsApp or WhatsApp Business app. A spare SIM is best.
+
+## Botpress (the tool we use)
+1. Sign up free at botpress.com. The free plan includes a small monthly AI allowance, enough to start and test.
+2. Create a new bot (agent) and give it your business name.
+3. Open the **Hub**, add the **WhatsApp** or **Instagram** integration, and follow its connection steps. It walks you through giving access from your Meta account.
+4. Use the built-in **test chat** (emulator) to talk to your bot before it goes live.
+
+## ManyChat (easier, but paid)
+ManyChat has fewer steps. Instagram works on its free plan, but the AI features and WhatsApp need the **Pro** plan (about $39 a month for new accounts in late 2026; check manychat.com/pricing). Pick it if you would rather pay than set things up.
+
+## WhatsApp message fees
+Meta charges small fees for some WhatsApp messages (mostly messages you start, such as reminders). Replies to customers who message you first are mostly free, within limits.
+
+## Exercise
+Create your accounts and connect one channel. Take a screenshot of the connected channel.`,
+      resources: [
+        { label: "Meta Business", url: "https://business.facebook.com" },
+        { label: "Botpress", url: "https://botpress.com" },
+        { label: "ManyChat pricing", url: "https://manychat.com/pricing" },
+      ],
+    },
+    {
+      week: 4,
+      title: "Build the assistant",
+      notes: `## In Botpress
+1. Paste the 3 rules and your tone into the bot's **instructions**.
+2. Add your brain sheet to the **knowledge base** (paste the text or upload the document). The bot answers from it.
+3. Write a **welcome message** that says the customer is chatting with an AI assistant: "Hi! I'm Amaka's Styles' AI assistant. Ask me about prices, sizes or delivery. Type HUMAN to talk to a person."
+4. Add a **"talk to a person"** step: when a customer types HUMAN, complains or asks for a refund or discount, the bot says a person will reply and alerts you (Botpress's human hand-off, or a message to your own WhatsApp).
+5. Test in the test chat, then **publish**.
+
+## In ManyChat (paid option)
+Set the same welcome message, add the AI to your default reply with your brain sheet as its instructions, add keywords such as MENU and PRICE, and a HUMAN keyword that pauses the automation and alerts you.
+
+## Good habits
+- Keep replies short: two or three lines.
+- Reply in the customer's language: English or Pidgin.
+- When unsure, the assistant says a person will reply, and you get the chat.
+
+## Exercise
+Ask your assistant your 10 questions from lesson 1 and note any wrong answers. Fix them in your brain sheet.`,
+      resources: [],
+    },
+    {
+      week: 5,
+      title: "Take orders and payments",
+      notes: `## Taking an order
+Teach the assistant to collect, one question at a time: the item, size or quantity, delivery or pickup, address area, and the customer's name. Then it repeats the order with the total.
+
+## A payment link without code
+Create a **Paystack Payment Page** (dashboard.paystack.com, Payment Pages) for each product or for a "pay any amount" page. Add the link to your brain sheet: "When the customer confirms the order, send this payment link: ...".
+
+## Know about every order
+- Tell the bot to send the full order to you (for example to your own WhatsApp or email) when the customer confirms. In ManyChat, use a notification to yourself or a "New order" tag.
+- Check Paystack for the payment before you deliver. Never deliver on a screenshot alone.
+
+## Exercise
+Create one Paystack Payment Page and complete a test order from start to finish.`,
+      resources: [{ label: "Paystack Payment Pages", url: "https://paystack.com/payment-pages" }],
+    },
+    {
+      week: 6,
+      title: "Test, launch and improve",
+      notes: `## Test before you launch
+Ask 3 friends to chat with your assistant as customers. Ask them to try a normal order, a tricky question, a complaint and Pidgin.
+
+## Launch
+Put "Chat with us on WhatsApp" or "DM us" on your posts, bio and flyers.
+
+## Improve every week
+Read your chats once a week. Every wrong or weak answer means something is missing from your brain sheet: add it.
+
+## Keep customer data safe (NDPA)
+- Tell customers they are chatting with an AI.
+- Don't ask for card numbers or passwords in the chat.
+- Only keep the details you need for the order.
+
+## Final project
+Submit your live assistant (a link or handle), screenshots of 5 test chats, and your brain sheet.
+
+## Want more?
+JTR builds full WhatsApp sales agents for businesses, with bookings, orders, payments and reminders.`,
+      resources: [],
+    },
+  ],
+  assignments: [
+    { week: 2, title: "Your brain sheet", brief: "Submit your assistant's brain sheet (a Google Doc link or paste it below), with the 3 rules at the top." },
+    { week: 5, title: "A test order", brief: "Share screenshots of one full test order with your assistant: questions, order summary and payment link." },
+    {
+      week: 6,
+      title: "Final project: your live AI assistant",
+      brief: "Submit your live assistant (WhatsApp number or Instagram handle), screenshots of 5 test chats (a normal order, a tricky question, a complaint, Pidgin and a 'talk to a person' request) and your brain sheet.",
+      isFinalProject: true,
+    },
+  ],
+  quizzes: [
+    {
+      week: 1,
+      title: "AI agents quiz",
+      questions: [
+        { question: "What is the difference between an auto-reply and an AI agent?", options: ["There is none", "An AI agent reads the question and answers it from your business details", "An auto-reply is smarter"], answer: 1 },
+        { question: "Which should your assistant hand to a person?", options: ["A question about opening hours", "A complaint or a refund request", "A question about delivery fees"], answer: 1 },
+        { question: "What must customers be told?", options: ["That they are chatting with an AI assistant", "Nothing", "Your personal phone number"], answer: 0 },
+      ],
+    },
+    {
+      week: 4,
+      title: "Building quiz",
+      questions: [
+        { question: "Where does the assistant get its answers?", options: ["From the internet", "From your brain sheet", "It makes them up"], answer: 1 },
+        { question: "What should happen when a customer types HUMAN?", options: ["The assistant pauses and you are alerted", "The chat closes", "Nothing"], answer: 0 },
+        { question: "When should you deliver an order?", options: ["When the customer sends a screenshot", "After you see the payment in Paystack", "Before payment"], answer: 1 },
+      ],
+    },
+  ],
+};
+
+export const courseTemplates = [salesCourse, animationCourse, agentsCourse];

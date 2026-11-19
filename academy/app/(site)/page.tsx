@@ -73,7 +73,11 @@ export default async function AcademyHome() {
   const hasLive = courses.some((c) => c.format === "live");
   const hasVideo = courses.some((c) => c.format === "recorded");
   const hasAnimation = courses.some((c) => c.slug === "animation-videos-with-ai");
+  const hasAgents = courses.some((c) => c.slug === "ai-agents-without-code");
   const video = courses.find((c) => c.format === "recorded");
+  const videoPart = hasAgents
+    ? "grow your sales with AI or build your own AI assistant for WhatsApp and Instagram, in video courses you take at your own pace"
+    : "grow your sales with AI in a video course you take at your own pace";
   return (
     <>
       <section className="relative overflow-hidden border-b border-line">
@@ -86,8 +90,8 @@ export default async function AcademyHome() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
               {hasAnimation
-                ? "For business owners and creators: grow your sales with AI in a video course you take at your own pace, or make animated videos with AI in a five-day live class. An AI tutor between lessons, and a certificate at the end."
-                : "For business owners and creators: grow your sales with AI in a video course you take at your own pace, starting any day. An AI tutor between lessons, and a certificate at the end."}
+                ? `For business owners and creators: ${videoPart}, or make animated videos with AI in a five-day live class. An AI tutor between lessons, and a certificate at the end.`
+                : `For business owners and creators: ${videoPart}, starting any day. An AI tutor between lessons, and a certificate at the end.`}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#courses" className="btn-primary h-12 px-7 text-base">

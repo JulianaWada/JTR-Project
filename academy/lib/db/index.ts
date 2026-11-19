@@ -57,8 +57,9 @@ export async function getDb(): Promise<Database> {
       // Start-up housekeeping (demo data, Jules's teacher login, self-paced intakes) must never take the page down:
       // a hiccup here is logged and tried again on the next cold start, and the visitor still gets their page.
       try {
-        const { ensureDemoData, ensureTeacherAccount } = await import("@/lib/seed");
+        const { ensureAddedCourses, ensureDemoData, ensureTeacherAccount } = await import("@/lib/seed");
         await ensureDemoData(state.db);
+        await ensureAddedCourses(state.db);
         await ensureTeacherAccount(state.db);
         const { ensureSelfPacedCohorts } = await import("@/lib/self-paced");
         await ensureSelfPacedCohorts(state.db);

@@ -75,7 +75,7 @@ Delete `academy/.data` to start again with fresh demo data.
 
 ## Still to decide
 
-- Course prices (₦50,000 each is a placeholder), intake dates and the Google Meet link for each intake.
+- Course prices (Boost Sales with AI: ₦15,000 in Nigeria, $39 abroad; the animation course is still a ₦50,000 / $35 placeholder), intake dates and the Google Meet link for each intake.
 - Lesson notes are a starting draft written for this build: please review and edit them in the teacher dashboard.
 - The certificate is signed "Jules, Lead Instructor".
 - Privacy policy and terms should mention student data and payments.
