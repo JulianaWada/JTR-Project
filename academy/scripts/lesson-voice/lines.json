@@ -134,6 +134,11 @@
  },
  "ai-agents-without-code": {
   "1": [
+   "Welcome to How to Build AI Agents Without Code, from JTR Academy!",
+   "In this course, you will build your own AI assistant for WhatsApp or Instagram. It answers your customers day and night, takes orders, and sends a payment link. And you won't write a single line of code.",
+   "In six short lessons, you will learn what an AI agent can do, write its brain sheet, set up your accounts, build the assistant, take orders and payments, and then test and launch it.",
+   "You will use Botpress, which is free to start, with Paystack for payments. Finish your final project, and you get a certificate. Let's begin!",
+   "Lesson 1. What an AI agent can do for your business.",
    "Meet Amaka. Her boutique is doing well, and her phone never stops. How much? Do you deliver? Is size sixteen available?",
    "At night, while Amaka sleeps, customers are still asking. When nobody answers, many of them buy somewhere else.",
    "An auto-reply sends the same message to everyone. Thanks, we'll get back to you. It doesn't answer anything.",
@@ -148,9 +153,11 @@
    "You can build your assistant for WhatsApp or for Instagram. For WhatsApp, you need a phone number that is not already on the WhatsApp app. For Instagram, you need a professional account.",
    "Start where most of your customers already message you.",
    "This week, list the ten questions your customers ask most, write your answer to each one, and choose WhatsApp or Instagram.",
-   "In lesson two, we will turn your answers into your assistant's brain sheet. See you there!"
+   "In lesson two, we will turn your answers into your assistant's brain sheet. See you there!",
+   "That's the end of lesson 1. Thank you for learning with JTR Academy!"
   ],
   "2": [
+   "Lesson 2. Write your assistant's brain sheet.",
    "Your assistant is only as good as what you tell it. So we write a brain sheet: one page with everything it needs to know. Your business, and your products and prices.",
    "Your delivery areas, fees and times. How customers pay. And your policies, like swaps and deposits.",
    "Your tone: friendly, in English or Pidgin. And what must always go to a person.",
@@ -162,9 +169,11 @@
    "Before you build anything, test it. Paste your brain sheet into ChatGPT or Claude, ask it to act as your assistant, and ask your ten questions.",
    "Try one in Pidgin too. If an answer is wrong or missing, fix the brain sheet and try again.",
    "This week, write your brain sheet, add the three rules, test it with your ten questions, and hand it in.",
-   "In lesson three, we will set up your accounts. See you there!"
+   "In lesson three, we will set up your accounts. See you there!",
+   "That's the end of lesson 2. Thank you for learning with JTR Academy!"
   ],
   "3": [
+   "Lesson 3. Set up your accounts.",
    "Before you start, you need a Facebook account and a free Meta Business portfolio, at business dot facebook dot com.",
    "For Instagram, switch your account to a professional account.",
    "For WhatsApp, you need a spare phone number that is not already on the WhatsApp app. A spare SIM is best.",
@@ -179,9 +188,11 @@
    "But the AI features and WhatsApp need the Pro plan, which costs about thirty-nine dollars a month.",
    "In this course we use Botpress, because it is free to start.",
    "This week, create your Meta Business portfolio, sign up for Botpress, connect WhatsApp or Instagram, and take a screenshot when it says connected.",
-   "In lesson four, we will build your assistant. See you there!"
+   "In lesson four, we will build your assistant. See you there!",
+   "That's the end of lesson 3. Thank you for learning with JTR Academy!"
   ],
   "4": [
+   "Lesson 4. Build the assistant.",
    "Open your bot and find the instructions. Tell it who it is, and paste your rules: only answer from the knowledge base, and never invent prices.",
    "Add your tone too: reply in English or Pidgin, like the customer, in two or three short lines.",
    "Next, open the knowledge base. This is where your brain sheet goes.",
@@ -194,9 +205,11 @@
    "Test everything in the test chat. Ask your ten questions, and try Pidgin too.",
    "When the answers are right, click publish. Your assistant is now live!",
    "This week, add your instructions and brain sheet, write your welcome message, set up talk to a person, and test your ten questions.",
-   "In lesson five, your assistant will take orders and payments. See you there!"
+   "In lesson five, your assistant will take orders and payments. See you there!",
+   "That's the end of lesson 4. Thank you for learning with JTR Academy!"
   ],
   "5": [
+   "Lesson 5. Take orders and payments.",
    "Now your assistant can take orders. Teach it to ask one question at a time. First, the item.",
    "Then the size or quantity, and delivery or pickup.",
    "Then the delivery area, and the customer's name.",
@@ -209,9 +222,11 @@
    "Tell your assistant to send every confirmed order to you, for example on your own WhatsApp or by email.",
    "Before you deliver, check the payment in Paystack. Never deliver on a screenshot alone. Then send it out!",
    "This week, teach your bot to collect an order, create a Paystack payment page, add the link to your brain sheet, and do one full test order.",
-   "In lesson six, we will test, launch and improve your assistant. See you there!"
+   "In lesson six, we will test, launch and improve your assistant. See you there!",
+   "That's the end of lesson 5. Thank you for learning with JTR Academy!"
   ],
   "6": [
+   "Lesson 6. Test, launch and improve.",
    "Before you tell your customers, ask three friends to chat with your assistant, as if they were customers. First, a normal order.",
    "Then a tricky question, a complaint, and a message in Pidgin. Watch how the assistant answers each one.",
    "Now launch it! Tell your customers they can chat with you any time. Put it in your bio, on your posts, and on your flyers and receipts.",
@@ -221,7 +236,8 @@
    "Never ask for card numbers or passwords in the chat, and keep only the details you need for the order.",
    "For your final project, hand in your live assistant's number or handle, screenshots of five test chats, and your brain sheet.",
    "Well done! You have built your own AI assistant without writing any code. Finish your project to get your certificate.",
-   "And if you ever want a full sales agent with bookings, orders, payments and reminders, JTR builds them for businesses like yours."
+   "And if you ever want a full sales agent with bookings, orders, payments and reminders, JTR builds them for businesses like yours.",
+   "That's the end of the course. Thank you for learning with JTR Academy, and well done!"
   ]
  }
 }
