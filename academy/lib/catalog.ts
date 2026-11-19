@@ -2,6 +2,7 @@ import { and, asc, eq, gt, or } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { classes, cohorts, courses } from "@/lib/db/schema";
 import { seatsTaken } from "@/lib/enrolment";
+import { ratingSummaries } from "@/lib/reviews";
 import { brandsFor, JTR_BRAND } from "@/lib/teachers";
 
 export type CourseRow = typeof courses.$inferSelect;
@@ -26,10 +27,13 @@ export async function publishedCourses(db: Database) {
   const rows = await db.query.courses.findMany({ where: eq(courses.published, true), orderBy: asc(courses.sortOrder) });
   const brands = await brandsFor(db, rows.map((c) => c.teacherId));
   const listed = rows.filter((c) => !c.teacherId || brands.has(c.teacherId));
+  const ratings = await ratingSummaries(db, listed.map((c) => c.id));
   return Promise.all(
     listed.map(async (course) => ({
       ...course,
       teacher: course.teacherId ? brands.get(course.teacherId)! : JTR_BRAND,
+      /** Average stars from students' reviews, or null before the first one. */
+      rating: ratings.get(course.id) ?? null,
       nextCohort: (await openCohorts(db, course.id))[0] ?? null,
     })),
   );

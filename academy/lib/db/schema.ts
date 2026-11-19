@@ -374,3 +374,39 @@ export const emails = pgTable("emails", {
   error: text("error"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }).enableRLS();
+
+export type ReviewStatus = "published" | "hidden";
+
+/**
+ * A student's rating (1 to 5 stars) and review of a course, given once they reach the end of their intake.
+ * One per student per course; they can edit it. The review shows on the course page straight away; the course's teacher
+ * (or the admin) can hide it. `feedback` is a private note for the teacher and is never shown publicly.
+ */
+export const courseReviews = pgTable(
+  "course_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
+    /** The intake the student took the course in. */
+    cohortId: uuid("cohort_id")
+      .notNull()
+      .references(() => cohorts.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(),
+    /** The public review; may be empty (a rating on its own). */
+    comment: text("comment").notNull().default(""),
+    /** Private feedback for the teacher. */
+    feedback: text("feedback").notNull().default(""),
+    status: text("status").$type<ReviewStatus>().notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("course_reviews_user_course_idx").on(t.userId, t.courseId),
+    index("course_reviews_course_idx").on(t.courseId, t.status, t.createdAt),
+  ],
+).enableRLS();

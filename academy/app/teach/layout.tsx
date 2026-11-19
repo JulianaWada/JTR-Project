@@ -37,6 +37,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
         { href: "/teach/payments", label: user.isAdmin ? "Payments" : "Sales", icon: "wallet" },
         { href: "/teach/chat", label: "Class chats", icon: "chat", badge: newChat },
         { href: "/teach/tutor", label: "Tutor questions", icon: "sparkles" },
+        { href: "/teach/reviews", label: "Reviews", icon: "star" },
         ...(user.isAdmin
           ? [
               { href: "/teach/teachers", label: "Teachers", icon: "users" as const, badge: pending },
