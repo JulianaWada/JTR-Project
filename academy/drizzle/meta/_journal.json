@@ -92,6 +92,13 @@
       "when": 1795023082000,
       "tag": "0012_hide_live_course",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795540000000,
+      "tag": "0013_boost_sales_price",
+      "breakpoints": true
     }
   ]
 }
