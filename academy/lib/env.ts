@@ -80,6 +80,10 @@ export const env = {
   get dailyApiKey() {
     return read("DAILY_API_KEY");
   },
+  /** The JTR class room is switched off for now. Set CLASS_ROOM=on (academy Vercel project) to bring it back. */
+  get classRoomOn() {
+    return read("CLASS_ROOM")?.toLowerCase() === "on";
+  },
 
   // Sessions and cron
   get sessionSecret() {
@@ -99,12 +103,12 @@ export const env = {
 
 export type ServiceMode = "live" | "test";
 
-export function modes(): { claude: ServiceMode; paystack: ServiceMode; email: ServiceMode; video: ServiceMode; database: "postgres" | "embedded" } {
+export function modes(): { claude: ServiceMode; paystack: ServiceMode; email: ServiceMode; video: ServiceMode | "off"; database: "postgres" | "embedded" } {
   return {
     claude: env.anthropicApiKey ? "live" : "test",
     paystack: env.paystackSecretKey ? "live" : "test",
     email: env.resendApiKey ? "live" : "test",
-    video: env.dailyApiKey ? "live" : "test",
+    video: !env.classRoomOn ? "off" : env.dailyApiKey ? "live" : "test",
     database: env.databaseUrl ? "postgres" : "embedded",
   };
 }

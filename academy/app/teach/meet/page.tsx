@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { MeetLinkCard } from "@/components/meet-link-card";
 import { Empty, Flash, PageTitle, TestModeBanner } from "@/components/ui";
 import { modes } from "@/lib/env";
 import { requireTeacher } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { liveIntakes } from "@/lib/meet-links";
+import { classRoomOn } from "@/lib/class-room";
 
 export const metadata: Metadata = { title: "Class rooms" };
 
 export default async function MeetLinks({ searchParams }: PageProps<"/teach/meet">) {
   const user = await requireTeacher();
+  // The class room is switched off for now (CLASS_ROOM=on brings it back).
+  if (!classRoomOn()) redirect("/teach");
   const intakes = await liveIntakes(await getDb(), undefined, user);
   return (
     <>

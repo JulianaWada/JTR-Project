@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { requireTeacher } from "@/lib/auth";
 import { recentStudentMessages } from "@/lib/chat";
 import { getDb, schema } from "@/lib/db";
-import { needsLink } from "@/lib/class-room";
+import { classRoomOn, needsLink } from "@/lib/class-room";
 import { liveIntakes } from "@/lib/meet-links";
 import { brandFor, ownCohortIds } from "@/lib/teachers";
 
@@ -32,7 +32,7 @@ export default async function TeachLayout({ children }: { children: React.ReactN
       items={[
         { href: "/teach", label: "Overview", icon: "grid", exact: true },
         { href: "/teach/courses", label: "Courses & intakes", icon: "book" },
-        { href: "/teach/meet", label: "Class rooms", icon: "video", badge: noMeetLink },
+        ...(classRoomOn() ? [{ href: "/teach/meet", label: "Class rooms", icon: "video" as const, badge: noMeetLink }] : []),
         { href: "/teach/marking", label: "Marking", icon: "check", badge: toMark },
         { href: "/teach/payments", label: user.isAdmin ? "Payments" : "Sales", icon: "wallet" },
         { href: "/teach/chat", label: "Class chats", icon: "chat", badge: newChat },

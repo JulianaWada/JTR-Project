@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { saveMeetLink } from "@/app/teach/actions";
 import { Pill } from "@/components/ui";
-import { needsLink, usesJtrRoom } from "@/lib/class-room";
+import { classRoomOn, needsLink, usesJtrRoom } from "@/lib/class-room";
 import type { liveIntakes } from "@/lib/meet-links";
 import { formatDate, formatTime } from "@/lib/time";
 
@@ -69,9 +69,11 @@ export function MeetLinkCard({ intake, returnTo }: { intake: Intake; returnTo: s
       <p className="mt-2 text-xs text-muted">
         Students see a Join button on their dashboard from 30 minutes before each class.{" "}
         {jtr ? (
-          <Link href={`/learn/${cohort.id}/room`} target="_blank" className="font-medium text-primary hover:underline">
-            Open the class room
-          </Link>
+          classRoomOn() && (
+            <Link href={`/learn/${cohort.id}/room`} target="_blank" className="font-medium text-primary hover:underline">
+              Open the class room
+            </Link>
+          )
         ) : (
           cohort.meetUrl && (
             <a href={cohort.meetUrl} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
