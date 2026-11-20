@@ -16,6 +16,7 @@ import {
   type AdminSession,
 } from "@/lib/admin/auth";
 import { recordAudit } from "@/lib/admin/audit";
+import { describeDbError } from "@/lib/db/diagnose";
 import { assignableRoles, can, roleInfo, type Permission } from "@/lib/admin/roles";
 import { addTeamMember, changeOwnPassword, getTeamMember, updateTeamMember } from "@/lib/admin/team";
 import { leadStatuses, saveProjectOrder, saveProjectSettings, setInterestStatus, setLeadStatus } from "@/lib/admin/site-data";
@@ -40,7 +41,15 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
     return { error: `Too many wrong attempts. Try again in ${Math.ceil((failures.resetAt - now) / 60_000)} minutes.` };
   }
   const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 200);
-  const result = await checkLogin({ email, password: String(form.get("password") ?? "") });
+  let result: Awaited<ReturnType<typeof checkLogin>>;
+  try {
+    result = await checkLogin({ email, password: String(form.get("password") ?? "") });
+  } catch (err) {
+    // Usually the database: say why on the form instead of showing a blank server error page.
+    const reason = describeDbError(err);
+    console.error(`[admin] Sign-in failed: ${reason}`);
+    return { error: `Signing in is not possible right now. ${reason}` };
+  }
   if (!result.ok) {
     if (failedLogins.size > 10_000) failedLogins.clear();
     failedLogins.set(ip, { count: (failures?.count ?? 0) + 1, resetAt: failures?.resetAt ?? now + FAILURE_WINDOW_MS });
