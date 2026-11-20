@@ -36,6 +36,15 @@ export function describeDbError(err: unknown): string {
   if (code === "ECONNREFUSED" || code === "ETIMEDOUT" || code === "CONNECT_TIMEOUT" || code === "ECONNRESET") {
     return "The database did not answer. Check that the Supabase project is not paused and that DATABASE_URL uses the Transaction pooler (port 6543).";
   }
+  if (code === "57014" || /statement timeout/i.test(message)) {
+    return "The database took too long to answer (statement timeout). Most likely an earlier stuck session is still holding a lock. In Supabase, open Project Settings > General and click Restart project, wait for it to come back, then redeploy on Vercel.";
+  }
+  if (code === "55P03" || /lock timeout/i.test(message)) {
+    return "The database is locked by another session. In Supabase, open Project Settings > General and click Restart project, then redeploy on Vercel.";
+  }
+  if (code === "42P01") {
+    return "The website's tables have not been created in this database yet. Redeploy on Vercel: each deploy sets up the tables before the site starts.";
+  }
   if (code === "3D000") {
     return "The database named at the end of DATABASE_URL does not exist. It should end in /postgres.";
   }
