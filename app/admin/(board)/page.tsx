@@ -19,22 +19,36 @@ type Activity = { at: Date; icon: IconName; tone: string; title: string; detail:
 
 const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "Africa/Lagos" });
 
+/** For the timing line in the logs. */
+function startTimer() {
+  const started = Date.now();
+  return () => Date.now() - started;
+}
+
 export default async function AdminOverview() {
   const session = await requireAdmin();
-  const started = Date.now();
+  const elapsed = startTimer();
   console.info("[admin] overview: loading");
-  const [counts, leads, interest, byCourse, daily, courses, academyPayments, businesses, agentPayments] = await Promise.all([
-    withTimeout(siteCounts(), 15_000),
-    withTimeout(listLeads(), 15_000),
-    withTimeout(listInterest(), 15_000),
-    withTimeout(interestByCourse(), 15_000),
-    withTimeout(dailyCounts(14), 15_000),
+  // The website's own data is read one query at a time (see siteCounts); the other apps' databases in parallel.
+  const others = Promise.all([
     withTimeout(listCourses(), 8000).catch(() => null),
     withTimeout(listPayments(), 8000).catch(() => null),
     withTimeout(listBusinesses(), 8000).catch(() => null),
     withTimeout(recentPayments(10), 8000).catch(() => null),
   ]);
-  console.info(`[admin] overview: loaded in ${Date.now() - started} ms`);
+  const siteData = async () => {
+    const counts = await siteCounts();
+    const leads = await listLeads();
+    const interest = await listInterest();
+    const byCourse = await interestByCourse();
+    const daily = await dailyCounts(14);
+    return [counts, leads, interest, byCourse, daily] as const;
+  };
+  const [[counts, leads, interest, byCourse, daily], [courses, academyPayments, businesses, agentPayments]] = await Promise.all([
+    withTimeout(siteData(), 20_000),
+    others,
+  ]);
+  console.info(`[admin] overview: loaded in ${elapsed()} ms`);
   const students = courses?.reduce((n, c) => n + c.activeStudents, 0) ?? 0;
   const academyRevenue = academyPayments?.filter((p) => p.status === "success" && p.currency === "NGN").reduce((n, p) => n + p.amountKobo, 0) ?? 0;
   const agentRevenue = businesses?.reduce((n, b) => n + b.paidKobo, 0) ?? 0;

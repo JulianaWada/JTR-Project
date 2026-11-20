@@ -15,7 +15,7 @@ const MIGRATIONS_FOLDER = path.join(process.cwd(), "drizzle");
 // Its own migrations table, so the website can share a Postgres database (e.g. the academy's Supabase) safely.
 const MIGRATIONS = { migrationsFolder: MIGRATIONS_FOLDER, migrationsTable: "__jtr_site_migrations" };
 
-type DbState = { db: Database };
+type DbState = { db: Database; client?: postgres.Sql; lastUsed?: number };
 const globalForDb = globalThis as unknown as { __jtrSiteDb?: DbState };
 
 /** DATABASE_URL without stray spaces or the quotes that sometimes come along when it is pasted into Vercel. */
@@ -42,25 +42,49 @@ async function createPglite(): Promise<DbState> {
   return { db };
 }
 
-async function createPostgres(url: string): Promise<DbState> {
+function connectPostgres(url: string): DbState {
   // `prepare: false` keeps it compatible with Supabase's transaction pooler (port 6543).
-  // Short timeouts so a stale or unreachable connection fails fast instead of hanging a page (same as the academy).
   const client = postgres(url, {
     prepare: false,
-    max: 3,
+    max: 10,
     idle_timeout: 20,
     max_lifetime: 60 * 5,
     connect_timeout: 10,
     onnotice: () => {},
   });
-  const db = drizzlePostgres(client, { schema });
+  return { db: drizzlePostgres(client, { schema }) as unknown as Database, client, lastUsed: Date.now() };
+}
+
+async function createPostgres(url: string): Promise<DbState> {
+  const state = connectPostgres(url);
   // Tables are created at deploy time (scripts/migrate-site.mjs, run by `npm run build`). Here a cold start only checks,
   // with one quick query, and catches up if the build couldn't. Never more than one runner, never fatal for the page:
   // many instances creating the same tables at once is what left the new Supabase database locked (Nov 2026).
-  await withTimeout(catchUpMigrations(url, client), 25_000).catch((err: unknown) => {
+  await withTimeout(catchUpMigrations(url, state.client!), 25_000).catch((err: unknown) => {
     console.error(`[db] Couldn't check the database tables at start: ${describeDbError(err)}`);
   });
-  return { db: db as unknown as Database };
+  return state;
+}
+
+/**
+ * Vercel freezes a server between visits, so its timers stop and the idle-connection clean-up never runs. When it
+ * wakes up, the pooler has long dropped those connections, and a query sent on one can wait forever: every admin page
+ * timed out while a fresh server answered at once (Nov 2026). So after a quiet spell the connections are replaced.
+ */
+const IDLE_REFRESH_MS = 15_000;
+
+function refreshIfIdle(state: DbState, url: string): DbState {
+  const now = Date.now();
+  if (state.client && state.lastUsed && now - state.lastUsed > IDLE_REFRESH_MS) {
+    const old = state.client;
+    // Queries still running get a few seconds to finish; dead connections are simply closed.
+    old.end({ timeout: 5 }).catch(() => {});
+    const fresh = connectPostgres(url);
+    globalForDb.__jtrSiteDb = fresh;
+    return fresh;
+  }
+  state.lastUsed = now;
+  return state;
 }
 
 async function expectedMigrations(): Promise<number> {
@@ -108,7 +132,8 @@ export async function getDb(): Promise<Database> {
       throw Object.assign(new Error(`Database unavailable. ${reason}`), { dbReason: reason });
     });
   }
-  return globalForDb.__jtrSiteDb.db;
+  const url = databaseUrl();
+  return url ? refreshIfIdle(globalForDb.__jtrSiteDb, url).db : globalForDb.__jtrSiteDb.db;
 }
 
 /** Whether the database can be used right now, with a plain reason when it can't (shown on the admin login page). */
