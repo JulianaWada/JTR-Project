@@ -11,6 +11,7 @@ import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
 import { isLocked, lockedWeeks, unlocksAt } from "@/lib/unlock";
 import { lessonLabel } from "@/lib/lesson-unit";
+import { classRoomOn, usesJtrRoom } from "@/lib/class-room";
 import { animatedLessonId } from "@/lib/animated-lessons";
 import { Stars } from "@/components/stars";
 import { canReview, ownReview } from "@/lib/reviews";
@@ -104,9 +105,9 @@ export default async function CourseSpace({ params, searchParams }: PageProps<"/
               <h2 className="mt-2 font-display text-xl font-semibold text-ink">
                 {lessonLabel(course)} {next.week}: {next.title}
               </h2>
-              <p className="mt-1 text-muted">{formatDateTime(next.startsAt)} Lagos time · {next.durationMinutes} minutes in the JTR class room</p>
+              <p className="mt-1 text-muted">{formatDateTime(next.startsAt)} Lagos time · {next.durationMinutes} minutes{usesJtrRoom(cohort) && classRoomOn() ? " in the JTR class room" : ""}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {nextState === "open" || nextState === "live" ? (
+                {usesJtrRoom(cohort) && !classRoomOn() ? null : nextState === "open" || nextState === "live" ? (
                   <a href={asset(`/join/${next.id}`)} className="btn-primary">
                     Join class now
                   </a>

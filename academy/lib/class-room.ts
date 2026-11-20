@@ -12,6 +12,11 @@ export const OPENS_MINUTES_BEFORE = 30;
 
 export type RoomMode = "jtr" | "link";
 
+/** Whether the JTR class room is switched on at all (CLASS_ROOM=on). While it is off, its pages and links are hidden. */
+export function classRoomOn() {
+  return env.classRoomOn;
+}
+
 /** Whether an intake meets in the JTR class room (the default) or on an outside link such as Google Meet. */
 export function usesJtrRoom(cohort: { room: string }) {
   return cohort.room !== "link";

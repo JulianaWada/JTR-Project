@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Pill } from "@/components/ui";
 import { checkCompletion } from "@/lib/certificates";
-import { openClass, outsideLink, roomPass, usesJtrRoom } from "@/lib/class-room";
+import { classRoomOn, openClass, outsideLink, roomPass, usesJtrRoom } from "@/lib/class-room";
 import { schema } from "@/lib/db";
 import { requireCohortAccess, untilText } from "@/lib/learn";
 import { lessonLabel } from "@/lib/lesson-unit";
@@ -18,6 +18,8 @@ export default async function ClassRoom({ params }: PageProps<"/learn/[cohortId]
   const { cohortId } = await params;
   const { db, user, cohort, course } = await requireCohortAccess(cohortId, `/learn/${cohortId}/room`);
   if (cohort.selfPaced) redirect(`/learn/${cohortId}`);
+  // The class room is switched off for now (CLASS_ROOM=on brings it back).
+  if (!classRoomOn() && usesJtrRoom(cohort)) redirect(`/learn/${cohortId}`);
   if (!usesJtrRoom(cohort)) redirect(outsideLink(cohort) || `/learn/${cohortId}`);
   const teacher = user.role === "teacher";
   const lessons = await db.query.classes.findMany({ where: eq(schema.classes.cohortId, cohortId), orderBy: asc(schema.classes.startsAt) });

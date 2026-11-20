@@ -14,7 +14,7 @@ import { sendClassReminders } from "@/lib/reminders";
 import { existsSync, readFileSync } from "node:fs";
 import { currencyFor, localPrice } from "@/lib/location";
 import { cleanMeetUrl, liveIntakes } from "@/lib/meet-links";
-import { needsLink, openClass, outsideLink, roomName, roomPass, usesJtrRoom } from "@/lib/class-room";
+import { classRoomOn, needsLink, openClass, outsideLink, roomName, roomPass, usesJtrRoom } from "@/lib/class-room";
 import { ensureAddedCourses, ensureTeacherAccount, seedCourses, seedDemoStudents } from "@/lib/seed";
 import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
@@ -632,6 +632,20 @@ describe("helpers", () => {
 });
 
 describe("JTR class room", () => {
+  it("is switched off unless CLASS_ROOM=on, and then doesn't count toward test mode", async () => {
+    const { modes } = await import("@/lib/env");
+    delete process.env.CLASS_ROOM;
+    expect(classRoomOn()).toBe(false);
+    expect(modes().video).toBe("off");
+    process.env.CLASS_ROOM = "on";
+    try {
+      expect(classRoomOn()).toBe(true);
+      expect(modes().video).toBe("test");
+    } finally {
+      delete process.env.CLASS_ROOM;
+    }
+  });
+
   it("uses the JTR class room by default, and an outside link only when chosen", async () => {
     const cohort = (await db.query.cohorts.findFirst({ where: eq(schema.cohorts.id, seeded.animationNext.cohort.id) }))!;
     expect(cohort.room).toBe("jtr");

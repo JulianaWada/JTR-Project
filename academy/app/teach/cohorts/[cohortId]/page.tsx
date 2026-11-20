@@ -9,6 +9,7 @@ import { requireTeacher } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { teachesCourse } from "@/lib/teachers";
 import { liveIntakes } from "@/lib/meet-links";
+import { classRoomOn } from "@/lib/class-room";
 import { money } from "@/lib/money";
 import { getProgress } from "@/lib/progress";
 import { formatDate, formatDateTime } from "@/lib/time";
@@ -77,7 +78,7 @@ export default async function CohortPage({ params, searchParams }: PageProps<"/t
         <Link href={`/learn/${cohortId}/chat`} className="btn-secondary btn-sm">
           💬 Open the class chat
         </Link>
-        {!selfPaced && cohort.room !== "link" && (
+        {!selfPaced && cohort.room !== "link" && classRoomOn() && (
           <Link href={`/learn/${cohortId}/room`} className="btn-secondary btn-sm">
             🎥 Open the class room
           </Link>

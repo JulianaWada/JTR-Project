@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { checkCompletion } from "@/lib/certificates";
-import { OPENS_MINUTES_BEFORE, outsideLink, usesJtrRoom } from "@/lib/class-room";
+import { classRoomOn, OPENS_MINUTES_BEFORE, outsideLink, usesJtrRoom } from "@/lib/class-room";
 import { getDb, schema } from "@/lib/db";
 import { teachesCourse } from "@/lib/teachers";
 import { addMinutes } from "@/lib/time";
@@ -25,7 +25,7 @@ export async function GET(_request: Request, { params }: RouteContext<"/join/[cl
 
   const course = await db.query.courses.findFirst({ where: eq(schema.courses.id, cohort.courseId), columns: { teacherId: true } });
   if (course && teachesCourse(user, course)) {
-    if (usesJtrRoom(cohort)) go(room);
+    if (usesJtrRoom(cohort) && classRoomOn()) go(room);
     if (link) redirect(link);
     go(`/teach/cohorts/${cohort.id}`);
   }
@@ -39,7 +39,7 @@ export async function GET(_request: Request, { params }: RouteContext<"/join/[cl
   const closes = addMinutes(lesson.startsAt, lesson.durationMinutes);
   if (now < opens || now > closes) go(`/learn/${cohort.id}/classes/${lesson.id}`);
   // The class room records attendance itself when the student comes in.
-  if (usesJtrRoom(cohort)) go(room);
+  if (usesJtrRoom(cohort) && classRoomOn()) go(room);
   if (!link) go(`/learn/${cohort.id}/classes/${lesson.id}`);
 
   await db.insert(schema.attendance).values({ classId, userId: user.id, source: "join" }).onConflictDoNothing();
