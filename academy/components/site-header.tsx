@@ -77,6 +77,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/teacher-login" className="hover:text-primary">
+                Teacher login
+              </Link>
+            </li>
+            <li>
               <Link href="/verify" className="hover:text-primary">
                 Verify a certificate
               </Link>

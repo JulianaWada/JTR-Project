@@ -63,7 +63,8 @@ export async function requireUser(next = "/learn") {
 
 /** An approved teacher or the admin. Anyone else goes to their application (if they applied) or their learning. */
 export async function requireTeacher() {
-  const user = await requireUser("/teach");
+  const user = await currentUser();
+  if (!user) redirect("/teacher-login?next=%2Fteach");
   if (user.role !== "teacher") {
     const db = await getDb();
     const applied = await db.query.teacherProfiles.findFirst({ where: eq(schema.teacherProfiles.userId, user.id), columns: { status: true } });
