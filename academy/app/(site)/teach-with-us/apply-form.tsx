@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { applyToTeach } from "./actions";
+import { PasswordInput } from "@/components/password-input";
 
 export function ApplyForm({ signedIn, defaults }: { signedIn: boolean; defaults?: { brandName: string; headline: string; subjects: string; website: string; bio: string } }) {
   const [state, action, pending] = useActionState(applyToTeach, undefined);
@@ -33,7 +34,7 @@ export function ApplyForm({ signedIn, defaults }: { signedIn: boolean; defaults?
               <label className="label" htmlFor="password">
                 Password
               </label>
-              <input className="input" id="password" name="password" type="password" required minLength={8} autoComplete="new-password" />
+              <PasswordInput id="password" name="password" required minLength={8} autoComplete="new-password" />
             </div>
           </div>
         </fieldset>
