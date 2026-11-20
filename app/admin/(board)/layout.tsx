@@ -7,6 +7,8 @@ import { requireAdmin, type AdminSession } from "@/lib/admin/auth";
 import { can, roleInfo } from "@/lib/admin/roles";
 import { siteCounts } from "@/lib/admin/site-data";
 import { databaseMode } from "@/lib/db";
+import { describeDbError } from "@/lib/db/diagnose";
+import { withTimeout } from "@/lib/with-timeout";
 import { logout } from "../actions";
 
 function Brand() {
@@ -50,7 +52,13 @@ function SidebarFooter({ session }: { session: AdminSession }) {
 export default async function BoardLayout({ children }: { children: ReactNode }) {
   const session = await requireAdmin();
   const show = { team: can(session.role, "team.manage"), audit: can(session.role, "audit.view") };
-  const counts = await siteCounts();
+  // If the website's database fails here, say why on the page instead of a blank server error.
+  let dbProblem: string | null = null;
+  const counts = await withTimeout(siteCounts(), 15_000).catch((err: unknown) => {
+    dbProblem = describeDbError(err);
+    console.error(`[admin] Board could not read the database: ${dbProblem}`);
+    return { newLeads: 0, weekLeads: 0, newInterest: 0, allInterest: 0 };
+  });
   const badges = { "/admin/leads": counts.newLeads, "/admin/academy": counts.newInterest };
   const testMode = databaseMode() === "pglite";
 
@@ -92,7 +100,16 @@ export default async function BoardLayout({ children }: { children: ReactNode })
             Test mode: using the built-in test database. Set DATABASE_URL in Vercel to keep leads and sign-ups permanently.
           </div>
         )}
-        <main className="mx-auto max-w-[90rem] space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
+        <main className="mx-auto max-w-[90rem] space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          {dbProblem ? (
+            <div role="alert" className="rounded-2xl border border-danger/40 bg-danger/10 p-5 text-sm text-ink">
+              <p className="font-semibold">The website&apos;s database is not answering, so this page can&apos;t load.</p>
+              <p className="mt-1">{dbProblem}</p>
+            </div>
+          ) : (
+            children
+          )}
+        </main>
       </div>
     </div>
   );
