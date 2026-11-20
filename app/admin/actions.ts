@@ -17,6 +17,7 @@ import {
 } from "@/lib/admin/auth";
 import { recordAudit } from "@/lib/admin/audit";
 import { describeDbError } from "@/lib/db/diagnose";
+import { withTimeout } from "@/lib/with-timeout";
 import { assignableRoles, can, roleInfo, type Permission } from "@/lib/admin/roles";
 import { addTeamMember, changeOwnPassword, getTeamMember, updateTeamMember } from "@/lib/admin/team";
 import { leadStatuses, saveProjectOrder, saveProjectSettings, setInterestStatus, setLeadStatus } from "@/lib/admin/site-data";
@@ -43,7 +44,7 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
   const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 200);
   let result: Awaited<ReturnType<typeof checkLogin>>;
   try {
-    result = await checkLogin({ email, password: String(form.get("password") ?? "") });
+    result = await withTimeout(checkLogin({ email, password: String(form.get("password") ?? "") }), 20_000);
   } catch (err) {
     // Usually the database: say why on the form instead of showing a blank server error page.
     const reason = describeDbError(err);
@@ -54,15 +55,16 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
     if (failedLogins.size > 10_000) failedLogins.clear();
     failedLogins.set(ip, { count: (failures?.count ?? 0) + 1, resetAt: failures?.resetAt ?? now + FAILURE_WINDOW_MS });
     // The email typed is kept so the super admin can spot someone guessing; the password never is.
-    await recordAudit({ userId: null, name: email || "(no email)", email: email || null, role: "unknown" }, "login.failed", null, {
-      reason: result.reason,
-    });
+    await withTimeout(
+      recordAudit({ userId: null, name: email || "(no email)", email: email || null, role: "unknown" }, "login.failed", null, { reason: result.reason }),
+      5000,
+    ).catch(() => {});
     if (result.reason === "disabled") return { error: "This login has been turned off. Ask the super admin." };
     return { error: "That email or password is not right." };
   }
   failedLogins.delete(ip);
   await startAdminSession(result.session.id, result.version);
-  await recordAudit(result.session, "login.success");
+  await withTimeout(recordAudit(result.session, "login.success"), 5000).catch(() => {});
   redirect("/admin");
 }
 

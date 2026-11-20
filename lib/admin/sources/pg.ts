@@ -11,7 +11,8 @@ export function connect(url: string): postgres.Sql {
   let sql = globalForPg.__jtrAdminPg.get(url);
   if (!sql) {
     // `prepare: false` keeps it compatible with Supabase's transaction pooler (port 6543).
-    sql = postgres(url, { prepare: false, max: 2, idle_timeout: 20 });
+    // Short timeouts: an unreachable app database shows "not connected" on the board instead of holding the page.
+    sql = postgres(url, { prepare: false, max: 2, idle_timeout: 20, max_lifetime: 60 * 5, connect_timeout: 5, onnotice: () => {} });
     globalForPg.__jtrAdminPg.set(url, sql);
   }
   return sql;

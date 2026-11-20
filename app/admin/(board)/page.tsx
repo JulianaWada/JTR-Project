@@ -9,6 +9,7 @@ import { listBusinesses, recentPayments, whatsappMode } from "@/lib/admin/source
 import { requireAdmin } from "@/lib/admin/auth";
 import { can } from "@/lib/admin/roles";
 import { cn } from "@/lib/cn";
+import { withTimeout } from "@/lib/with-timeout";
 
 export const metadata = { title: "Overview" };
 
@@ -26,10 +27,10 @@ export default async function AdminOverview() {
     listInterest(),
     interestByCourse(),
     dailyCounts(14),
-    listCourses().catch(() => null),
-    listPayments().catch(() => null),
-    listBusinesses().catch(() => null),
-    recentPayments(10).catch(() => null),
+    withTimeout(listCourses(), 8000).catch(() => null),
+    withTimeout(listPayments(), 8000).catch(() => null),
+    withTimeout(listBusinesses(), 8000).catch(() => null),
+    withTimeout(recentPayments(10), 8000).catch(() => null),
   ]);
   const students = courses?.reduce((n, c) => n + c.activeStudents, 0) ?? 0;
   const academyRevenue = academyPayments?.filter((p) => p.status === "success" && p.currency === "NGN").reduce((n, p) => n + p.amountKobo, 0) ?? 0;
