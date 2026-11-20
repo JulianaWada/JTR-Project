@@ -1,11 +1,12 @@
 import "server-only";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { drizzle as drizzlePglite, type PgliteDatabase } from "drizzle-orm/pglite";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { describeDbError } from "./diagnose";
 import * as schema from "./schema";
+import { withTimeout } from "@/lib/with-timeout";
 
 // Both drivers expose the same query API; the type of the embedded one is used throughout.
 export type Database = PgliteDatabase<typeof schema>;
@@ -53,10 +54,33 @@ async function createPostgres(url: string): Promise<DbState> {
     onnotice: () => {},
   });
   const db = drizzlePostgres(client, { schema });
-  // Migrations are small and idempotent, so they run on the first connection rather than in a separate step.
-  const { migrate } = await import("drizzle-orm/postgres-js/migrator");
-  await migrate(db, MIGRATIONS);
+  // Tables are created at deploy time (scripts/migrate-site.mjs, run by `npm run build`). Here a cold start only checks,
+  // with one quick query, and catches up if the build couldn't. Never more than one runner, never fatal for the page:
+  // many instances creating the same tables at once is what left the new Supabase database locked (Nov 2026).
+  await withTimeout(catchUpMigrations(url, client), 25_000).catch((err: unknown) => {
+    console.error(`[db] Couldn't check the database tables at start: ${describeDbError(err)}`);
+  });
   return { db: db as unknown as Database };
+}
+
+async function expectedMigrations(): Promise<number> {
+  const journal = JSON.parse(await readFile(path.join(MIGRATIONS_FOLDER, "meta", "_journal.json"), "utf8")) as { entries: unknown[] };
+  return journal.entries.length;
+}
+
+async function catchUpMigrations(url: string, client: postgres.Sql) {
+  const expected = await expectedMigrations();
+  const [table] = await client<{ exists: boolean }[]>`select to_regclass('drizzle.__jtr_site_migrations') is not null as exists`;
+  const applied = table?.exists ? ((await client<{ n: number }[]>`select count(*)::int as n from drizzle.__jtr_site_migrations`)[0]?.n ?? 0) : 0;
+  if (applied >= expected) return;
+  console.warn(`[db] ${expected - applied} database update(s) missing; applying them now.`);
+  const runner = postgres(url, { prepare: false, max: 1, connect_timeout: 10, onnotice: () => {} });
+  try {
+    const { migrate } = await import("drizzle-orm/postgres-js/migrator");
+    await migrate(drizzlePostgres(runner), MIGRATIONS);
+  } finally {
+    await runner.end({ timeout: 5 }).catch(() => {});
+  }
 }
 
 let pending: Promise<DbState> | null = null;
