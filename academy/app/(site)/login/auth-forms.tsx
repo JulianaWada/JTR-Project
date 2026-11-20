@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { login, signup } from "./actions";
+import { PasswordInput } from "@/components/password-input";
 
 export function LoginForm({ next, demo }: { next?: string; demo?: boolean }) {
   const [state, action, pending] = useActionState(login, undefined);
@@ -18,7 +19,7 @@ export function LoginForm({ next, demo }: { next?: string; demo?: boolean }) {
         <label className="label" htmlFor="password">
           Password
         </label>
-        <input className="input" id="password" name="password" type="password" required autoComplete="current-password" />
+        <PasswordInput id="password" name="password" required autoComplete="current-password" />
       </div>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
       <button className="btn-primary w-full" disabled={pending}>
@@ -55,7 +56,7 @@ export function SignupForm({ next }: { next?: string }) {
         <label className="label" htmlFor="password">
           Password
         </label>
-        <input className="input" id="password" name="password" type="password" required minLength={8} autoComplete="new-password" />
+        <PasswordInput id="password" name="password" required minLength={8} autoComplete="new-password" />
       </div>
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
       <button className="btn-primary w-full" disabled={pending}>
