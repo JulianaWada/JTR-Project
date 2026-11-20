@@ -55,12 +55,14 @@ export default async function BoardLayout({ children }: { children: ReactNode })
   console.info(`[admin] board: signed in as ${session.role}`);
   const show = { team: can(session.role, "team.manage"), audit: can(session.role, "audit.view") };
   // If the website's database fails here, say why on the page instead of a blank server error.
-  let dbProblem: string | null = null;
-  const counts = await withTimeout(siteCounts(), 15_000).catch((err: unknown) => {
-    dbProblem = describeDbError(err);
-    console.error(`[admin] Board could not read the database: ${dbProblem}`);
-    return { newLeads: 0, weekLeads: 0, newInterest: 0, allInterest: 0 };
-  });
+  const { counts, dbProblem } = await withTimeout(siteCounts(), 15_000).then(
+    (c) => ({ counts: c, dbProblem: null as string | null }),
+    (err: unknown) => {
+      const reason = describeDbError(err);
+      console.error(`[admin] Board could not read the database: ${reason}`);
+      return { counts: { newLeads: 0, weekLeads: 0, newInterest: 0, allInterest: 0 }, dbProblem: reason };
+    },
+  );
   const badges = { "/admin/leads": counts.newLeads, "/admin/academy": counts.newInterest };
   const testMode = databaseMode() === "pglite";
 
