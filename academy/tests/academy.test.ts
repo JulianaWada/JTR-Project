@@ -20,6 +20,7 @@ import { ensureSelfPacedCohorts } from "@/lib/self-paced";
 import { previewCourses } from "@/lib/student";
 import { askTutor } from "@/lib/tutor";
 import { sendEmail } from "@/lib/email";
+import { adminNotifyEmail, alertNewSignup } from "@/lib/admin-alerts";
 import { chatMessagesFor, deleteChatMessage, pinChatMessage, postChatMessage, recentStudentMessages } from "@/lib/chat";
 import { hashPassword } from "@/lib/passwords";
 import { addMinutes } from "@/lib/time";
@@ -52,6 +53,49 @@ async function enrolAndPay(cohortId: string, code: string | null = null) {
   await markPaymentSuccessful(db, reference);
   return reference;
 }
+
+describe("admin alerts", () => {
+  it("emails the admin inbox once per paid enrollment, with student, course, intake and amount", async () => {
+    process.env.ADMIN_NOTIFY_EMAIL = "Owner@Example.com";
+    try {
+      const reference = await enrolAndPay(seeded.animationNext.cohort.id);
+      await markPaymentSuccessful(db, reference); // a repeated webhook doesn't send a second alert
+      const alerts = await db.query.emails.findMany({ where: eq(schema.emails.to, "owner@example.com") });
+      expect(alerts).toHaveLength(1);
+      expect(alerts[0].subject).toContain("New enrollment: Amaka Obi");
+      expect(alerts[0].body).toContain("amaka@example.com");
+      expect(alerts[0].body).toContain(seeded.animationCourse.title);
+      expect(alerts[0].body).toContain(`Intake: ${seeded.animationNext.cohort.name}`);
+      expect(alerts[0].body).toContain("Amount paid: ₦");
+      expect(alerts[0].body).toContain(reference);
+    } finally {
+      delete process.env.ADMIN_NOTIFY_EMAIL;
+    }
+  });
+
+  it("emails the admin about a new sign-up, and falls back to the teacher login without ADMIN_NOTIFY_EMAIL", async () => {
+    expect(adminNotifyEmail()).toBe((process.env.TEACHER_EMAIL?.trim().toLowerCase() || "jules@julestechright.com"));
+    await alertNewSignup(db, student);
+    const [alert] = await db.query.emails.findMany({ where: eq(schema.emails.to, adminNotifyEmail()) });
+    expect(alert.subject).toBe("New student sign-up: Amaka Obi");
+    expect(alert.body).toContain("amaka@example.com");
+  });
+
+  it("never lets a failed alert stop an enrollment", async () => {
+    const broken = new Proxy(db, {
+      get(target, prop, receiver) {
+        if (prop === "insert") {
+          return (table: unknown) => {
+            if (table === schema.emails) throw new Error("email table down");
+            return target.insert(table as typeof schema.emails);
+          };
+        }
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+    await expect(alertNewSignup(broken as Database, student)).resolves.toBeUndefined();
+  });
+});
 
 describe("enrolment and payment", () => {
   it("sends students to the test checkout without a Paystack key, then activates the enrolment", async () => {

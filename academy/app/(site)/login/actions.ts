@@ -4,6 +4,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { alertNewSignup } from "@/lib/admin-alerts";
 import { endSession, safeNext, startSession } from "@/lib/auth";
 import { getDb, schema } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/passwords";
@@ -59,6 +60,7 @@ export async function signup(_prev: FormState, form: FormData): Promise<FormStat
     .insert(schema.users)
     .values({ name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone, passwordHash: hashPassword(parsed.data.password) })
     .returning();
+  await alertNewSignup(db, user);
   await startSession(user.id);
   redirect(safeNext(form.get("next"), "/learn"));
 }

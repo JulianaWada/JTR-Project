@@ -69,6 +69,7 @@ Delete `academy/.data` to start again with fresh demo data.
 | `PAYSTACK_SECRET_KEY` | Real payments (required for students to enroll on the live site) |
 | `ALLOW_TEST_PAYMENTS` | Leave empty. `true` turns the practice checkout back on for a demo copy, which lets anyone in for free |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Real emails |
+| `ADMIN_NOTIFY_EMAIL` | The inbox that gets an alert for every new student sign-up, paid enrollment and teacher application (falls back to `TEACHER_EMAIL`) |
 | `DAILY_API_KEY` | Live video in the JTR class room |
 | `CRON_SECRET` | Protects the reminders endpoint; Vercel sends it automatically |
 | `DEMO_PASSWORD` | Leave empty in production (it creates the demo students) |
