@@ -89,7 +89,14 @@ let pending: Promise<DbState> | null = null;
 export async function getDb(): Promise<Database> {
   if (!globalForDb.__jtrSiteDb) {
     const url = databaseUrl();
-    pending ??= url ? createPostgres(url) : createPglite();
+    if (!pending) {
+      const started = Date.now();
+      console.info("[db] connecting");
+      pending = (url ? createPostgres(url) : createPglite()).then((state) => {
+        console.info(`[db] ready after ${Date.now() - started} ms`);
+        return state;
+      });
+    }
     // A failed start (e.g. the database is unreachable) is retried on the next request.
     globalForDb.__jtrSiteDb = await pending.catch((err) => {
       pending = null;

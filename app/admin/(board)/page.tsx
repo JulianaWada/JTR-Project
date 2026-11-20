@@ -21,17 +21,20 @@ const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric"
 
 export default async function AdminOverview() {
   const session = await requireAdmin();
+  const started = Date.now();
+  console.info("[admin] overview: loading");
   const [counts, leads, interest, byCourse, daily, courses, academyPayments, businesses, agentPayments] = await Promise.all([
-    siteCounts(),
-    listLeads(),
-    listInterest(),
-    interestByCourse(),
-    dailyCounts(14),
+    withTimeout(siteCounts(), 15_000),
+    withTimeout(listLeads(), 15_000),
+    withTimeout(listInterest(), 15_000),
+    withTimeout(interestByCourse(), 15_000),
+    withTimeout(dailyCounts(14), 15_000),
     withTimeout(listCourses(), 8000).catch(() => null),
     withTimeout(listPayments(), 8000).catch(() => null),
     withTimeout(listBusinesses(), 8000).catch(() => null),
     withTimeout(recentPayments(10), 8000).catch(() => null),
   ]);
+  console.info(`[admin] overview: loaded in ${Date.now() - started} ms`);
   const students = courses?.reduce((n, c) => n + c.activeStudents, 0) ?? 0;
   const academyRevenue = academyPayments?.filter((p) => p.status === "success" && p.currency === "NGN").reduce((n, p) => n + p.amountKobo, 0) ?? 0;
   const agentRevenue = businesses?.reduce((n, b) => n + b.paidKobo, 0) ?? 0;
