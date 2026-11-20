@@ -50,7 +50,9 @@ function SidebarFooter({ session }: { session: AdminSession }) {
 }
 
 export default async function BoardLayout({ children }: { children: ReactNode }) {
+  console.info("[admin] board: checking the sign-in");
   const session = await requireAdmin();
+  console.info(`[admin] board: signed in as ${session.role}`);
   const show = { team: can(session.role, "team.manage"), audit: can(session.role, "audit.view") };
   // If the website's database fails here, say why on the page instead of a blank server error.
   let dbProblem: string | null = null;

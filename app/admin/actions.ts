@@ -42,6 +42,9 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
     return { error: `Too many wrong attempts. Try again in ${Math.ceil((failures.resetAt - now) / 60_000)} minutes.` };
   }
   const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 200);
+  const started = Date.now();
+  const took = () => `${Date.now() - started} ms`;
+  console.info("[admin] sign-in: checking the password");
   let result: Awaited<ReturnType<typeof checkLogin>>;
   try {
     result = await withTimeout(checkLogin({ email, password: String(form.get("password") ?? "") }), 20_000);
@@ -51,6 +54,7 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
     console.error(`[admin] Sign-in failed: ${reason}`);
     return { error: `Signing in is not possible right now. ${reason}` };
   }
+  console.info(`[admin] sign-in: password checked (${result.ok ? "ok" : result.reason}) after ${took()}`);
   if (!result.ok) {
     if (failedLogins.size > 10_000) failedLogins.clear();
     failedLogins.set(ip, { count: (failures?.count ?? 0) + 1, resetAt: failures?.resetAt ?? now + FAILURE_WINDOW_MS });
@@ -65,6 +69,7 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
   failedLogins.delete(ip);
   await startAdminSession(result.session.id, result.version);
   await withTimeout(recordAudit(result.session, "login.success"), 5000).catch(() => {});
+  console.info(`[admin] sign-in: signed in, opening the board after ${took()}`);
   redirect("/admin");
 }
 
