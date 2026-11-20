@@ -1,5 +1,6 @@
 import "server-only";
-import { count, desc, eq, gte } from "drizzle-orm";
+import { count, desc, eq, gte, sql } from "drizzle-orm";
+import { cache } from "react";
 import { getDb, schema } from "@/lib/db";
 import type { LeadStatus } from "@/lib/db/schema";
 
@@ -48,17 +49,29 @@ export async function setInterestStatus(id: string, status: LeadStatus) {
   return before;
 }
 
-export async function siteCounts() {
+/**
+ * Badge and headline counts in one query. Cached per request, so the board layout and the page share it.
+ * One query instead of four parallel ones: many parallel queries on a few connections are pipelined by the
+ * driver, and Supabase's transaction pooler could leave such a batch waiting (the overview timed out, Nov 2026).
+ */
+export const siteCounts = cache(async () => {
   const db = await getDb();
   const weekAgo = new Date(Date.now() - 7 * 86_400_000);
-  const [[newLeads], [weekLeads], [newInterest], [allInterest]] = await Promise.all([
-    db.select({ n: count() }).from(schema.leads).where(eq(schema.leads.status, "new")),
-    db.select({ n: count() }).from(schema.leads).where(gte(schema.leads.createdAt, weekAgo)),
-    db.select({ n: count() }).from(schema.academyInterest).where(eq(schema.academyInterest.status, "new")),
-    db.select({ n: count() }).from(schema.academyInterest),
-  ]);
-  return { newLeads: newLeads.n, weekLeads: weekLeads.n, newInterest: newInterest.n, allInterest: allInterest.n };
-}
+  const [row] = await db
+    .select({
+      newLeads: sql<number>`(select count(*)::int from ${schema.leads} where ${schema.leads.status} = 'new')`,
+      weekLeads: sql<number>`(select count(*)::int from ${schema.leads} where ${schema.leads.createdAt} >= ${weekAgo.toISOString()}::timestamptz)`,
+      newInterest: sql<number>`(select count(*)::int from ${schema.academyInterest} where ${schema.academyInterest.status} = 'new')`,
+      allInterest: sql<number>`(select count(*)::int from ${schema.academyInterest})`,
+    })
+    .from(sql`(select 1) as one`);
+  return {
+    newLeads: Number(row?.newLeads ?? 0),
+    weekLeads: Number(row?.weekLeads ?? 0),
+    newInterest: Number(row?.newInterest ?? 0),
+    allInterest: Number(row?.allInterest ?? 0),
+  };
+});
 
 export async function interestByCourse() {
   const db = await getDb();
@@ -106,10 +119,12 @@ export async function dailyCounts(days = 14): Promise<DailyCount[]> {
   const db = await getDb();
   const since = new Date(Date.now() - days * 86_400_000);
   const dayOf = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(d);
-  const [leadRows, interestRows] = await Promise.all([
-    db.select({ at: schema.leads.createdAt }).from(schema.leads).where(gte(schema.leads.createdAt, since)),
-    db.select({ at: schema.academyInterest.createdAt }).from(schema.academyInterest).where(gte(schema.academyInterest.createdAt, since)),
-  ]);
+  // One after the other, for the same reason as siteCounts.
+  const leadRows = await db.select({ at: schema.leads.createdAt }).from(schema.leads).where(gte(schema.leads.createdAt, since));
+  const interestRows = await db
+    .select({ at: schema.academyInterest.createdAt })
+    .from(schema.academyInterest)
+    .where(gte(schema.academyInterest.createdAt, since));
   const result = new Map<string, DailyCount>();
   for (let i = days - 1; i >= 0; i--) {
     const day = dayOf(new Date(Date.now() - i * 86_400_000));
