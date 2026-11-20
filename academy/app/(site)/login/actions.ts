@@ -19,9 +19,10 @@ function isTeacherLogin(email: string, password: string) {
   return email === teacherEmail && timingSafeEqual(a, b);
 }
 
-export type FormState = { error?: string } | undefined;
+export type FormState = { error?: string; wrongPage?: "teacher" | "student"; email?: string } | undefined;
 
-export async function login(_prev: FormState, form: FormData): Promise<FormState> {
+/** Checks the email and password; for the TEACHER_EMAIL account it also repairs the account from the env vars. */
+async function checkLogin(form: FormData) {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
   const db = await getDb();
@@ -31,11 +32,39 @@ export async function login(_prev: FormState, form: FormData): Promise<FormState
     await ensureTeacherAccount(db);
     user = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
   }
-  if (!user || !verifyPassword(password, user.passwordHash)) {
-    return { error: "That email and password don't match." };
+  if (!user || !verifyPassword(password, user.passwordHash)) return { db, user: null, email };
+  return { db, user, email };
+}
+
+const NO_MATCH = "That email and password don't match.";
+
+/** Student login. Teachers are pointed to the teacher login instead. */
+export async function login(_prev: FormState, form: FormData): Promise<FormState> {
+  const { user, email } = await checkLogin(form);
+  if (!user) return { error: NO_MATCH, email };
+  if (user.role === "teacher") {
+    return { error: "This is the student login. Teachers sign in on the teacher login page.", wrongPage: "teacher", email };
   }
   await startSession(user.id);
-  redirect(safeNext(form.get("next"), user.role === "teacher" ? "/teach" : "/learn"));
+  redirect(safeNext(form.get("next"), "/learn"));
+}
+
+/** Teacher login: approved teachers and the academy admin. Applicants go to their application; students are pointed back. */
+export async function teacherLogin(_prev: FormState, form: FormData): Promise<FormState> {
+  const { db, user, email } = await checkLogin(form);
+  if (!user) return { error: NO_MATCH, email };
+  if (user.role !== "teacher") {
+    const applied = await db.query.teacherProfiles.findFirst({ where: eq(schema.teacherProfiles.userId, user.id), columns: { status: true } });
+    if (!applied) {
+      return { error: "This is the teacher login, and this account is a student account. Please use the student login.", wrongPage: "student", email };
+    }
+    // They applied to teach but aren't approved (yet): show them where their application stands.
+    await startSession(user.id);
+    redirect("/teach-with-us");
+  }
+  await startSession(user.id);
+  const next = safeNext(form.get("next"), "/teach");
+  redirect(next.startsWith("/teach") || next.startsWith("/learn") || next.startsWith("/join") ? next : "/teach");
 }
 
 const signupSchema = z.object({

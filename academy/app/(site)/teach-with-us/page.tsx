@@ -36,7 +36,7 @@ export default async function TeachWithUs({ searchParams }: PageProps<"/teach-wi
       <div className="card border-primary/30">
         <h2 className="font-display text-xl font-semibold text-ink">{sent ? "Thank you! Your application is in." : "Your application is waiting for approval"}</h2>
         <p className="mt-2 text-sm text-muted">
-          JTR will look at it and email you at <span className="font-medium text-ink">{user?.email}</span>. Once you&apos;re approved, log in and your
+          JTR will look at it and email you at <span className="font-medium text-ink">{user?.email}</span>. Once you&apos;re approved, sign in on the teacher login page and your
           teacher dashboard opens, where you add your logo and build your courses.
         </p>
         <Link href="/learn" className="btn-secondary mt-4">
@@ -67,7 +67,10 @@ export default async function TeachWithUs({ searchParams }: PageProps<"/teach-wi
             <Link href="/login?next=/teach-with-us" className="font-medium text-primary hover:underline">
               Log in first
             </Link>{" "}
-            and apply with it.
+            and apply with it. Already an approved teacher?{" "}
+            <Link href="/teacher-login" className="font-medium text-primary hover:underline">
+              Teacher login
+            </Link>
           </p>
         )}
       </div>

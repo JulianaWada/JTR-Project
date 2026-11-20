@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
-import { login, signup } from "./actions";
+import { login, signup, teacherLogin } from "./actions";
 import { PasswordInput } from "@/components/password-input";
 
-export function LoginForm({ next, demo }: { next?: string; demo?: boolean }) {
-  const [state, action, pending] = useActionState(login, undefined);
+export function LoginForm({ next, demo, teacher }: { next?: string; demo?: boolean; teacher?: boolean }) {
+  const [state, action, pending] = useActionState(teacher ? teacherLogin : login, undefined);
+  const nextQuery = next ? `?next=${encodeURIComponent(next)}` : "";
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="next" value={next ?? ""} />
@@ -13,7 +15,7 @@ export function LoginForm({ next, demo }: { next?: string; demo?: boolean }) {
         <label className="label" htmlFor="email">
           Email
         </label>
-        <input className="input" id="email" name="email" type="email" required autoComplete="email" defaultValue={demo ? "ada@example.com" : undefined} />
+        <input className="input" id="email" name="email" type="email" required autoComplete="email" defaultValue={state?.email ?? (demo ? (teacher ? "jules@julestechright.com" : "ada@example.com") : undefined)} />
       </div>
       <div>
         <label className="label" htmlFor="password">
@@ -21,9 +23,29 @@ export function LoginForm({ next, demo }: { next?: string; demo?: boolean }) {
         </label>
         <PasswordInput id="password" name="password" required autoComplete="current-password" />
       </div>
-      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+      {state?.error && (
+        <p className="text-sm text-danger" role="alert">
+          {state.error}
+          {state.wrongPage === "teacher" && (
+            <>
+              {" "}
+              <Link href={`/teacher-login${nextQuery}`} className="font-medium underline">
+                Go to the teacher login
+              </Link>
+            </>
+          )}
+          {state.wrongPage === "student" && (
+            <>
+              {" "}
+              <Link href="/login" className="font-medium underline">
+                Go to the student login
+              </Link>
+            </>
+          )}
+        </p>
+      )}
       <button className="btn-primary w-full" disabled={pending}>
-        {pending ? "Logging in…" : "Log in"}
+        {pending ? "Logging in…" : teacher ? "Log in as a teacher" : "Log in"}
       </button>
     </form>
   );

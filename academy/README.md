@@ -42,7 +42,9 @@ With no keys everything runs in **test mode**: an embedded database (`.data/`), 
 
 - Student in progress: `ada@example.com`
 - Graduate with a certificate: `chioma@example.com` (certificate `JTR-DEMO7`)
-- Teacher: `jules@julestechright.com`
+- Teacher (admin): `jules@julestechright.com`, approved teacher `bisi@example.com`
+
+Students log in at `/academy/login`; teachers and the admin sign in at `/academy/teacher-login` (linked from the footer and Teach with JTR). Each page turns away the other kind of account with a link to the right page. Someone who applied to teach but isn't approved yet is taken to their application.
 
 Delete `academy/.data` to start again with fresh demo data.
 
