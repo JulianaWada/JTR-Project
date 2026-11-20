@@ -1,6 +1,7 @@
 import { and, count, eq, ne, sql } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { cohorts, courses, discountCodes, enrolments, payments, users, type Currency, type users as usersTable } from "@/lib/db/schema";
+import { alertNewEnrolment } from "@/lib/admin-alerts";
 import { sendEmail } from "@/lib/email";
 import { env, url } from "@/lib/env";
 import { money, shortCode } from "@/lib/money";
@@ -187,6 +188,7 @@ export async function markPaymentSuccessful(db: Database, reference: string, che
         ]
     ).join("\n"),
   });
+  await alertNewEnrolment(db, { user, course, cohort, payment });
   return { ...payment, status: "success" as const };
 }
 

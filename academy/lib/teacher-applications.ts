@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import type { Database } from "@/lib/db";
 import { teacherProfiles, users, type TeacherStatus } from "@/lib/db/schema";
+import { adminNotifyEmail } from "@/lib/admin-alerts";
 import { sendEmail } from "@/lib/email";
 import { url } from "@/lib/env";
-import { TEACHER_EMAIL } from "@/lib/seed";
 
 // Becoming a teacher: anyone can apply; the admin approves. Approval turns the account into a teacher account,
 // which opens the teacher dashboard. Rejecting or suspending turns it back into a student account (their own
@@ -40,9 +40,8 @@ export async function applyAsTeacher(db: Database, userId: string, app: Applicat
   if (existing) await db.update(teacherProfiles).set(values).where(eq(teacherProfiles.userId, userId));
   else await db.insert(teacherProfiles).values({ userId, ...values });
 
-  const adminEmail = process.env.TEACHER_EMAIL?.trim().toLowerCase() || TEACHER_EMAIL;
   await sendEmail(db, {
-    to: adminEmail,
+    to: adminNotifyEmail(),
     subject: `New teacher application: ${app.brandName || user.name}`,
     body: [
       `${user.name} (${user.email}) has applied to teach on JTR Academy.`,
